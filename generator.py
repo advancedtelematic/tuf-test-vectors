@@ -65,6 +65,13 @@ def jsonify(jsn):
     return json.dumps(jsn, sort_keys=True, indent=2)
 
 
+def human_message(err):
+    if err == 'TargetHashMismatch':
+        return "The target's calculated hash did not match the hash in the metadata."
+    else:
+        raise Exception('Unknown err: {}'.format(err))
+
+
 def sign(keys, signed):
     data = cjson(signed)
 
@@ -93,7 +100,7 @@ class Repo:
     TARGETS_KEYS = ['ed25519']
     TIMESTAMP_KEYS = ['ed25519']
     SNAPSHOT_KEYS = ['ed25519']
-    TARGETS = [('file.txt', 'wat wat wat')]
+    TARGETS = [('file.txt', b'wat wat wat\n')]
 
     def __init__(self):
         for d in ['keys', 'targets']:
@@ -127,8 +134,8 @@ class Repo:
             self.snapshot_keys.append((sig_method, key_data[0], key_data[1]))
 
         for target, content in self.TARGETS:
-            with open(path.join(self.output_dir, 'targets', target), 'w') as f:
-                f.write(content)
+            with open(path.join(self.output_dir, 'targets', target), 'wb') as f:
+                f.write(self.alter_target(content))
 
         self.make_root(1)
         for version, root in enumerate(self.root_meta):
@@ -143,6 +150,9 @@ class Repo:
 
         self.make_timestamp()
         self.write_meta('timestamp', self.timestamp_meta)
+
+    def alter_target(self, target) -> bytes:
+        return target
 
     @property
     def output_dir(self):
@@ -228,18 +238,14 @@ class Repo:
     def make_targets(self):
         file_data = dict()
 
-        for root, _, filenames in os.walk(path.join(self.output_dir, 'targets')):
-            for filename in filenames:
-                full_path = os.path.join(root, filename)
-                with open(full_path, 'rb') as f:
-                    byts = f.read()
-                    file_data[full_path.replace(path.join(self.output_dir, ''), '')] = {
-                        'length': len(byts),
-                        'hashes': {
-                            'sha512': sha512(byts),
-                            'sha256': sha256(byts),
-                        }
-                    }
+        for target, content in self.TARGETS:
+            file_data['targets/' + target] = {
+                'length': len(content),
+                'hashes': {
+                    'sha512': sha512(content),
+                    'sha256': sha256(content),
+                }
+            }
 
         signed = {
             '_type': 'Targets',
@@ -307,7 +313,7 @@ class Repo:
 
         try:
             meta['error'] = cls.ERROR
-            meta['error_msg'] = cls.ERROR_MESSAGE
+            meta['error_msg'] = human_message(cls.ERROR)
         except AttributeError:
             pass
 
@@ -323,6 +329,18 @@ class Repo001(Repo):
 
     NAME = '001'
     IS_SUCCESS = True
+
+
+class Repo002(Repo):
+
+    NAME = '002'
+    IS_SUCCESS = False
+    ERROR = 'TargetHashMismatch'
+
+    def alter_target(self, target) -> bytes:
+        new = bytearray(target)
+        new[0] ^= 0x01
+        return bytes(new)
 
 
 if __name__ == '__main__':

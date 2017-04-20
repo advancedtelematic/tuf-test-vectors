@@ -20,8 +20,8 @@ For example:
   {
     "repo": "002",
     "is_success": false,
-    "error": "MissingMetadata::Timestamp",
-    "error_msg": "The 'timestamp' metadata was missing"
+    "error": "TargetHashMismatch",
+    "error_msg": "The target's calculated hash did not match the hash in the metadata."
   }
 ]
 ```
