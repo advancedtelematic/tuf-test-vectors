@@ -28,9 +28,14 @@ For example:
 
 The above shows that the first test vector is in the directory called `001`, and
 that TUF should successfully validate the single file `file.txt`. The repo
-called `002` should not validate `file.txt` because it is missing the timestamp
-metadata. The field `error` will be machine parseable while the field
-`error_msg` is the answer to the question "Why didn't the file validate?"
+called `002` should not validate `file.txt` because the hash in the metadata
+should not match the hash that is calculated. The field `error` will be machine
+parseable while the field `error_msg` is the answer to the question "Why didn't
+the file validate?"
+
+### Notes
+
+- All signatures and hashes are hex encoded.
 
 ## License
 
