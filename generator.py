@@ -115,6 +115,8 @@ def sign(keys, signed):
 
 class Repo:
 
+    ERROR = None
+
     ROOT_KEYS = [['ed25519']]
     TARGETS_KEYS = ['ed25519']
     TIMESTAMP_KEYS = ['ed25519']
@@ -348,36 +350,35 @@ class Repo:
         self.timestamp_meta = {'signatures': sign(self.timestamp_keys, signed), 'signed': signed}
 
     @classmethod
-    def vector_meta(cls):
+    def vector_meta(cls) -> dict:
         meta = {
             'repo': cls.NAME,
-            'is_success': cls.IS_SUCCESS,
+            'is_success': cls.ERROR is None,
         }
 
-        try:
+        if cls.ERROR is not None:
             meta['error'] = cls.ERROR
             meta['error_msg'] = human_message(cls.ERROR)
-        except AttributeError:
-            pass
 
         return meta
 
     @classmethod
     def subclasses(cls) -> list:
-        return cls.__subclasses__() + [g for s in cls.__subclasses__()
-                                       for g in s.subclasses()]
+        '''Returns a sorted list of all Repo subclasses. Elements are unique.
+        '''
+        return sorted(list(set(cls.__subclasses__() + [g for s in cls.__subclasses__()
+                                                       for g in s.subclasses()])),
+                      key=lambda x: x.NAME)
 
 
 class Repo001(Repo):
 
     NAME = '001'
-    IS_SUCCESS = True
 
 
 class Repo002(Repo):
 
     NAME = '002'
-    IS_SUCCESS = False
     ERROR = 'TargetHashMismatch'
 
     def alter_target(self, target) -> bytes:
@@ -389,12 +390,16 @@ class Repo002(Repo):
 class Repo003(Repo):
 
     NAME = '003'
-    IS_SUCCESS = True
 
     ROOT_KEYS = [['rsassa-pss-sha256']]
     TARGETS_KEYS = ['rsassa-pss-sha256']
     TIMESTAMP_KEYS = ['rsassa-pss-sha256']
     SNAPSHOT_KEYS = ['rsassa-pss-sha256']
+
+
+class Repo004(Repo002, Repo003):
+
+    NAME = '004'
 
 
 if __name__ == '__main__':
