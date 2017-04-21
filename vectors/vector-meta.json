@@ -30,5 +30,21 @@
     "error_msg": "The target's size was greater than the size in the metadata.",
     "is_success": false,
     "repo": "006"
+  },
+  {
+    "is_success": true,
+    "repo": "007"
+  },
+  {
+    "is_success": true,
+    "repo": "008"
+  },
+  {
+    "is_success": true,
+    "repo": "009"
+  },
+  {
+    "is_success": true,
+    "repo": "010"
   }
 ]

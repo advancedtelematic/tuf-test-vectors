@@ -118,7 +118,7 @@ def sign(keys, signed):
 class Repo:
 
     ERROR = None
-
+    EXPIRED = None
     ROOT_KEYS = [['ed25519']]
     TARGETS_KEYS = ['ed25519']
     TIMESTAMP_KEYS = ['ed25519']
@@ -239,7 +239,7 @@ class Repo:
         signed = {
             '_type': 'Root',
             'consistent_snapshot': False,
-            'expires': '2038-01-19T03:14:06Z',
+            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'root' else '2038-01-19T03:14:06Z',
             'version': version,
             'keys': {},
             'roles': {
@@ -311,7 +311,7 @@ class Repo:
 
         signed = {
             '_type': 'Targets',
-            'expires': '2038-01-19T03:14:06Z',
+            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'targets' else '2038-01-19T03:14:06Z',
             'version': 1,
             'targets': file_data,
         }
@@ -321,7 +321,7 @@ class Repo:
     def make_snapshot(self):
         signed = {
             '_type': 'Snapshot',
-            'expires': '2038-01-19T03:14:06Z',
+            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'snapshot' else '2038-01-19T03:14:06Z',
             'version': 1,
             'meta': {
                 'targets.json': {
@@ -353,7 +353,7 @@ class Repo:
 
         signed = {
             '_type': 'Timestamp',
-            'expires': '2038-01-19T03:14:06Z',
+            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'timestamp' else '2038-01-19T03:14:06Z',
             'version': 1,
             'meta': {
                 'snapshot.json': {
@@ -434,6 +434,30 @@ class Repo005(Repo):
 class Repo006(Repo005, Repo003):
 
     NAME = '006'
+
+
+class Repo007(Repo):
+
+    NAME = '007'
+    EXPIRED = 'root'
+
+
+class Repo008(Repo):
+
+    NAME = '008'
+    EXPIRED = 'targets'
+
+
+class Repo009(Repo):
+
+    NAME = '009'
+    EXPIRED = 'timestamp'
+
+
+class Repo010(Repo):
+
+    NAME = '010'
+    EXPIRED = 'snapshot'
 
 
 if __name__ == '__main__':
