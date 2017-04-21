@@ -33,26 +33,50 @@
   },
   {
     "error": "ExpiredMetadata::Root",
-    "error_msg": "The Root metadata was expired.",
+    "error_msg": "The root metadata was expired.",
     "is_success": false,
     "repo": "007"
   },
   {
     "error": "ExpiredMetadata::Targets",
-    "error_msg": "The Targets metadata was expired.",
+    "error_msg": "The targets metadata was expired.",
     "is_success": false,
     "repo": "008"
   },
   {
     "error": "ExpiredMetadata::Timestamp",
-    "error_msg": "The Timestamp metadata was expired.",
+    "error_msg": "The timestamp metadata was expired.",
     "is_success": false,
     "repo": "009"
   },
   {
     "error": "ExpiredMetadata::Snapshot",
-    "error_msg": "The Snapshot metadata was expired.",
+    "error_msg": "The snapshot metadata was expired.",
     "is_success": false,
     "repo": "010"
+  },
+  {
+    "error": "UnmetThreshold::Root",
+    "error_msg": "The root metadata had an unmet threshold.",
+    "is_success": false,
+    "repo": "011"
+  },
+  {
+    "error": "UnmetThreshold::Targets",
+    "error_msg": "The targets metadata had an unmet threshold.",
+    "is_success": false,
+    "repo": "012"
+  },
+  {
+    "error": "UnmetThreshold::Timestamp",
+    "error_msg": "The timestamp metadata had an unmet threshold.",
+    "is_success": false,
+    "repo": "013"
+  },
+  {
+    "error": "UnmetThreshold::Targets",
+    "error_msg": "The targets metadata had an unmet threshold.",
+    "is_success": false,
+    "repo": "014"
   }
 ]

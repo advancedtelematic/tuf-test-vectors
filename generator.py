@@ -81,7 +81,6 @@ def jsonify(jsn):
 
 
 def human_message(err):
-
     if err == 'TargetHashMismatch':
         return "The target's calculated hash did not match the hash in the metadata."
     elif err == 'OversizedTarget':
@@ -90,7 +89,9 @@ def human_message(err):
         err_base, err_sub = err.split('::')
 
         if err_base == 'ExpiredMetadata':
-            return "The {} metadata was expired.".format(err_sub)
+            return "The {} metadata was expired.".format(err_sub.lower())
+        if err_base == 'UnmetThreshold':
+            return "The {} metadata had an unmet threshold.".format(err_sub.lower())
         else:
             raise Exception('Unknown err: {}'.format(err_base))
     else:
@@ -152,6 +153,22 @@ class Repo:
     '''The repo's targets.
     '''
     TARGETS = [('file.txt', b'wat wat wat\n')]
+
+    '''The modifiers to the root thesholds.
+    '''
+    ROOT_THRESHOLD_MOD = [0]
+
+    '''The modifier to the targets theshold.
+    '''
+    TARGETS_THRESHOLD_MOD = 0
+
+    '''The modifier to the timestamp theshold.
+    '''
+    TIMESTAMP_THRESHOLD_MOD = 0
+
+    '''The modifier to the targets theshold.
+    '''
+    SNAPSHOT_THRESHOLD_MOD = 0
 
     def __init__(self):
         for d in ['keys', 'targets']:
@@ -273,19 +290,19 @@ class Repo:
             'roles': {
                 'root': {
                     'keyids': [],
-                    'threshold': 1,
+                    'threshold': len(self.root_keys[version - 1]) + self.ROOT_THRESHOLD_MOD[version - 1],
                 },
                 'targets': {
                     'keyids': [],
-                    'threshold': 1,
+                    'threshold': len(self.targets_keys) + self.TARGETS_THRESHOLD_MOD,
                 },
                 'timestamp': {
                     'keyids': [],
-                    'threshold': 1,
+                    'threshold': len(self.timestamp_keys) + self.TIMESTAMP_THRESHOLD_MOD,
                 },
                 'snapshot': {
                     'keyids': [],
-                    'threshold': 1,
+                    'threshold': len(self.snapshot_keys) + self.SNAPSHOT_THRESHOLD_MOD,
                 },
             }
         }
@@ -490,6 +507,38 @@ class Repo010(Repo):
     NAME = '010'
     ERROR = 'ExpiredMetadata::Snapshot'
     EXPIRED = 'snapshot'
+
+
+class Repo011(Repo):
+
+    NAME = '011'
+    ERROR = 'UnmetThreshold::Root'
+    ROOT_KEYS = [['ed25519', 'ed25519']]
+    ROOT_THRESHOLD_MOD = [-1]
+
+
+class Repo012(Repo):
+
+    NAME = '012'
+    ERROR = 'UnmetThreshold::Targets'
+    TARGETS_KEYS = ['ed25519', 'ed25519']
+    TARGETS_THRESHOLD_MOD = -1
+
+
+class Repo013(Repo):
+
+    NAME = '013'
+    ERROR = 'UnmetThreshold::Timestamp'
+    TIMESTAMP_KEYS = ['ed25519', 'ed25519']
+    TIMESTAMP_THRESHOLD_MOD = -1
+
+
+class Repo014(Repo):
+
+    NAME = '014'
+    ERROR = 'UnmetThreshold::Targets'
+    SNAPSHOT_KEYS = ['ed25519', 'ed25519']
+    SNAPSHOT_THRESHOLD_MOD = -1
 
 
 if __name__ == '__main__':
