@@ -17,5 +17,9 @@ init: venv ## Initialize the environment
 run: init ## Run a webserver on localhost:8080 to serve the TUF content
 	@./server.py
 
+update: ## Update the requirements and virtualenv
+	@pip-compile requirements.in && \
+		$(MAKE) init
+
 venv: ## Create the virtualenv
 	@if [ ! -d venv ]; then virtualenv -p `which python3` venv; fi
