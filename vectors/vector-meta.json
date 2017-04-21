@@ -5,8 +5,12 @@
   },
   {
     "error": "TargetHashMismatch",
-    "error_msg": "The target's calculated hash did not match the hash in the metadata",
+    "error_msg": "The target's calculated hash did not match the hash in the metadata.",
     "is_success": false,
     "repo": "002"
+  },
+  {
+    "is_success": true,
+    "repo": "003"
   }
 ]

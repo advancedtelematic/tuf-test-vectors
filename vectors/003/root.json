@@ -1,0 +1,38 @@
+{
+  "signatures": [
+    {
+      "keyid": "aae033de4b2d5e9f16d7d95519a10e506acfcba34eae95fef224f44ae8412ec9",
+      "method": "rsassa-pss-sha256",
+      "sig": "8a6fed3f05988a4a212fe4f562d100738cef670ca03cf1a980d2e8f475953c8b5f8e7a68b21d0cb071b0e7144d34e10d774f900742c7ea8d50799c80917f83767aaafd25ee6fe42ef07c797a4f2f1f1e03d84670866637135f894df5d70c7ac8948adcf0e0fb8922d8e6155cffd85c9cf256af6806678c07a0364f023be5f0bc75c677c91a1b9e024e6abf9c47b95609ce21241a0dc165d84fd7ab6030672c3221b5c1887b7947839676abb8d909bab2a7faa6c18e7e292791234f7fe56380b8181013e9c110e59c0a2ea2cfcb114976d9ef3cf4de8a50cfd72ad6b4c33265fb0cc8b64c125452eb7188ab001fdd20d3d43e2c4efc8d6e024ec745630aec3cba"
+    }
+  ],
+  "signed": {
+    "_type": "Root",
+    "consistent_snapshot": false,
+    "expires": "2038-01-19T03:14:06Z",
+    "keys": {
+      "aae033de4b2d5e9f16d7d95519a10e506acfcba34eae95fef224f44ae8412ec9": {
+        "keytype": "rsa",
+        "keyvalue": {
+          "public": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAndqFFxVnq7FjihMB7sBj\nfMMIS2112HB0PauY7wDQ8gTnfbWkCOOQ2kvh0f8Ph41rQ1iZiPaZq+eQ+yqhPCsP\nJKSeq9H8oOCon4JI5afSTUTkC0NmA1SN3cMMJvUgNr+uBWOc+IHr90o6xBTuzplm\nnzzjGCGNaOMLt7P3yuF8q9UXb1DBOBvqYutGB5UB+9Ma0K4c5lMnUy0IVb6j1tEC\nFKSi4RTepA5UAOV5LE2T6Gs89kRjhTxvVsKAAj92z3VGX5pJR9zm6ZrAbjSen9Lf\nvFWgd2Hz1Qy4d9Jm0iSaJb5VG06/O4JMT1FXfIv2OP5NlzKoyDxp5ZEVLHWNksHH\nawIDAQAB\n-----END PUBLIC KEY-----"
+        }
+      }
+    },
+    "roles": {
+      "root": "aae033de4b2d5e9f16d7d95519a10e506acfcba34eae95fef224f44ae8412ec9",
+      "snapshot": {
+        "keyids": [],
+        "threshold": 1
+      },
+      "targets": {
+        "keyids": [],
+        "threshold": 1
+      },
+      "timestamp": {
+        "keyids": [],
+        "threshold": 1
+      }
+    },
+    "version": 1
+  }
+}
