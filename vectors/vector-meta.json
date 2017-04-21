@@ -32,19 +32,27 @@
     "repo": "006"
   },
   {
-    "is_success": true,
+    "error": "ExpiredMetadata::Root",
+    "error_msg": "The Root metadata was expired.",
+    "is_success": false,
     "repo": "007"
   },
   {
-    "is_success": true,
+    "error": "ExpiredMetadata::Targets",
+    "error_msg": "The Targets metadata was expired.",
+    "is_success": false,
     "repo": "008"
   },
   {
-    "is_success": true,
+    "error": "ExpiredMetadata::Timestamp",
+    "error_msg": "The Timestamp metadata was expired.",
+    "is_success": false,
     "repo": "009"
   },
   {
-    "is_success": true,
+    "error": "ExpiredMetadata::Snapshot",
+    "error_msg": "The Snapshot metadata was expired.",
+    "is_success": false,
     "repo": "010"
   }
 ]

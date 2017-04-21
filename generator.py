@@ -81,10 +81,18 @@ def jsonify(jsn):
 
 
 def human_message(err):
+
     if err == 'TargetHashMismatch':
         return "The target's calculated hash did not match the hash in the metadata."
     elif err == 'OversizedTarget':
         return "The target's size was greater than the size in the metadata."
+    elif '::' in err:
+        err_base, err_sub = err.split('::')
+
+        if err_base == 'ExpiredMetadata':
+            return "The {} metadata was expired.".format(err_sub)
+        else:
+            raise Exception('Unknown err: {}'.format(err_base))
     else:
         raise Exception('Unknown err: {}'.format(err))
 
@@ -117,12 +125,32 @@ def sign(keys, signed):
 
 class Repo:
 
+    '''The error that TUF should encounter, if any. None implies success.
+    '''
     ERROR = None
+
+    '''The name of the metadata that is expired.
+    '''
     EXPIRED = None
+
+    '''The signature methods for the root keys.
+    '''
     ROOT_KEYS = [['ed25519']]
+
+    '''The signature methods for the targets keys.
+    '''
     TARGETS_KEYS = ['ed25519']
+
+    '''The signature methods for the timestamp keys.
+    '''
     TIMESTAMP_KEYS = ['ed25519']
+
+    '''The signature methods for the snapshot keys.
+    '''
     SNAPSHOT_KEYS = ['ed25519']
+
+    '''The repo's targets.
+    '''
     TARGETS = [('file.txt', b'wat wat wat\n')]
 
     def __init__(self):
@@ -439,24 +467,28 @@ class Repo006(Repo005, Repo003):
 class Repo007(Repo):
 
     NAME = '007'
+    ERROR = 'ExpiredMetadata::Root'
     EXPIRED = 'root'
 
 
 class Repo008(Repo):
 
     NAME = '008'
+    ERROR = 'ExpiredMetadata::Targets'
     EXPIRED = 'targets'
 
 
 class Repo009(Repo):
 
     NAME = '009'
+    ERROR = 'ExpiredMetadata::Timestamp'
     EXPIRED = 'timestamp'
 
 
 class Repo010(Repo):
 
     NAME = '010'
+    ERROR = 'ExpiredMetadata::Snapshot'
     EXPIRED = 'snapshot'
 
 
