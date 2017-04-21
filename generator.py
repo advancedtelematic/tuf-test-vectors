@@ -267,7 +267,22 @@ class Repo:
         for sig_method, _, pub in self.root_keys[version - 1]:
             k_id = key_id(pub)
             keys.append((sig_method, pub))
-            signed['roles']['root'] = k_id
+            signed['roles']['root']['keyids'].append(k_id)
+
+        for sig_method, _, pub in self.targets_keys:
+            k_id = key_id(pub)
+            keys.append((sig_method, pub))
+            signed['roles']['targets']['keyids'].append(k_id)
+
+        for sig_method, _, pub in self.timestamp_keys:
+            k_id = key_id(pub)
+            keys.append((sig_method, pub))
+            signed['roles']['timestamp']['keyids'].append(k_id)
+
+        for sig_method, _, pub in self.snapshot_keys:
+            k_id = key_id(pub)
+            keys.append((sig_method, pub))
+            signed['roles']['snapshot']['keyids'].append(k_id)
 
         for sig_method, pub in keys:
             signed['keys'][key_id(pub)] = {
@@ -319,6 +334,7 @@ class Repo:
         for version, root in enumerate(self.root_meta):
             name = '{}.root.json'.format(version + 1)
             jsn = jsonify(root)
+
             signed['meta'][name] = {
                 'length': len(jsn),
                 'version': root['signed']['version'],
@@ -333,17 +349,19 @@ class Repo:
         self.snapshot_meta = {'signatures': sign(self.snapshot_keys, signed), 'signed': signed}
 
     def make_timestamp(self):
+        jsn = jsonify(self.snapshot_meta)
+
         signed = {
             '_type': 'Timestamp',
             'expires': '2038-01-19T03:14:06Z',
             'version': 1,
             'meta': {
                 'snapshot.json': {
-                    'length': len(self.snapshot_meta),
+                    'length': len(jsn),
                     'version': 1,
                     'hashes': {
-                        'sha512': sha512(jsonify(self.snapshot_meta).encode('utf-8')),
-                        'sha256': sha256(jsonify(self.snapshot_meta).encode('utf-8')),
+                        'sha512': sha512(jsn.encode('utf-8')),
+                        'sha256': sha256(jsn.encode('utf-8')),
                     },
                 },
             }
