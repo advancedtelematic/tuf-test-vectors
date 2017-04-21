@@ -83,6 +83,8 @@ def jsonify(jsn):
 def human_message(err):
     if err == 'TargetHashMismatch':
         return "The target's calculated hash did not match the hash in the metadata."
+    elif err == 'OversizedTarget':
+        return "The target's size was greater than the size in the metadata."
     else:
         raise Exception('Unknown err: {}'.format(err))
 
@@ -400,6 +402,20 @@ class Repo003(Repo):
 class Repo004(Repo002, Repo003):
 
     NAME = '004'
+
+
+class Repo005(Repo):
+
+    NAME = '005'
+    ERROR = 'OversizedTarget'
+
+    def alter_target(self, target) -> bytes:
+        return target + b'\n'
+
+
+class Repo006(Repo005, Repo003):
+
+    NAME = '006'
 
 
 if __name__ == '__main__':

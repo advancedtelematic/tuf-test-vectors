@@ -18,5 +18,17 @@
     "error_msg": "The target's calculated hash did not match the hash in the metadata.",
     "is_success": false,
     "repo": "004"
+  },
+  {
+    "error": "OversizedTarget",
+    "error_msg": "The target's size was greater than the size in the metadata.",
+    "is_success": false,
+    "repo": "005"
+  },
+  {
+    "error": "OversizedTarget",
+    "error_msg": "The target's size was greater than the size in the metadata.",
+    "is_success": false,
+    "repo": "006"
   }
 ]
