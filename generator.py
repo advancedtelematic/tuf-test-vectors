@@ -332,7 +332,7 @@ class Repo:
         for sig_method, pub in keys:
             signed['keys'][key_id(pub)] = {
                 'keytype': key_type(sig_method),
-                'keyvalue': {'public': pub},
+                'keyval': {'public': pub},
             }
 
         meta = {'signatures': sign(self.root_keys[version - 1], signed), 'signed': signed}
