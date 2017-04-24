@@ -555,7 +555,7 @@ class Repo013(Repo):
 class Repo014(Repo):
 
     NAME = '014'
-    ERROR = 'UnmetThreshold::Targets'
+    ERROR = 'UnmetThreshold::Snapshot'
     SNAPSHOT_KEYS = ['ed25519', 'ed25519']
     SNAPSHOT_THRESHOLD_MOD = 1
 

@@ -156,8 +156,8 @@
     ]
   },
   {
-    "error": "UnmetThreshold::Targets",
-    "error_msg": "The targets metadata had an unmet threshold.",
+    "error": "UnmetThreshold::Snapshot",
+    "error_msg": "The snapshot metadata had an unmet threshold.",
     "is_success": false,
     "repo": "014",
     "root_keys": [
