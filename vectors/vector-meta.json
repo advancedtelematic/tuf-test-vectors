@@ -78,5 +78,9 @@
     "error_msg": "The targets metadata had an unmet threshold.",
     "is_success": false,
     "repo": "014"
+  },
+  {
+    "is_success": true,
+    "repo": "015"
   }
 ]

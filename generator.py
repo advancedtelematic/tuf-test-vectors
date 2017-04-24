@@ -17,6 +17,7 @@ import json
 import logging
 import os
 
+from argparse import ArgumentParser
 from canonicaljson import encode_canonical_json as cjson
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
@@ -33,12 +34,16 @@ log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 
 
-def main():
+def main(target_repo=None):
     vector_meta = []
     for repo in Repo.subclasses():
+        vector_meta.append(repo.vector_meta())
+
+        if target_repo is not None and repo.NAME != target_repo:
+            continue
+
         log.info('Generating repo {}'.format(repo.NAME))
         repo = repo()
-        vector_meta.append(repo.vector_meta())
         log.info('Repo {} done'.format(repo.NAME))
 
     # verify vector_meta
@@ -217,12 +222,13 @@ class Repo:
             with open(path.join(self.output_dir, 'targets', target), 'wb') as f:
                 f.write(self.alter_target(content))
 
-        self.make_root(1)
-        for version, root in enumerate(self.root_meta):
-            log.info('Making root metadata version {}'.format(version))
+        for root_version in range(len(self.ROOT_KEYS)):
+            self.make_root(root_version + 1)
 
-            # TODO cross sign verion N+1 with keys from version N
+        for version, root in enumerate(self.root_meta):
+            log.info('Making root metadata version {}'.format(version + 1))
             self.write_meta('{}.root'.format(version + 1), root)
+
         self.write_meta('root', self.root_meta[-1])
 
         log.info('Making targets metadata')
@@ -335,7 +341,11 @@ class Repo:
                 'keyval': {'public': pub},
             }
 
-        meta = {'signatures': sign(self.root_keys[version - 1], signed), 'signed': signed}
+        keys = self.root_keys[version - 1]
+        if version > 1:
+            keys.extend(self.root_keys[version - 2])
+
+        meta = {'signatures': sign(keys, signed), 'signed': signed}
 
         if not hasattr(self, 'root_meta'):
             self.root_meta = []
@@ -541,5 +551,21 @@ class Repo014(Repo):
     SNAPSHOT_THRESHOLD_MOD = -1
 
 
+class Repo15(Repo):
+
+    NAME = '015'
+    ROOT_KEYS = [['ed25519'], ['ed25519']]
+    ROOT_THRESHOLD_MOD = [1, 1]
+
+
 if __name__ == '__main__':
-    main()
+    parser = ArgumentParser(path.basename(__file__))
+    parser.add_argument('-r', '--repo', help='The repo to generate')
+    args = parser.parse_args()
+
+    try:
+        repo = args.repo
+    except AttributeError:
+        repo = None
+
+    main(repo)
