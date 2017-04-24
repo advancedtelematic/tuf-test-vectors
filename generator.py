@@ -555,7 +555,7 @@ class Repo15(Repo):
 
     NAME = '015'
     ROOT_KEYS = [['ed25519'], ['ed25519']]
-    ROOT_THRESHOLD_MOD = [1, 1]
+    ROOT_THRESHOLD_MOD = [0, 0]
 
 
 if __name__ == '__main__':

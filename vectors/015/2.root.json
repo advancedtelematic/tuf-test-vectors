@@ -3,12 +3,12 @@
     {
       "keyid": "f24efaf978c739e8c195f9cd435cd6a1d2dfe2672cd648b06adc4df028947703",
       "method": "ed25519",
-      "sig": "35781f73deb20ef62aff74ea4a017e9c44b94c689f8b82acd591b21d0084831b9fdecdcc28b2c02216dd9c0cc46e66a005081ec544ce4357accf4c269d4aaa0d"
+      "sig": "e8f5dba8fe341cc1783c29f51f075e656f59ec4f95e6fcc8777b6d28e5c37580f905be6b09a3a22cb83d6fc6da3d441db3b184ca1e6ec31bb603a83bb6049802"
     },
     {
       "keyid": "180c85f62b8024609f7c4d420a46c780a28bb8ad1616233022c13df36cedd53e",
       "method": "ed25519",
-      "sig": "44a4de586bca6bf5251e68f478b684910443ea7915137a416f19dd022d6cc8e96e89a16f13baf63d33849931c02afe632780525ee5e24d029d0ba1b6ef537a0d"
+      "sig": "d13920e247a6ca8d93c080e71d677be078d15ee40a0aa4601c8e3d113c3cfc547d8d15b19a2c46995e30fdcff97111498c0e7df08708004c1215a830e0158c0e"
     }
   ],
   "signed": {
@@ -46,7 +46,7 @@
         "keyids": [
           "f24efaf978c739e8c195f9cd435cd6a1d2dfe2672cd648b06adc4df028947703"
         ],
-        "threshold": 2
+        "threshold": 1
       },
       "snapshot": {
         "keyids": [

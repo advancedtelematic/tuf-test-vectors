@@ -3,7 +3,7 @@
     {
       "keyid": "9c40c99b7defae58cdf3c9c1f96a2f789693d7a822ed5bdab26e1cb249c3ebff",
       "method": "ed25519",
-      "sig": "6b058609818cd705c3c8b6424327c6dba52439f707cc193f7f2dc67acff6aeeb4106eaf8db9b121405409ffa2896be9ee199b98e40f7f2836f47ec1c5981ee0e"
+      "sig": "1c42a454570004c3c06915c915732f9c0d60a8052df87e46b2cfd597db18be4840c03d4a8765b8b82fcc3a54c73f54e1429f88540e55edcc34ce108e885c0e04"
     }
   ],
   "signed": {
@@ -12,24 +12,24 @@
     "meta": {
       "1.root.json": {
         "hashes": {
-          "sha256": "78dab25ea6a9b6779a5662c904f44fe74f8fac7c327f78137fff827aa7222197",
-          "sha512": "835dda8ee4988eb722a7a37707db78351fcfccae909c2a529437b0e5c72e62f580159f10bff8a06b0f2c5835f8f0ce68481ff117527bfcd6befc7f5576cfe3aa"
+          "sha256": "4623c034d7d0889e75f6d87e18add47be8a3567250c4b33448d620035849a781",
+          "sha512": "e80cd8ff7b4e22eafdaffb3807411c7cafdaa3eddd0dbedd56d1e75d32dd8a68877258169c514cfe4ae8e91ed4d58d362d243ed9252fec93b3d2f835238c983a"
         },
         "length": 2026,
         "version": 1
       },
       "2.root.json": {
         "hashes": {
-          "sha256": "ea441394bbfdb5144ccfebd9b866d71568036c31d13b4a65286926cf0ef45d98",
-          "sha512": "d1071c7ad84402dac903e87a8bfb4401b75c7a1e7969bb698525857c67f0b8c5a95180ffbde6f342f3759c346c14eeeca61bd0f6ff9ca1f86e6bfacd3bfe6488"
+          "sha256": "4a997379dc288ff8949dc8d0929e46ef4c4529ab9e1c95e33be0c112f6da9125",
+          "sha512": "c518b69601e7ea3e68906dbf88e67567b47c58082b3b7d236528f57f154d8f3aad1dc5ee986aff6c9bdfd992fb6e0170c52a24938fa2ce0f46a78a254888ba1a"
         },
         "length": 2293,
         "version": 2
       },
       "root.json": {
         "hashes": {
-          "sha256": "ea441394bbfdb5144ccfebd9b866d71568036c31d13b4a65286926cf0ef45d98",
-          "sha512": "d1071c7ad84402dac903e87a8bfb4401b75c7a1e7969bb698525857c67f0b8c5a95180ffbde6f342f3759c346c14eeeca61bd0f6ff9ca1f86e6bfacd3bfe6488"
+          "sha256": "4a997379dc288ff8949dc8d0929e46ef4c4529ab9e1c95e33be0c112f6da9125",
+          "sha512": "c518b69601e7ea3e68906dbf88e67567b47c58082b3b7d236528f57f154d8f3aad1dc5ee986aff6c9bdfd992fb6e0170c52a24938fa2ce0f46a78a254888ba1a"
         },
         "length": 2293,
         "version": 2
