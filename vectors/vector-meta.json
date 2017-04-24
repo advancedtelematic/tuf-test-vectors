@@ -1,86 +1,180 @@
 [
   {
     "is_success": true,
-    "repo": "001"
+    "repo": "001",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   },
   {
     "error": "TargetHashMismatch",
     "error_msg": "The target's calculated hash did not match the hash in the metadata.",
     "is_success": false,
-    "repo": "002"
+    "repo": "002",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   },
   {
     "is_success": true,
-    "repo": "003"
+    "repo": "003",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "rsa"
+      }
+    ]
   },
   {
     "error": "TargetHashMismatch",
     "error_msg": "The target's calculated hash did not match the hash in the metadata.",
     "is_success": false,
-    "repo": "004"
+    "repo": "004",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "rsa"
+      }
+    ]
   },
   {
     "error": "OversizedTarget",
     "error_msg": "The target's size was greater than the size in the metadata.",
     "is_success": false,
-    "repo": "005"
+    "repo": "005",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   },
   {
     "error": "OversizedTarget",
     "error_msg": "The target's size was greater than the size in the metadata.",
     "is_success": false,
-    "repo": "006"
+    "repo": "006",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "rsa"
+      }
+    ]
   },
   {
     "error": "ExpiredMetadata::Root",
     "error_msg": "The root metadata was expired.",
     "is_success": false,
-    "repo": "007"
+    "repo": "007",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   },
   {
     "error": "ExpiredMetadata::Targets",
     "error_msg": "The targets metadata was expired.",
     "is_success": false,
-    "repo": "008"
+    "repo": "008",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   },
   {
     "error": "ExpiredMetadata::Timestamp",
     "error_msg": "The timestamp metadata was expired.",
     "is_success": false,
-    "repo": "009"
+    "repo": "009",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   },
   {
     "error": "ExpiredMetadata::Snapshot",
     "error_msg": "The snapshot metadata was expired.",
     "is_success": false,
-    "repo": "010"
+    "repo": "010",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   },
   {
     "error": "UnmetThreshold::Root",
     "error_msg": "The root metadata had an unmet threshold.",
     "is_success": false,
-    "repo": "011"
+    "repo": "011",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      },
+      {
+        "path": "1.root-2.pub",
+        "type": "ed25519"
+      }
+    ]
   },
   {
     "error": "UnmetThreshold::Targets",
     "error_msg": "The targets metadata had an unmet threshold.",
     "is_success": false,
-    "repo": "012"
+    "repo": "012",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   },
   {
     "error": "UnmetThreshold::Timestamp",
     "error_msg": "The timestamp metadata had an unmet threshold.",
     "is_success": false,
-    "repo": "013"
+    "repo": "013",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   },
   {
     "error": "UnmetThreshold::Targets",
     "error_msg": "The targets metadata had an unmet threshold.",
     "is_success": false,
-    "repo": "014"
+    "repo": "014",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   },
   {
     "is_success": true,
-    "repo": "015"
+    "repo": "015",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   }
 ]

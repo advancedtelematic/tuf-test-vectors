@@ -219,7 +219,7 @@ class Repo:
         for target, content in self.TARGETS:
             log.info('Writing target: {}'.format(target))
 
-            with open(path.join(self.output_dir, 'targets', target), 'wb') as f:
+            with open(path.join(self.output_dir, 'repo', 'targets', target), 'wb') as f:
                 f.write(self.alter_target(content))
 
         for root_version in range(len(self.ROOT_KEYS)):
@@ -282,7 +282,7 @@ class Repo:
         return (priv, pub)
 
     def write_meta(self, name, data) -> None:
-        with open(path.join(self.output_dir, name + '.json'), 'w') as f:
+        with open(path.join(self.output_dir, 'repo', name + '.json'), 'w') as f:
             f.write(jsonify(data))
             f.write('\n')
 
@@ -426,9 +426,18 @@ class Repo:
 
     @classmethod
     def vector_meta(cls) -> dict:
+        root_keys = []
+        for i, sig_method in enumerate(cls.ROOT_KEYS[0]):
+            key_meta = {
+                'type': key_type(sig_method),
+                'path': '1.root-{}.pub'.format(i + 1),
+            }
+            root_keys.append(key_meta)
+
         meta = {
             'repo': cls.NAME,
             'is_success': cls.ERROR is None,
+            'root_keys': root_keys,
         }
 
         if cls.ERROR is not None:
