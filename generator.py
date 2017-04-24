@@ -533,7 +533,7 @@ class Repo011(Repo):
     NAME = '011'
     ERROR = 'UnmetThreshold::Root'
     ROOT_KEYS = [['ed25519', 'ed25519']]
-    ROOT_THRESHOLD_MOD = [-1]
+    ROOT_THRESHOLD_MOD = [1]
 
 
 class Repo012(Repo):
@@ -541,7 +541,7 @@ class Repo012(Repo):
     NAME = '012'
     ERROR = 'UnmetThreshold::Targets'
     TARGETS_KEYS = ['ed25519', 'ed25519']
-    TARGETS_THRESHOLD_MOD = -1
+    TARGETS_THRESHOLD_MOD = 1
 
 
 class Repo013(Repo):
@@ -549,7 +549,7 @@ class Repo013(Repo):
     NAME = '013'
     ERROR = 'UnmetThreshold::Timestamp'
     TIMESTAMP_KEYS = ['ed25519', 'ed25519']
-    TIMESTAMP_THRESHOLD_MOD = -1
+    TIMESTAMP_THRESHOLD_MOD = 1
 
 
 class Repo014(Repo):
@@ -557,7 +557,7 @@ class Repo014(Repo):
     NAME = '014'
     ERROR = 'UnmetThreshold::Targets'
     SNAPSHOT_KEYS = ['ed25519', 'ed25519']
-    SNAPSHOT_THRESHOLD_MOD = -1
+    SNAPSHOT_THRESHOLD_MOD = 1
 
 
 class Repo15(Repo):

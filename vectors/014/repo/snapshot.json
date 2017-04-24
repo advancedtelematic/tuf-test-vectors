@@ -3,12 +3,12 @@
     {
       "keyid": "299e17cc2421ba21b5af13b4a2d3bffa356f1127b6941c249e7cbe147c09c6cf",
       "method": "ed25519",
-      "sig": "ee7e99bbc0603f7efe820a16dfbf10b4a56aa28516e5fcc0bb71edb0e007bfe2baa6925d09ce099a7931b7ca0c5cc1d11e312eccb488fe7bf9c9b22e55c06e09"
+      "sig": "f03a24248056d8e17de9c81c014a9ffa2b6e485e1512967363dd8a4c9d6f74bf986985686660a112f072dc9dfc9d9a25bf7a1ebc6f157dc7a3474d5d84706b05"
     },
     {
       "keyid": "0d26023dbfb51342ae20411f84b36b0386414693037c45834ddacc96bdd67ddf",
       "method": "ed25519",
-      "sig": "ea55b2274557cdf183bbb3c63d4ec4e4b66c559d4db33623360e622ae60bc7fe83780e3debff269d05c66b855446716fec7c00a2afff6b9d8fb0227fdfb9ab0b"
+      "sig": "1260d46c439ce48a6862f1c71b76d94dbb4594732d5b82477532a0656471422fb921c38c804508a028d6af3a9f88660cd077f28360bb5f928e929622b86f9607"
     }
   ],
   "signed": {
@@ -17,16 +17,16 @@
     "meta": {
       "1.root.json": {
         "hashes": {
-          "sha256": "9871dadc4af267e4168b2ce5470b160f91c429677a516ccb7ad32683d09de842",
-          "sha512": "4f398829b7d26808f7800c208988b4f99de584dca11acb3c09a18bd0bfa3a3bdafc9d0fdebc86659b2c99c5fe5beb3233907731c641a51faa2e7ee4b1658f694"
+          "sha256": "ff99aa8d4ffe5f19f5b5fa4bb92f6b255f3618c5873cb7b11971a14dbad66175",
+          "sha512": "8e98ba1577d54f03b78a1a50bd010f23136015dbd9bd42dfe19040e09895ac6fd6a4d24397fb2cf39909b266c38812eaf233fa34193d1aad4570a2ebbd11e5b2"
         },
         "length": 2336,
         "version": 1
       },
       "root.json": {
         "hashes": {
-          "sha256": "9871dadc4af267e4168b2ce5470b160f91c429677a516ccb7ad32683d09de842",
-          "sha512": "4f398829b7d26808f7800c208988b4f99de584dca11acb3c09a18bd0bfa3a3bdafc9d0fdebc86659b2c99c5fe5beb3233907731c641a51faa2e7ee4b1658f694"
+          "sha256": "ff99aa8d4ffe5f19f5b5fa4bb92f6b255f3618c5873cb7b11971a14dbad66175",
+          "sha512": "8e98ba1577d54f03b78a1a50bd010f23136015dbd9bd42dfe19040e09895ac6fd6a4d24397fb2cf39909b266c38812eaf233fa34193d1aad4570a2ebbd11e5b2"
         },
         "length": 2336,
         "version": 1
