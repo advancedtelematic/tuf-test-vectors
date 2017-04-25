@@ -579,6 +579,8 @@ class Repo014(Repo):
 
 
 class Repo15(Repo):
+    '''Good rotation from 1.root.json to 2.root.json.
+    '''
 
     NAME = '015'
     ROOT_KEYS = [['ed25519'], ['ed25519']]
@@ -593,12 +595,7 @@ class Repo15(Repo):
 
 if __name__ == '__main__':
     parser = ArgumentParser(path.basename(__file__))
-    parser.add_argument('-r', '--repo', help='The repo to generate')
+    parser.add_argument('-r', '--repo', help='The repo to generate', default=None)
     args = parser.parse_args()
 
-    try:
-        repo = args.repo
-    except AttributeError:
-        repo = None
-
-    main(repo)
+    main(args.repo)
