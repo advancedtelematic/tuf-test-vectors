@@ -184,9 +184,10 @@ class Repo:
         self.timestamp_keys = []
         self.snapshot_keys = []
 
+        self.root_meta = []
+
         for version_idx in range(len(self.ROOT_KEYS)):
             log.info('Making keys for root version {}'.format(version_idx + 1))
-
             key_group = []
 
             for key_idx, sig_method in enumerate(self.ROOT_KEYS[version_idx]):
@@ -241,11 +242,11 @@ class Repo:
                     f.write(self.alter_target(content))
 
             log.info('Making root metadata')
-            self.make_root(version_idx + 1)
+            self.root_meta.append(self.make_root(version_idx))
 
-            for version, root in enumerate(self.root_meta):
-                log.info('Making root metadata version {}'.format(version + 1))
-                self.write_meta('{}.root'.format(version + 1), root)
+            for version_idx, root in enumerate(self.root_meta):
+                log.info('Making root metadata version {}'.format(version_idx + 1))
+                self.write_meta('{}.root'.format(version_idx + 1), root)
 
             self.write_meta('root', self.root_meta[-1])
 
@@ -304,51 +305,51 @@ class Repo:
             f.write(jsonify(data))
             f.write('\n')
 
-    def make_root(self, version) -> None:
+    def make_root(self, version_idx) -> None:
         signed = {
             '_type': 'Root',
             'consistent_snapshot': False,
             'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'root' else '2038-01-19T03:14:06Z',
-            'version': version,
+            'version': version_idx + 1,
             'keys': {},
             'roles': {
                 'root': {
                     'keyids': [],
-                    'threshold': len(self.root_keys[version - 1]) + self.ROOT_THRESHOLD_MOD[version - 1],
+                    'threshold': len(self.root_keys[version_idx]) + self.ROOT_THRESHOLD_MOD[version_idx],
                 },
                 'targets': {
                     'keyids': [],
-                    'threshold': len(self.targets_keys[version - 1]) + self.TARGETS_THRESHOLD_MOD[version - 1],
+                    'threshold': len(self.targets_keys[version_idx]) + self.TARGETS_THRESHOLD_MOD[version_idx],
                 },
                 'timestamp': {
                     'keyids': [],
-                    'threshold': len(self.timestamp_keys[version - 1]) + self.TIMESTAMP_THRESHOLD_MOD[version - 1],
+                    'threshold': len(self.timestamp_keys[version_idx]) + self.TIMESTAMP_THRESHOLD_MOD[version_idx],
                 },
                 'snapshot': {
                     'keyids': [],
-                    'threshold': len(self.snapshot_keys[version - 1]) + self.SNAPSHOT_THRESHOLD_MOD[version - 1],
+                    'threshold': len(self.snapshot_keys[version_idx]) + self.SNAPSHOT_THRESHOLD_MOD[version_idx],
                 },
             }
         }
 
         keys = []
 
-        for sig_method, _, pub in self.root_keys[version - 1]:
+        for sig_method, _, pub in self.root_keys[version_idx]:
             k_id = key_id(pub)
             keys.append((sig_method, pub))
             signed['roles']['root']['keyids'].append(k_id)
 
-        for sig_method, _, pub in self.targets_keys[version - 1]:
+        for sig_method, _, pub in self.targets_keys[version_idx]:
             k_id = key_id(pub)
             keys.append((sig_method, pub))
             signed['roles']['targets']['keyids'].append(k_id)
 
-        for sig_method, _, pub in self.timestamp_keys[version - 1]:
+        for sig_method, _, pub in self.timestamp_keys[version_idx]:
             k_id = key_id(pub)
             keys.append((sig_method, pub))
             signed['roles']['timestamp']['keyids'].append(k_id)
 
-        for sig_method, _, pub in self.snapshot_keys[version - 1]:
+        for sig_method, _, pub in self.snapshot_keys[version_idx]:
             k_id = key_id(pub)
             keys.append((sig_method, pub))
             signed['roles']['snapshot']['keyids'].append(k_id)
@@ -359,18 +360,13 @@ class Repo:
                 'keyval': {'public': pub},
             }
 
-        keys = self.root_keys[version - 1]
-        if version > 1:
-            keys.extend(self.root_keys[version - 2])
+        keys = self.root_keys[version_idx]
+        if version_idx > 0:
+            keys.extend(self.root_keys[version_idx - 1])
 
-        meta = {'signatures': sign(keys, signed), 'signed': signed}
+        return {'signatures': sign(keys, signed), 'signed': signed}
 
-        if not hasattr(self, 'root_meta'):
-            self.root_meta = []
-
-        self.root_meta.append(meta)
-
-    def make_targets(self, version):
+    def make_targets(self, version_idx):
         file_data = dict()
 
         for target, content in self.TARGETS:
@@ -389,9 +385,9 @@ class Repo:
             'targets': file_data,
         }
 
-        self.targets_meta = {'signatures': sign(self.targets_keys[version - 1], signed), 'signed': signed}
+        self.targets_meta = {'signatures': sign(self.targets_keys[version_idx], signed), 'signed': signed}
 
-    def make_snapshot(self, version):
+    def make_snapshot(self, version_idx):
         signed = {
             '_type': 'Snapshot',
             'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'snapshot' else '2038-01-19T03:14:06Z',
@@ -404,8 +400,8 @@ class Repo:
         }
 
         # TODO not sure if all versions of root need to be included
-        for version_idx, root in enumerate(self.root_meta):
-            name = '{}.root.json'.format(version_idx + 1)
+        for root_version_idx, root in enumerate(self.root_meta):
+            name = '{}.root.json'.format(root_version_idx + 1)
             jsn = jsonify(root)
 
             signed['meta'][name] = {
@@ -419,9 +415,9 @@ class Repo:
 
             signed['meta']['root.json'] = signed['meta'][name]
 
-        self.snapshot_meta = {'signatures': sign(self.snapshot_keys[version - 1], signed), 'signed': signed}
+        self.snapshot_meta = {'signatures': sign(self.snapshot_keys[version_idx], signed), 'signed': signed}
 
-    def make_timestamp(self, version):
+    def make_timestamp(self, version_idx):
         jsn = jsonify(self.snapshot_meta)
 
         signed = {
@@ -440,7 +436,7 @@ class Repo:
             }
         }
 
-        self.timestamp_meta = {'signatures': sign(self.timestamp_keys[version - 1], signed), 'signed': signed}
+        self.timestamp_meta = {'signatures': sign(self.timestamp_keys[version_idx], signed), 'signed': signed}
 
     @classmethod
     def vector_meta(cls) -> dict:
