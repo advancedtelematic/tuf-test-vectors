@@ -68,8 +68,13 @@ def sha512(byts):
     return h.hexdigest()
 
 
-def key_id(pub):
-    return sha256(cjson(pub))
+def key_id(pub, alter=False):
+    if alter:
+        byts = bytearray(cjson(pub))
+        byts[0] ^= 0x01
+        return sha256(bytes(byts))
+    else:
+        return sha256(cjson(pub))
 
 
 def key_type(sig_method):
@@ -179,6 +184,10 @@ class Repo:
        E.g, if this is set to [2], then 1.root.json will not sign 2.root.json
     '''
     ROOT_CROSS_SIGN_SKIP = []
+
+    '''The key IDs to intentionally miscalculate.
+    '''
+    BAD_KEY_IDS = None
 
     def __init__(self):
         for d in ['keys', path.join('repo', 'targets')]:
@@ -340,27 +349,28 @@ class Repo:
         keys = []
 
         for sig_method, _, pub in self.root_keys[version_idx]:
-            k_id = key_id(pub)
-            keys.append((sig_method, pub))
+            k_id = key_id(pub, self.BAD_KEY_IDS == 'root')
+            keys.append((sig_method, pub, k_id))
             signed['roles']['root']['keyids'].append(k_id)
 
         for sig_method, _, pub in self.targets_keys[version_idx]:
-            k_id = key_id(pub)
-            keys.append((sig_method, pub))
+            k_id = key_id(pub, self.BAD_KEY_IDS == 'targets')
+            keys.append((sig_method, pub, k_id))
             signed['roles']['targets']['keyids'].append(k_id)
 
         for sig_method, _, pub in self.timestamp_keys[version_idx]:
-            k_id = key_id(pub)
-            keys.append((sig_method, pub))
+            k_id = key_id(pub, self.BAD_KEY_IDS == 'timestamp')
+            keys.append((sig_method, pub, k_id))
             signed['roles']['timestamp']['keyids'].append(k_id)
 
         for sig_method, _, pub in self.snapshot_keys[version_idx]:
+            k_id = key_id(pub, self.BAD_KEY_IDS == 'snapshot')
             k_id = key_id(pub)
-            keys.append((sig_method, pub))
+            keys.append((sig_method, pub, k_id))
             signed['roles']['snapshot']['keyids'].append(k_id)
 
-        for sig_method, pub in keys:
-            signed['keys'][key_id(pub)] = {
+        for sig_method, pub, k_id in keys:
+            signed['keys'][k_id] = {
                 'keytype': key_type(sig_method),
                 'keyval': {'public': pub},
             }
@@ -596,13 +606,40 @@ class Repo015(Repo):
 
 
 class Repo016(Repo015):
-
     '''Bad rotation from 1.root.json to 2.root.json.
     '''
 
     NAME = '016'
     ERROR = 'UnmetThreshold::Root'
     ROOT_CROSS_SIGN_SKIP = [2]
+
+
+class Repo017(Repo001):
+
+    NAME = '017'
+    ERROR = 'UnmetThreshold::Root'
+    BAD_KEY_IDS = 'root'
+
+
+class Repo018(Repo001):
+
+    NAME = '018'
+    ERROR = 'UnmetThreshold::Targets'
+    BAD_KEY_IDS = 'targets'
+
+
+class Repo019(Repo001):
+
+    NAME = '019'
+    ERROR = 'UnmetThreshold::Timestamp'
+    BAD_KEY_IDS = 'timestamp'
+
+
+class Repo020(Repo001):
+
+    NAME = '020'
+    ERROR = 'UnmetThreshold::Snapshot'
+    BAD_KEY_IDS = 'Snapshot'
 
 
 if __name__ == '__main__':

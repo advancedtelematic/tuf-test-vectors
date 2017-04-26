@@ -188,5 +188,53 @@
         "type": "ed25519"
       }
     ]
+  },
+  {
+    "error": "UnmetThreshold::Root",
+    "error_msg": "The root metadata had an unmet threshold.",
+    "is_success": false,
+    "repo": "017",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
+  },
+  {
+    "error": "UnmetThreshold::Targets",
+    "error_msg": "The targets metadata had an unmet threshold.",
+    "is_success": false,
+    "repo": "018",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
+  },
+  {
+    "error": "UnmetThreshold::Timestamp",
+    "error_msg": "The timestamp metadata had an unmet threshold.",
+    "is_success": false,
+    "repo": "019",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
+  },
+  {
+    "error": "UnmetThreshold::Snapshot",
+    "error_msg": "The snapshot metadata had an unmet threshold.",
+    "is_success": false,
+    "repo": "020",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   }
 ]
