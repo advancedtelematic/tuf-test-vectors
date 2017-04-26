@@ -365,7 +365,6 @@ class Repo:
 
         for sig_method, _, pub in self.snapshot_keys[version_idx]:
             k_id = key_id(pub, self.BAD_KEY_IDS == 'snapshot')
-            k_id = key_id(pub)
             keys.append((sig_method, pub, k_id))
             signed['roles']['snapshot']['keyids'].append(k_id)
 
@@ -639,7 +638,7 @@ class Repo020(Repo001):
 
     NAME = '020'
     ERROR = 'UnmetThreshold::Snapshot'
-    BAD_KEY_IDS = 'Snapshot'
+    BAD_KEY_IDS = 'snapshot'
 
 
 if __name__ == '__main__':
