@@ -5,7 +5,7 @@ import os
 
 # activate the virtual environment
 activate_this = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                             'venv/bin/activate_this.py')
+                             os.path.join('venv', 'bin', 'activate_this.py'))
 with open(activate_this) as f:
     code = compile(f.read(), activate_this, 'exec')
     exec(code, dict(__file__=activate_this))

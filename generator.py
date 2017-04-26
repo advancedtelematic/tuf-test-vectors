@@ -4,7 +4,7 @@ from os import path
 
 # activate the virtual environment
 activate_this = path.join(path.abspath(path.dirname(__file__)),
-                          'venv/bin/activate_this.py')
+                          path.join('venv', 'bin', 'activate_this.py'))
 with open(activate_this) as f:
     code = compile(f.read(), activate_this, 'exec')
     exec(code, dict(__file__=activate_this))
@@ -175,8 +175,13 @@ class Repo:
     '''
     SNAPSHOT_THRESHOLD_MOD = [0]
 
+    '''The versions to skip root cross signing.
+       E.g, if this is set to [2], then 1.root.json will not sign 2.root.json
+    '''
+    ROOT_CROSS_SIGN_SKIP = []
+
     def __init__(self):
-        for d in ['keys', 'targets']:
+        for d in ['keys', path.join('repo', 'targets')]:
             os.makedirs(path.join(self.output_dir, d), exist_ok=True)
 
         self.root_keys = []
@@ -361,7 +366,8 @@ class Repo:
             }
 
         keys = self.root_keys[version_idx]
-        if version_idx > 0:
+
+        if version_idx > 0 and (version_idx + 1) not in self.ROOT_CROSS_SIGN_SKIP:
             keys.extend(self.root_keys[version_idx - 1])
 
         return {'signatures': sign(keys, signed), 'signed': signed}
@@ -574,7 +580,7 @@ class Repo014(Repo):
     SNAPSHOT_THRESHOLD_MOD = [1]
 
 
-class Repo15(Repo):
+class Repo015(Repo):
     '''Good rotation from 1.root.json to 2.root.json.
     '''
 
@@ -587,6 +593,16 @@ class Repo15(Repo):
     TARGETS_THRESHOLD_MOD = [0, 0]
     TIMESTAMP_THRESHOLD_MOD = [0, 0]
     SNAPSHOT_THRESHOLD_MOD = [0, 0]
+
+
+class Repo016(Repo015):
+
+    '''Bad rotation from 1.root.json to 2.root.json.
+    '''
+
+    NAME = '016'
+    ERROR = 'UnmetThreshold::Root'
+    ROOT_CROSS_SIGN_SKIP = [2]
 
 
 if __name__ == '__main__':

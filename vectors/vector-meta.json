@@ -176,5 +176,17 @@
         "type": "ed25519"
       }
     ]
+  },
+  {
+    "error": "UnmetThreshold::Root",
+    "error_msg": "The root metadata had an unmet threshold.",
+    "is_success": false,
+    "repo": "016",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   }
 ]
