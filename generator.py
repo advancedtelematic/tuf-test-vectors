@@ -10,6 +10,7 @@ with open(activate_this) as f:
     exec(code, dict(__file__=activate_this))
 
 
+import base64
 import binascii
 import ed25519
 import hashlib
@@ -23,8 +24,8 @@ from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_PSS
 
-
-OUTPUT_DIR = path.join(path.dirname(path.abspath(__file__)), 'vectors')
+SIGNATURE_ENCODING = None
+OUTPUT_DIR = None
 
 log = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -34,7 +35,11 @@ log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 
 
-def main(target_repo=None):
+def main(signature_encoding, output_dir, target_repo=None):
+    global SIGNATURE_ENCODING, OUTPUT_DIR
+    SIGNATURE_ENCODING = signature_encoding
+    OUTPUT_DIR = output_dir
+
     vector_meta = []
     for repo in Repo.subclasses():
         vector_meta.append(repo.vector_meta())
@@ -129,6 +134,17 @@ def human_message(err):
         raise Exception('Unknown err: {}'.format(err))
 
 
+def encode_signature(sig):
+    global SIGNATURE_ENCODING
+
+    if SIGNATURE_ENCODING == 'hex':
+        return binascii.hexlify(sig).decode('utf-8')
+    elif SIGNATURE_ENCODING == 'base64':
+        return base64.b64encode(sig).decode('utf-8')
+    else:
+        raise Exception('Invalid signature encoding: {}'.format(SIGNATURE_ENCODING))
+
+
 def sign(keys, signed):
     data = cjson(signed)
 
@@ -136,19 +152,19 @@ def sign(keys, signed):
     for sig_method, priv, pub in keys:
         if sig_method == 'ed25519':
             priv = ed25519.SigningKey(binascii.unhexlify(priv))
-            sig = priv.sign(data, encoding='hex').decode('utf-8')
+            sig = priv.sign(data)
         elif sig_method == 'rsassa-pss-sha256':
             h = SHA256.new(data)
             rsa = RSA.importKey(priv)
             signer = PKCS1_PSS.new(rsa)
-            sig = binascii.hexlify(signer.sign(h)).decode('utf-8')
+            sig = signer.sign(h)
         else:
             raise Exception('unknown signature method: {}'.format(sig_method))
 
         sig_data = {
             'keyid': key_id(pub),
             'method': sig_method,
-            'sig': sig,
+            'sig': encode_signature(sig),
         }
         sigs.append(sig_data)
 
@@ -686,7 +702,11 @@ class Repo022(Repo001):
 
 if __name__ == '__main__':
     parser = ArgumentParser(path.basename(__file__))
+    parser.add_argument('-o', '--output-dir', help='The path to write the repos',
+                        default=path.join(path.dirname(path.abspath(__file__)), 'vectors'))
     parser.add_argument('-r', '--repo', help='The repo to generate', default=None)
+    parser.add_argument('--signature-encoding', help='The encoding for cryptographic signatures',
+                        default='hex', choices=['hex', 'base64'])
     args = parser.parse_args()
 
-    main(args.repo)
+    main(args.signature_encoding, args.output_dir, args.repo)
