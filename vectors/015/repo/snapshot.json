@@ -3,7 +3,7 @@
     {
       "keyid": "96a35c1a4e714b62db4a1653006f3b9a7a66a01eb86b97b13926bac550b587b3",
       "method": "ed25519",
-      "sig": "66bf9b6a62bd99e6078b0036e74a16ebe1c13736c5fb9eee48fea91f2486d1fb125225e79d2776ca1ab0232affb9d1e210a4add63563a93c3bb85cf278782804"
+      "sig": "10019a2430c77d5fb04cdeb279290717fcdf62479a171603177411beaa81924f51429798a4834bcd3b66dfd0c4b6951edf54e2da275b19f009177b7697a0d80b"
     }
   ],
   "signed": {
@@ -35,7 +35,7 @@
         "version": 2
       },
       "targets.json": {
-        "version": 1
+        "version": 2
       }
     },
     "version": 1

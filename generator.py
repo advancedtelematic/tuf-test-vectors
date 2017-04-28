@@ -409,7 +409,7 @@ class Repo:
             'version': 1,
             'meta': {
                 'targets.json': {
-                    'version': 1,
+                    'version': version_idx + 1,  # TODO this might need updating
                 },
             }
         }
