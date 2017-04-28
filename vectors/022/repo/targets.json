@@ -1,0 +1,23 @@
+{
+  "signatures": [
+    {
+      "keyid": "c830558ece9dc1ce9a05adac5f8fc3ae1f301e9023b2ee8c3e8313a3b480a973",
+      "method": "ed25519",
+      "sig": "615cce6e9577d2f9b0b7e20e529715a5ebb1a470f01e335a98c2477f7a97dce5697e796d6c44c908c28c8bd56b9b340ae3e27c193cf401ae34be9eb87f5dde08"
+    }
+  ],
+  "signed": {
+    "_type": "Targets",
+    "expires": "2038-01-19T03:14:06Z",
+    "targets": {
+      "targets/file.txt": {
+        "hashes": {
+          "sha256": "fbf121c8e85875ffb9d50eab2cfa2a692df0e3e06afc2913492abe128bae66d0",
+          "sha512": "ac51637364cff0f6802e087c8c6a51f1925384af639214282a67e093495ef746d8f1c2326cf7182a1067fd69f6049247f509a95a533032f9565c905ce4c5d5fe"
+        },
+        "length": 12
+      }
+    },
+    "version": 1
+  }
+}

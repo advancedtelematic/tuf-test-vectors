@@ -56,16 +56,30 @@ def main(target_repo=None):
         f.write('\n')
 
 
-def sha256(byts):
+def sha256(byts, alter=False):
     h = hashlib.sha256()
     h.update(byts)
-    return h.hexdigest()
+    d = h.digest()
+
+    if alter:
+        d = bytearray(d)
+        d[0] ^= 0x01
+        d = bytes(d)
+
+    return binascii.hexlify(d).decode('utf-8')
 
 
-def sha512(byts):
+def sha512(byts, alter=False):
     h = hashlib.sha512()
     h.update(byts)
-    return h.hexdigest()
+    d = h.digest()
+
+    if alter:
+        d = bytearray(d)
+        d[0] ^= 0x01
+        d = bytes(d)
+
+    return binascii.hexlify(d).decode('utf-8')
 
 
 def key_id(pub, alter=False):
@@ -97,11 +111,18 @@ def human_message(err):
         return "The target's size was greater than the size in the metadata."
     elif '::' in err:
         err_base, err_sub = err.split('::')
+        assert err_sub in ['Root', 'Targets', 'Timestamp', 'Snapshot']
 
         if err_base == 'ExpiredMetadata':
             return "The {} metadata was expired.".format(err_sub.lower())
-        if err_base == 'UnmetThreshold':
+        elif err_base == 'UnmetThreshold':
             return "The {} metadata had an unmet threshold.".format(err_sub.lower())
+        elif err_base == 'MetadataHashMismatch':
+            return  "The {} metadata's hash did not match the hash in the metadata." \
+                    .format(err_sub.lower())
+        elif err_base == 'OversizedMetadata':
+            return  "The {} metadata's size was greater than the size in the metadata." \
+                    .format(err_sub.lower())
         else:
             raise Exception('Unknown err: {}'.format(err_base))
     else:
@@ -188,6 +209,15 @@ class Repo:
     '''The key IDs to intentionally miscalculate.
     '''
     BAD_KEY_IDS = None
+
+    '''The versions of the snapshot metadata that have an incorrect root.json size.
+       The modified size is 1 less than the original size to trigger an oversized error.
+    '''
+    SNAPSHOT_BAD_ROOT_SIZE_VERSIONS = []
+
+    '''The versions of the snapshot metadata that have an incorrect root.json hashes.
+    '''
+    SNAPSHOT_BAD_ROOT_HASH_VERSIONS = []
 
     def __init__(self):
         for d in ['keys', path.join('repo', 'targets')]:
@@ -420,11 +450,11 @@ class Repo:
             jsn = jsonify(root)
 
             signed['meta'][name] = {
-                'length': len(jsn),
+                'length': len(jsn) if version_idx + 1 not in self.SNAPSHOT_BAD_ROOT_SIZE_VERSIONS else len(jsn) - 1,
                 'version': root['signed']['version'],
                 'hashes': {
-                    'sha512': sha512(jsn.encode('utf-8')),
-                    'sha256': sha256(jsn.encode('utf-8')),
+                    'sha512': sha512(jsn.encode('utf-8'), version_idx + 1 in self.SNAPSHOT_BAD_ROOT_HASH_VERSIONS),
+                    'sha256': sha256(jsn.encode('utf-8'), version_idx + 1 in self.SNAPSHOT_BAD_ROOT_HASH_VERSIONS),
                 },
             }
 
@@ -639,6 +669,19 @@ class Repo020(Repo001):
     NAME = '020'
     ERROR = 'UnmetThreshold::Snapshot'
     BAD_KEY_IDS = 'snapshot'
+
+
+class Repo021(Repo001):
+
+    NAME = '021'
+    ERROR = 'OversizedMetadata::Root'
+    SNAPSHOT_BAD_ROOT_SIZE_VERSIONS = [1]
+
+class Repo022(Repo001):
+
+    NAME = '022'
+    ERROR = 'MetadataHashMismatch::Root'
+    SNAPSHOT_BAD_ROOT_HASH_VERSIONS = [1]
 
 
 if __name__ == '__main__':

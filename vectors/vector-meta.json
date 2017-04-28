@@ -236,5 +236,29 @@
         "type": "ed25519"
       }
     ]
+  },
+  {
+    "error": "OversizedMetadata::Root",
+    "error_msg": "The root metadata's size was greater than the size in the metadata.",
+    "is_success": false,
+    "repo": "021",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
+  },
+  {
+    "error": "MetadataHashMismatch::Root",
+    "error_msg": "The root metadata's hash did not match the hash in the metadata.",
+    "is_success": false,
+    "repo": "022",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      }
+    ]
   }
 ]
