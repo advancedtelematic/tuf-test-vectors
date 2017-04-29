@@ -3,12 +3,12 @@
     {
       "keyid": "299e17cc2421ba21b5af13b4a2d3bffa356f1127b6941c249e7cbe147c09c6cf",
       "method": "ed25519",
-      "sig": "f03a24248056d8e17de9c81c014a9ffa2b6e485e1512967363dd8a4c9d6f74bf986985686660a112f072dc9dfc9d9a25bf7a1ebc6f157dc7a3474d5d84706b05"
+      "sig": "03ceb40fbdbcf3070791f1389ba9240df1a89dee987994ae5d892e3f2bc445c0b6146f1b45618bccf1e98a1a6f10f33f973bc0eab1d96c85439d86ee959ddd08"
     },
     {
       "keyid": "0d26023dbfb51342ae20411f84b36b0386414693037c45834ddacc96bdd67ddf",
       "method": "ed25519",
-      "sig": "1260d46c439ce48a6862f1c71b76d94dbb4594732d5b82477532a0656471422fb921c38c804508a028d6af3a9f88660cd077f28360bb5f928e929622b86f9607"
+      "sig": "4cc82bceac5c43b7b80653de719cad409477c0135b8084dd82c167114eff79e90512f2ca15af4a40638e12ecf170b1f820aae8ce712afdca138b46d0c2753708"
     }
   ],
   "signed": {
@@ -17,18 +17,18 @@
     "meta": {
       "1.root.json": {
         "hashes": {
-          "sha256": "ff99aa8d4ffe5f19f5b5fa4bb92f6b255f3618c5873cb7b11971a14dbad66175",
-          "sha512": "8e98ba1577d54f03b78a1a50bd010f23136015dbd9bd42dfe19040e09895ac6fd6a4d24397fb2cf39909b266c38812eaf233fa34193d1aad4570a2ebbd11e5b2"
+          "sha256": "9f708588f68825102b4b1eb6d6f114fc085359e3a66c5032f89c6702df1913c7",
+          "sha512": "0f8a60dcfaaefc79dd56eb4ceaf31a63214086197f874beaf7a6b675a8c4fa140af75983f4cb756b4c0a7a4b347d2805cb7938ad3d723f36dae1f5b7bff373c1"
         },
-        "length": 2336,
+        "length": 2337,
         "version": 1
       },
       "root.json": {
         "hashes": {
-          "sha256": "ff99aa8d4ffe5f19f5b5fa4bb92f6b255f3618c5873cb7b11971a14dbad66175",
-          "sha512": "8e98ba1577d54f03b78a1a50bd010f23136015dbd9bd42dfe19040e09895ac6fd6a4d24397fb2cf39909b266c38812eaf233fa34193d1aad4570a2ebbd11e5b2"
+          "sha256": "9f708588f68825102b4b1eb6d6f114fc085359e3a66c5032f89c6702df1913c7",
+          "sha512": "0f8a60dcfaaefc79dd56eb4ceaf31a63214086197f874beaf7a6b675a8c4fa140af75983f4cb756b4c0a7a4b347d2805cb7938ad3d723f36dae1f5b7bff373c1"
         },
-        "length": 2336,
+        "length": 2337,
         "version": 1
       },
       "targets.json": {

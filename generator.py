@@ -58,7 +58,6 @@ def main(signature_encoding, output_dir, target_repo=None):
 
     with open(path.join(OUTPUT_DIR, 'vector-meta.json'), 'w') as f:
         f.write(jsonify(vector_meta))
-        f.write('\n')
 
 
 def sha256(byts, alter=False):
@@ -106,7 +105,7 @@ def key_type(sig_method):
 
 
 def jsonify(jsn):
-    return json.dumps(jsn, sort_keys=True, indent=2)
+    return json.dumps(jsn, sort_keys=True, indent=2) + '\n'
 
 
 def human_message(err):
@@ -363,7 +362,6 @@ class Repo:
     def write_meta(self, name, data) -> None:
         with open(path.join(self.output_dir, 'repo', name + '.json'), 'w') as f:
             f.write(jsonify(data))
-            f.write('\n')
 
     def make_root(self, version_idx) -> None:
         signed = {
