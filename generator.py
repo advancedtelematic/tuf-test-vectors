@@ -685,17 +685,22 @@ class Repo020(Repo001):
     BAD_KEY_IDS = 'snapshot'
 
 
-class Repo021(Repo001):
+class Repo021(Repo015):
+    '''Because the first step in a download is downloading the root,
+       so it shuldn't matter if the meta data is wrong.
+    '''
 
     NAME = '021'
-    ERROR = 'OversizedMetadata::Root'
-    SNAPSHOT_BAD_ROOT_SIZE_VERSIONS = [1]
+    SNAPSHOT_BAD_ROOT_SIZE_VERSIONS = [2]
 
-class Repo022(Repo001):
+
+class Repo022(Repo015):
+    '''Because the first step in a download is downloading the root,
+       so it shuldn't matter if the meta data is wrong.
+    '''
 
     NAME = '022'
-    ERROR = 'MetadataHashMismatch::Root'
-    SNAPSHOT_BAD_ROOT_HASH_VERSIONS = [1]
+    SNAPSHOT_BAD_ROOT_HASH_VERSIONS = [2]
 
 
 if __name__ == '__main__':

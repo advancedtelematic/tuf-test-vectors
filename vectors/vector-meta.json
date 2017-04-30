@@ -238,9 +238,7 @@
     ]
   },
   {
-    "error": "OversizedMetadata::Root",
-    "error_msg": "The root metadata's size was greater than the size in the metadata.",
-    "is_success": false,
+    "is_success": true,
     "repo": "021",
     "root_keys": [
       {
@@ -250,9 +248,7 @@
     ]
   },
   {
-    "error": "MetadataHashMismatch::Root",
-    "error_msg": "The root metadata's hash did not match the hash in the metadata.",
-    "is_success": false,
+    "is_success": true,
     "repo": "022",
     "root_keys": [
       {
