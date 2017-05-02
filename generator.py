@@ -528,12 +528,12 @@ class Repo:
                       key=lambda x: x.NAME)
 
 
-class Repo001(Repo):
+class ValidEd25519Repo(Repo):
 
     NAME = '001'
 
 
-class Repo002(Repo):
+class TargetHashMismatchRepo(Repo):
 
     NAME = '002'
     ERROR = 'TargetHashMismatch'
@@ -544,7 +544,7 @@ class Repo002(Repo):
         return bytes(new)
 
 
-class Repo003(Repo):
+class ValidRsa2048Repo(Repo):
 
     NAME = '003'
 
@@ -554,12 +554,12 @@ class Repo003(Repo):
     SNAPSHOT_KEYS = [['rsassa-pss-sha256']]
 
 
-class Repo004(Repo002, Repo003):
+class RsaTargetHashMismatchRepo(TargetHashMismatchRepo, ValidRsa2048Repo):
 
     NAME = '004'
 
 
-class Repo005(Repo):
+class OversizedTargetRepo(Repo):
 
     NAME = '005'
     ERROR = 'OversizedTarget'
@@ -568,40 +568,40 @@ class Repo005(Repo):
         return target + b'\n'
 
 
-class Repo006(Repo005, Repo003):
+class RsaOversizedTargetRepo(OversizedTargetRepo, ValidRsa2048Repo):
 
     NAME = '006'
 
 
-class Repo007(Repo):
+class ExpiredRootRepo(Repo):
 
     NAME = '007'
     ERROR = 'ExpiredMetadata::Root'
     EXPIRED = 'root'
 
 
-class Repo008(Repo):
+class ExpiredTargetsRepo(Repo):
 
     NAME = '008'
     ERROR = 'ExpiredMetadata::Targets'
     EXPIRED = 'targets'
 
 
-class Repo009(Repo):
+class ExpiredTimestampRepo(Repo):
 
     NAME = '009'
     ERROR = 'ExpiredMetadata::Timestamp'
     EXPIRED = 'timestamp'
 
 
-class Repo010(Repo):
+class ExpiredSnapshotRepo(Repo):
 
     NAME = '010'
     ERROR = 'ExpiredMetadata::Snapshot'
     EXPIRED = 'snapshot'
 
 
-class Repo011(Repo):
+class UnmetRootThresholdRepo(Repo):
 
     NAME = '011'
     ERROR = 'UnmetThreshold::Root'
@@ -609,7 +609,7 @@ class Repo011(Repo):
     ROOT_THRESHOLD_MOD = [1]
 
 
-class Repo012(Repo):
+class UnmetTargetsThresholdRepo(Repo):
 
     NAME = '012'
     ERROR = 'UnmetThreshold::Targets'
@@ -617,7 +617,7 @@ class Repo012(Repo):
     TARGETS_THRESHOLD_MOD = [1]
 
 
-class Repo013(Repo):
+class UnmetTimestampThresholdRepo(Repo):
 
     NAME = '013'
     ERROR = 'UnmetThreshold::Timestamp'
@@ -625,7 +625,7 @@ class Repo013(Repo):
     TIMESTAMP_THRESHOLD_MOD = [1]
 
 
-class Repo014(Repo):
+class UnmetSnapshotThresholdRepo(Repo):
 
     NAME = '014'
     ERROR = 'UnmetThreshold::Snapshot'
@@ -633,7 +633,7 @@ class Repo014(Repo):
     SNAPSHOT_THRESHOLD_MOD = [1]
 
 
-class Repo015(Repo):
+class ValidRootKeyRotationRepo(Repo):
     '''Good rotation from 1.root.json to 2.root.json.
     '''
 
@@ -648,7 +648,7 @@ class Repo015(Repo):
     SNAPSHOT_THRESHOLD_MOD = [0, 0]
 
 
-class Repo016(Repo015):
+class InvalidRootKeyRotationRepo(ValidRootKeyRotationRepo):
     '''Bad rotation from 1.root.json to 2.root.json.
     '''
 
@@ -657,35 +657,35 @@ class Repo016(Repo015):
     ROOT_CROSS_SIGN_SKIP = [2]
 
 
-class Repo017(Repo001):
+class BadRootKeyIdsRepo(ValidEd25519Repo):
 
     NAME = '017'
     ERROR = 'UnmetThreshold::Root'
     BAD_KEY_IDS = 'root'
 
 
-class Repo018(Repo001):
+class BadTargetsKeyIdsRepo(ValidEd25519Repo):
 
     NAME = '018'
     ERROR = 'UnmetThreshold::Targets'
     BAD_KEY_IDS = 'targets'
 
 
-class Repo019(Repo001):
+class BadTimestampKeyIdsRepo(ValidEd25519Repo):
 
     NAME = '019'
     ERROR = 'UnmetThreshold::Timestamp'
     BAD_KEY_IDS = 'timestamp'
 
 
-class Repo020(Repo001):
+class BadSnapshotKeyIdsRepo(ValidEd25519Repo):
 
     NAME = '020'
     ERROR = 'UnmetThreshold::Snapshot'
     BAD_KEY_IDS = 'snapshot'
 
 
-class Repo021(Repo015):
+class InvalidRootSizeInSnapshotMetaRepo(ValidRootKeyRotationRepo):
     '''Because the first step in a download is downloading the root,
        so it shuldn't matter if the meta data is wrong.
     '''
@@ -694,7 +694,7 @@ class Repo021(Repo015):
     SNAPSHOT_BAD_ROOT_SIZE_VERSIONS = [2]
 
 
-class Repo022(Repo015):
+class InvalidRootHasInSnapshotMetaRepo(ValidRootKeyRotationRepo):
     '''Because the first step in a download is downloading the root,
        so it shuldn't matter if the meta data is wrong.
     '''
