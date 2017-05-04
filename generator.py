@@ -127,6 +127,8 @@ def human_message(err):
         elif err_base == 'OversizedMetadata':
             return  "The {} metadata's size was greater than the size in the metadata." \
                     .format(err_sub.lower())
+        elif err_base == 'IllegalThreshold':
+            return 'The role {} had an illegal signature threshold.'.format(err_sub.lower())
         else:
             raise Exception('Unknown err: {}'.format(err_base))
     else:
@@ -701,6 +703,34 @@ class InvalidRootHasInSnapshotMetaRepo(ValidRootKeyRotationRepo):
 
     NAME = '022'
     SNAPSHOT_BAD_ROOT_HASH_VERSIONS = [2]
+
+
+class RootThresholdZeroRepo(Repo):
+
+    NAME = '023'
+    ERROR = 'IllegalThreshold::Root'
+    ROOT_THRESHOLD_MOD = [-1]
+
+
+class TargetsThresholdZeroRepo(Repo):
+
+    NAME = '024'
+    ERROR = 'IllegalThreshold::Targets'
+    TARGETS_THRESHOLD_MOD = [-1]
+
+
+class TimestampThresholdZeroRepo(Repo):
+
+    NAME = '025'
+    ERROR = 'IllegalThreshold::Timestamp'
+    TIMESTAMP_THRESHOLD_MOD = [-1]
+
+
+class SnapshotThresholdZeroRepo(Repo):
+
+    NAME = '026'
+    ERROR = 'IllegalThreshold::Snapshot'
+    SNAPSHOT_THRESHOLD_MOD = [-1]
 
 
 if __name__ == '__main__':
