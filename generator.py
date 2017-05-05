@@ -439,14 +439,14 @@ class Repo:
                 }
             }
 
-        signed = {
-            '_type': 'Targets',
-            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'targets' else '2038-01-19T03:14:06Z',
-            'version': 1,
-            'targets': file_data,
-        }
+        signed = {'_type': 'Targets', 'expires': '2017-01-01T00:00:00Z' if self.EXPIRED ==
+                  'targets' else '2038-01-19T03:14:06Z', 'version': 1, 'targets': file_data, }
 
-        self.targets_meta = {'signatures': sign(self.targets_keys[version_idx], signed), 'signed': signed}
+        self.targets_meta = {
+            'signatures': sign(
+                self.targets_keys[version_idx],
+                signed),
+            'signed': signed}
 
     def make_snapshot(self, version_idx):
         signed = {
@@ -469,14 +469,22 @@ class Repo:
                 'length': len(jsn) if version_idx + 1 not in self.SNAPSHOT_BAD_ROOT_SIZE_VERSIONS else len(jsn) - 1,
                 'version': root['signed']['version'],
                 'hashes': {
-                    'sha512': sha512(jsn.encode('utf-8'), version_idx + 1 in self.SNAPSHOT_BAD_ROOT_HASH_VERSIONS),
-                    'sha256': sha256(jsn.encode('utf-8'), version_idx + 1 in self.SNAPSHOT_BAD_ROOT_HASH_VERSIONS),
+                    'sha512': sha512(
+                        jsn.encode('utf-8'),
+                        version_idx + 1 in self.SNAPSHOT_BAD_ROOT_HASH_VERSIONS),
+                    'sha256': sha256(
+                        jsn.encode('utf-8'),
+                        version_idx + 1 in self.SNAPSHOT_BAD_ROOT_HASH_VERSIONS),
                 },
             }
 
             signed['meta']['root.json'] = signed['meta'][name]
 
-        self.snapshot_meta = {'signatures': sign(self.snapshot_keys[version_idx], signed), 'signed': signed}
+        self.snapshot_meta = {
+            'signatures': sign(
+                self.snapshot_keys[version_idx],
+                signed),
+            'signed': signed}
 
     def make_timestamp(self, version_idx):
         jsn = jsonify(self.snapshot_meta)
@@ -490,14 +498,19 @@ class Repo:
                     'length': len(jsn),
                     'version': 1,
                     'hashes': {
-                        'sha512': sha512(jsn.encode('utf-8')),
-                        'sha256': sha256(jsn.encode('utf-8')),
+                        'sha512': sha512(
+                            jsn.encode('utf-8')),
+                        'sha256': sha256(
+                            jsn.encode('utf-8')),
                     },
                 },
-            }
-        }
+            }}
 
-        self.timestamp_meta = {'signatures': sign(self.timestamp_keys[version_idx], signed), 'signed': signed}
+        self.timestamp_meta = {
+            'signatures': sign(
+                self.timestamp_keys[version_idx],
+                signed),
+            'signed': signed}
 
     @classmethod
     def vector_meta(cls) -> dict:
