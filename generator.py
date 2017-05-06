@@ -19,10 +19,10 @@ import logging
 import os
 
 from argparse import ArgumentParser
-from canonicaljson import encode_canonical_json as cjson
-from Crypto.Hash import SHA256
+from Crypto.Hash import SHA256, SHA512
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_PSS
+from securesystemslib.formats import encode_canonical as cjson
 
 SIGNATURE_ENCODING = None
 OUTPUT_DIR = None
@@ -88,17 +88,19 @@ def sha512(byts, alter=False):
 
 def key_id(pub, alter=False):
     if alter:
-        byts = bytearray(cjson(pub))
+        byts = bytearray(cjson(pub).encode('utf-8'))
         byts[0] ^= 0x01
         return sha256(bytes(byts))
     else:
-        return sha256(cjson(pub))
+        return sha256(cjson(pub).encode('utf-8'))
 
 
 def key_type(sig_method):
     if sig_method == 'ed25519':
         return 'ed25519'
     elif sig_method == 'rsassa-pss-sha256':
+        return 'rsa'
+    elif sig_method == 'rsassa-pss-sha512':
         return 'rsa'
     else:
         raise Exception('unknown signature method: {}'.format(sig_method))
@@ -147,15 +149,21 @@ def encode_signature(sig):
 
 
 def sign(keys, signed):
-    data = cjson(signed)
+    data = cjson(signed).encode('utf-8')
 
     sigs = []
     for sig_method, priv, pub in keys:
         if sig_method == 'ed25519':
             priv = ed25519.SigningKey(binascii.unhexlify(priv))
             sig = priv.sign(data)
-        elif sig_method == 'rsassa-pss-sha256':
-            h = SHA256.new(data)
+        elif sig_method.startswith('rsassa-pss'):
+            if sig_method == 'rsassa-pss-sha256':
+                h = SHA256.new(data)
+            elif sig_method == 'rsassa-pss-sha512':
+                h = SHA512.new(data)
+            else:
+                raise Exception('Bad sig method: {}'.format(sig_method))
+
             rsa = RSA.importKey(priv)
             signer = PKCS1_PSS.new(rsa)
             sig = signer.sign(h)
@@ -559,7 +567,7 @@ class TargetHashMismatchRepo(Repo):
         return bytes(new)
 
 
-class ValidRsa2048Repo(Repo):
+class Valid2048RsaSsaPssSha256Repo(Repo):
 
     NAME = '003'
 
@@ -569,7 +577,7 @@ class ValidRsa2048Repo(Repo):
     SNAPSHOT_KEYS = [['rsassa-pss-sha256']]
 
 
-class RsaTargetHashMismatchRepo(TargetHashMismatchRepo, ValidRsa2048Repo):
+class RsaTargetHashMismatchRepo(TargetHashMismatchRepo, Valid2048RsaSsaPssSha256Repo):
 
     NAME = '004'
 
@@ -583,7 +591,7 @@ class OversizedTargetRepo(Repo):
         return target + b'\n'
 
 
-class RsaOversizedTargetRepo(OversizedTargetRepo, ValidRsa2048Repo):
+class RsaOversizedTargetRepo(OversizedTargetRepo, Valid2048RsaSsaPssSha256Repo):
 
     NAME = '006'
 
@@ -744,6 +752,25 @@ class SnapshotThresholdZeroRepo(Repo):
     NAME = '026'
     ERROR = 'IllegalThreshold::Snapshot'
     SNAPSHOT_THRESHOLD_MOD = [-1]
+
+
+class Valid2048RsaSsaPssSha512Repo(Repo):
+
+    NAME = '027'
+
+    ROOT_KEYS = [['rsassa-pss-sha512']]
+    TARGETS_KEYS = [['rsassa-pss-sha512']]
+    TIMESTAMP_KEYS = [['rsassa-pss-sha512']]
+    SNAPSHOT_KEYS = [['rsassa-pss-sha512']]
+
+
+class ValidMixedKeysRepo(Repo):
+    NAME = '028'
+
+    ROOT_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
+    TARGETS_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
+    TIMESTAMP_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
+    SNAPSHOT_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
 
 
 if __name__ == '__main__':

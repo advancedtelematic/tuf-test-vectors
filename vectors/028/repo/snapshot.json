@@ -1,0 +1,45 @@
+{
+  "signatures": [
+    {
+      "keyid": "49ecb19e4915ab20ccc473ef2970212cf5d963c7d54d6275005c304cb291aa3b",
+      "method": "ed25519",
+      "sig": "0866e4711e038b066ad7746c304a814cd12a54a43f962b260454b8ad6d34ec9ca2ba05b342d02d72f4495e67097c9807545b5293d456b9f6d061d4a880003f0b"
+    },
+    {
+      "keyid": "d4c906d2b063041c072bd619ad3513051f870e52b9ff3e2033fd7b40d2a48303",
+      "method": "rsassa-pss-sha256",
+      "sig": "ac59e43e36488b8986b3db6a5d01e5a52aecda6209d8efe0e43ead210451c3de9c234e1fb1ed8fa9d694e0ca55d0521ffc55a8be01cf6237cf335b00bc63560bfe07fad7935b7245fbbf288595ed772eae48a835ea67d6e61ed32e4768fe70fa08ca9239e4b0d59256ff923981a940ce496e5e3b2ce8aa76b3125c2726dde5a2e705559f7cb7edf0d4f39873c639500303313e71220cdd90e0d432457b191d31482f6464ee0da18d41a5efd2606eed8751973e8254a41263be30e95c5533a69468a3b979e3822cba06878b72d6d8bf3cf3bf1102dbfb914a5cd9b61afaacc182524e7fe110ac60f15e1444942c0e8ec3f6a7da3df0a8081114eaca6cd1731e59"
+    },
+    {
+      "keyid": "c769208e176c2b5866ffbb15f4f4146628493f952eacdd971424f29c918b0ae0",
+      "method": "rsassa-pss-sha512",
+      "sig": "0a68778fbcd32dbdc0d9037f13a53e6f61c9db57b73678877cd886fe0a5fd32efdf96e6faa258ac6ff95916a51b57ddd6e5fcb8202444c309b3e98eb9ebf2e96eddae876b63a7eaa855e190a15c1b4441255c8534487a0e1fec3884f3fe0ed3c48b853bf501611cb815f58fb4ab5a4e6f16b501f43f5a2ae3e12a565e668f7b8484a8b1f41210edfd96e49dbb488ae6543678f020a6c1ad1f62e515efd3679bad0e7139b462cad71f1fc594b82132c6a5a5106e4dce8e8ac4e819dfe2665f9a4d1b557627090439ff1dc16f4f60fa6a65ee53b5ccc3493cc249b232710e9f26a38d46ae3cf72ea0e11176677922b0c2b358cd1d66c46b3a1329b8c91b2217f24"
+    }
+  ],
+  "signed": {
+    "_type": "Snapshot",
+    "expires": "2038-01-19T03:14:06Z",
+    "meta": {
+      "1.root.json": {
+        "hashes": {
+          "sha256": "83a9b8db87a93971234ab220ac31b9deb9527b4ddef18563779aeedb2ba4edf7",
+          "sha512": "2db417142afe33557bb0284c258c48097868e16eb655a2fdcebf1d822ad8fa2297615cbe56520ba5b9be4194ec5ff9040882944547eaebc0eeeff3f1c65cdcc2"
+        },
+        "length": 8949,
+        "version": 1
+      },
+      "root.json": {
+        "hashes": {
+          "sha256": "83a9b8db87a93971234ab220ac31b9deb9527b4ddef18563779aeedb2ba4edf7",
+          "sha512": "2db417142afe33557bb0284c258c48097868e16eb655a2fdcebf1d822ad8fa2297615cbe56520ba5b9be4194ec5ff9040882944547eaebc0eeeff3f1c65cdcc2"
+        },
+        "length": 8949,
+        "version": 1
+      },
+      "targets.json": {
+        "version": 1
+      }
+    },
+    "version": 1
+  }
+}

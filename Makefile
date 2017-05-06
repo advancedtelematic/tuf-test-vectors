@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := run
 
 clean: ## Remove temp resources
-	@git clean -xdf
+	@rm -rf venv
 
 generate: init ## Generate test vectors
 	@./generator.py

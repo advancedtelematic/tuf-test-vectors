@@ -1,4 +1,4 @@
 ed25519
-canonicaljson
 Flask
 pycrypto
+securesystemslib

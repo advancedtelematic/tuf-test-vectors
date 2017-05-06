@@ -304,5 +304,33 @@
         "type": "ed25519"
       }
     ]
+  },
+  {
+    "is_success": true,
+    "repo": "027",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "rsa"
+      }
+    ]
+  },
+  {
+    "is_success": true,
+    "repo": "028",
+    "root_keys": [
+      {
+        "path": "1.root-1.pub",
+        "type": "ed25519"
+      },
+      {
+        "path": "1.root-2.pub",
+        "type": "rsa"
+      },
+      {
+        "path": "1.root-3.pub",
+        "type": "rsa"
+      }
+    ]
   }
 ]
