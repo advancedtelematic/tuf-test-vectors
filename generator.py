@@ -26,6 +26,7 @@ from securesystemslib.formats import encode_canonical as cjson
 
 SIGNATURE_ENCODING = None
 OUTPUT_DIR = None
+COMPACT_JSON = False
 
 log = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -35,10 +36,11 @@ log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 
 
-def main(signature_encoding, output_dir, target_repo=None):
-    global SIGNATURE_ENCODING, OUTPUT_DIR
+def main(signature_encoding, output_dir, target_repo=None, compact=False):
+    global SIGNATURE_ENCODING, OUTPUT_DIR, COMPACT_JSON
     SIGNATURE_ENCODING = signature_encoding
     OUTPUT_DIR = output_dir
+    COMPACT_JSON = bool(compact)
 
     vector_meta = []
     for repo in Repo.subclasses():
@@ -107,7 +109,18 @@ def key_type(sig_method):
 
 
 def jsonify(jsn):
-    return json.dumps(jsn, sort_keys=True, indent=2) + '\n'
+    global COMPACT_JSON
+    kwargs = {'sort_keys': True, }
+
+    if not COMPACT_JSON:
+        kwargs['indent'] = 2
+
+    out = json.dumps(jsn, **kwargs)
+
+    if not COMPACT_JSON:
+        out += '\n'
+
+    return out
 
 
 def human_message(err):
@@ -780,6 +793,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--repo', help='The repo to generate', default=None)
     parser.add_argument('--signature-encoding', help='The encoding for cryptographic signatures',
                         default='hex', choices=['hex', 'base64'])
+    parser.add_argument('--compact', help='Write JSON in compact format', action='store_true')
     args = parser.parse_args()
 
-    main(args.signature_encoding, args.output_dir, args.repo)
+    main(args.signature_encoding, args.output_dir, args.repo, args.compact)
