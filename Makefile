@@ -1,4 +1,4 @@
-.PHONY: generate help init run venv
+.PHONY: clean generate help init run update venv
 .DEFAULT_GOAL := run
 
 clean: ## Remove temp resources
