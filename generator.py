@@ -239,6 +239,22 @@ class Repo:
     '''
     SNAPSHOT_THRESHOLD_MOD = [0]
 
+    '''The number of signatures to skip when signing root metadata.
+    '''
+    ROOT_SIGN_SKIP = [0]
+
+    '''The number of signatures to skip when signing targets metadata.
+    '''
+    TARGETS_SIGN_SKIP = [0]
+
+    '''The number of signatures to skip when signing timestamp metadata.
+    '''
+    TIMESTAMP_SIGN_SKIP = [0]
+
+    '''The number of signatures to skip when signing snapshot metadata.
+    '''
+    SNAPSHOT_SIGN_SKIP = [0]
+
     '''The versions to skip root cross signing.
        E.g, if this is set to [2], then 1.root.json will not sign 2.root.json
     '''
@@ -441,7 +457,7 @@ class Repo:
                 'keyval': {'public': pub},
             }
 
-        keys = self.root_keys[version_idx]
+        keys = self.root_keys[version_idx][0:len(self.ROOT_KEYS[version_idx]) - self.ROOT_SIGN_SKIP[version_idx]]
 
         if version_idx > 0 and (version_idx + 1) not in self.ROOT_CROSS_SIGN_SKIP:
             keys.extend(self.root_keys[version_idx - 1])
@@ -642,7 +658,7 @@ class UnmetRootThresholdRepo(Repo):
     NAME = '011'
     ERROR = 'UnmetThreshold::Root'
     ROOT_KEYS = [['ed25519', 'ed25519']]
-    ROOT_THRESHOLD_MOD = [1]
+    ROOT_SIGN_SKIP = [1]
 
 
 class UnmetTargetsThresholdRepo(Repo):
@@ -650,7 +666,7 @@ class UnmetTargetsThresholdRepo(Repo):
     NAME = '012'
     ERROR = 'UnmetThreshold::Targets'
     TARGETS_KEYS = [['ed25519', 'ed25519']]
-    TARGETS_THRESHOLD_MOD = [1]
+    TARGETS_SIGN_SKIP = [1]
 
 
 class UnmetTimestampThresholdRepo(Repo):
@@ -658,7 +674,7 @@ class UnmetTimestampThresholdRepo(Repo):
     NAME = '013'
     ERROR = 'UnmetThreshold::Timestamp'
     TIMESTAMP_KEYS = [['ed25519', 'ed25519']]
-    TIMESTAMP_THRESHOLD_MOD = [1]
+    TIMESTAMP_SIGN_SKIP = [1]
 
 
 class UnmetSnapshotThresholdRepo(Repo):
@@ -666,7 +682,7 @@ class UnmetSnapshotThresholdRepo(Repo):
     NAME = '014'
     ERROR = 'UnmetThreshold::Snapshot'
     SNAPSHOT_KEYS = [['ed25519', 'ed25519']]
-    SNAPSHOT_THRESHOLD_MOD = [1]
+    SNAPSHOT_SIGN_SKIP = [1]
 
 
 class ValidRootKeyRotationRepo(Repo):
@@ -682,6 +698,10 @@ class ValidRootKeyRotationRepo(Repo):
     TARGETS_THRESHOLD_MOD = [0, 0]
     TIMESTAMP_THRESHOLD_MOD = [0, 0]
     SNAPSHOT_THRESHOLD_MOD = [0, 0]
+    ROOT_SIGN_SKIP = [0, 0]
+    TARGETS_SIGN_SKIP = [0, 0]
+    TIMESTAMP_SIGN_SKIP = [0, 0]
+    SNAPSHOT_SIGN_SKIP = [0, 0]
 
 
 class InvalidRootKeyRotationRepo(ValidRootKeyRotationRepo):
