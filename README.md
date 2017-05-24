@@ -1,13 +1,15 @@
 # tuf-test-vectors
 
-A collection of test vectors that can be used to verify if a TUF client conforms
-to the specification with regards to processing metadata and targets.
+A collection of test vectors that can be used to verify if a TUF or Uptane 
+client conforms to the specification with regards to processing metadata and
+targets.
 
 ## Vectors
 
-The vectors can be found in the `vectors` directory. There is metadata about the
-test vectors to allow for programatic testing. The file `vectors-meta.json`
-is a list of entries that map to a vector and the expected outcome.
+The vectors can be found in the `tuf` and `uptane` directories. There is
+metadata about the test vectors to allow for programatic testing. The file
+`vectors-meta.json` is a list of entries that map to a vector and the expected
+outcome.
 
 For example:
 
