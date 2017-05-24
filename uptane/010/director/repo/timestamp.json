@@ -1,0 +1,24 @@
+{
+  "signatures": [
+    {
+      "keyid": "d325c5474155516048fe5228ece77d814cb0158c841d3fdae7a3fe5016c06546",
+      "method": "ed25519",
+      "sig": "9ca8a8fb4c5378de2b836ba0b573f25ae55758a35dd9f98ca74471fb3b9291b489dc383ab91eeec6ae8bdd0ea7a5e39b3cc3c32ba47707a6f568be91518a0802"
+    }
+  ],
+  "signed": {
+    "_type": "Timestamp",
+    "expires": "2017-01-01T00:00:00Z",
+    "meta": {
+      "snapshot.json": {
+        "hashes": {
+          "sha256": "724cd2ac8ae4a36ebf2a1f551dcbe66b63f563a3cf0179237ff32deff8255086",
+          "sha512": "80470f0d1a81e2850b8bea17eece0623bbb32fdcdc6cc44fb15a63075dcbb2d043fd3802bc17393cf98a108c2d56c76261adfab0e658ec5172eac280831a96f0"
+        },
+        "length": 1158,
+        "version": 1
+      }
+    },
+    "version": 1
+  }
+}

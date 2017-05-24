@@ -1,0 +1,67 @@
+{
+  "signatures": [
+    {
+      "keyid": "cacb48d7b03e8035015ebdc616914a0e398c3be066e2af9c67927ef1503d1ddc",
+      "method": "ed25519",
+      "sig": "acac2c03eca808e17c177d36093eaddabe863227ac320279f2f486b79449f568d519b5def485d40ce99a1c51016cd0bf6d651f70ccb7e5407c908b2480a5170f"
+    }
+  ],
+  "signed": {
+    "_type": "Root",
+    "consistent_snapshot": false,
+    "expires": "2038-01-19T03:14:06Z",
+    "keys": {
+      "02d3274ec85830ed535f8e9ca371f5f619dd2dff5e561d9c702a00625b5c242d": {
+        "keytype": "ed25519",
+        "keyval": {
+          "public": "e88985691be482307054e462afcf608011e492c7bf1a2c2a6e088ceb43fa9fc2"
+        }
+      },
+      "42c2705b7d935b31d9127edf18348d971fcc897a042de8b6fea6a7cbc77db942": {
+        "keytype": "ed25519",
+        "keyval": {
+          "public": "c52ee27d4ed9d24bd1e5461f99856a18d29d78fb44ca5d3ac421cc54328e5ca0"
+        }
+      },
+      "64d7fc5ac3faa0f990cde7530ec5acf672eb76a84e86e61e8b58994c2d6a1418": {
+        "keytype": "ed25519",
+        "keyval": {
+          "public": "850e0ff8a0b977594d9b29f7086240088eac1b3f04b4711d6d2e2c49a2ab1d41"
+        }
+      },
+      "cacb48d7b03e8035015ebdc616914a0e398c3be066e2af9c67927ef1503d1ddc": {
+        "keytype": "ed25519",
+        "keyval": {
+          "public": "a502c6c9b6c78edacc0366e4bb3364bdddc152ed79a0e81b99d40198fe6d113c"
+        }
+      }
+    },
+    "roles": {
+      "root": {
+        "keyids": [
+          "cacb48d7b03e8035015ebdc616914a0e398c3be066e2af9c67927ef1503d1ddc"
+        ],
+        "threshold": 1
+      },
+      "snapshot": {
+        "keyids": [
+          "02d3274ec85830ed535f8e9ca371f5f619dd2dff5e561d9c702a00625b5c242d"
+        ],
+        "threshold": 1
+      },
+      "targets": {
+        "keyids": [
+          "64d7fc5ac3faa0f990cde7530ec5acf672eb76a84e86e61e8b58994c2d6a1418"
+        ],
+        "threshold": 1
+      },
+      "timestamp": {
+        "keyids": [
+          "42c2705b7d935b31d9127edf18348d971fcc897a042de8b6fea6a7cbc77db942"
+        ],
+        "threshold": 1
+      }
+    },
+    "version": 1
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "signatures": [
+    {
+      "keyid": "41bce5ceb00ce6bfa586f36370de33fdb16c14c478fa18dd74943e4593dfd445",
+      "method": "rsassa-pss-sha256",
+      "sig": "a14854ecf00a579895a0c2e7ed67956becbc448e12b036b66d9dd662f3cd7f95492e778807e0cf0de1d099472e384db9dfb4843f3f3c7dcd92a10ed5502fbc561a40779d0d8fb0921e0555aa93d061d43dc2793a116b0a2aa3f44d89e53ebe86308b629fb67d17b5a7177566fb134deee21f38eb4c1e7c6ba2cc1da72f1a46b8f9683eab877e7aaab2f9e6b673b0d914ab67254c2cdbe5c006f3093cafc218aba33111b45b99efb13fd83f3b6b115a8cafdbd76b87a89122dcd494ea7a70cfc0a84b02a7a1fbfd7917a5a121d8348c7c378d0bfa21b20145daf51ccb1a6b83f769d3bacf9d481df232ba88bf74653d6fca8c66ffd289a58f4250e6c1552c8fd7"
+    }
+  ],
+  "signed": {
+    "_type": "Timestamp",
+    "expires": "2038-01-19T03:14:06Z",
+    "meta": {
+      "snapshot.json": {
+        "hashes": {
+          "sha256": "e92d1b736fff1e218d8b76bbdae8944abe8e99ce207b80bf70a35b07ce2bdfb3",
+          "sha512": "80cdc9b5120c6a0c0e0b361622db2e5445731222ea1c4654f1c6002b95536b06d8f87986e54658b2aba3659586b049816a649d003e70238e7a741b52ff93b178"
+        },
+        "length": 1552,
+        "version": 1
+      }
+    },
+    "version": 1
+  }
+}

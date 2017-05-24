@@ -36,14 +36,14 @@ log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 
 
-def main(signature_encoding, output_dir, target_repo=None, compact=False):
+def main(repo_type, signature_encoding, output_dir, target_repo=None, compact=False):
     global SIGNATURE_ENCODING, OUTPUT_DIR, COMPACT_JSON
     SIGNATURE_ENCODING = signature_encoding
     OUTPUT_DIR = output_dir
     COMPACT_JSON = bool(compact)
 
     vector_meta = []
-    for repo in Repo.subclasses():
+    for repo in subclasses(Repo if repo_type == 'tuf' else Uptane):
         vector_meta.append(repo.vector_meta())
 
         if target_repo is not None and repo.NAME != target_repo:
@@ -53,13 +53,18 @@ def main(signature_encoding, output_dir, target_repo=None, compact=False):
         repo = repo()
         log.info('Repo {} done'.format(repo.NAME))
 
-    # verify vector_meta
-    for meta in vector_meta:
-        assert 'repo' in meta
-        assert isinstance(meta['is_success'], bool)
-
     with open(path.join(OUTPUT_DIR, 'vector-meta.json'), 'w') as f:
         f.write(jsonify(vector_meta))
+
+
+def subclasses(cls) -> list:
+    '''Returns a sorted list of all Repo subclasses. Elements are unique.
+    '''
+    def inner(c):
+        return c.__subclasses__() + [g for s in c.__subclasses__()
+                                     for g in inner(s)]
+
+    return sorted(list(set(inner(cls))), key=lambda x: x.NAME)
 
 
 def sha256(byts, alter=False):
@@ -130,7 +135,12 @@ def human_message(err):
         return "The target's size was greater than the size in the metadata."
     elif '::' in err:
         err_base, err_sub = err.split('::')
-        assert err_sub in ['Root', 'Targets', 'Timestamp', 'Snapshot']
+
+        if err_base == 'MissingRepo':
+            assert err_sub in ['Director', 'Repo'], err_sub
+            return 'The {} repo is missing.'.format(err_sub.lower())
+
+        assert err_sub in ['Root', 'Targets', 'Timestamp', 'Snapshot'], err_sub
 
         if err_base == 'ExpiredMetadata':
             return "The {} metadata was expired.".format(err_sub.lower())
@@ -273,7 +283,13 @@ class Repo:
     '''
     SNAPSHOT_BAD_ROOT_HASH_VERSIONS = []
 
-    def __init__(self):
+    def __init__(self, output_prefix=None, uptane_role=None):
+        assert (output_prefix is None and uptane_role is None) or \
+                (output_prefix is not None and uptane_role is not None)
+
+        self.uptane_role = uptane_role
+        self.output_prefix = output_prefix
+
         for d in ['keys', path.join('repo', 'targets')]:
             os.makedirs(path.join(self.output_dir, d), exist_ok=True)
 
@@ -365,7 +381,10 @@ class Repo:
 
     @property
     def output_dir(self):
-        return path.join(OUTPUT_DIR, self.NAME)
+        if self.output_prefix is not None:
+            return path.join(OUTPUT_DIR, self.output_prefix, self.uptane_role)
+        else:
+            return path.join(OUTPUT_DIR, self.NAME)
 
     def gen_key(self, role, sig_method):
         typ = key_type(sig_method)
@@ -571,13 +590,87 @@ class Repo:
 
         return meta
 
+
+class Uptane:
+
+    DIRECTOR_CLS = None
+    REPO_CLS = None
+
+    def __init__(self):
+        if self.DIRECTOR_CLS is not None:
+            self.director = self.DIRECTOR_CLS(self.NAME, uptane_role='director')
+
+        if self.REPO_CLS is not None:
+            self.repo = self.REPO_CLS(self.NAME, uptane_role='repo')
+
     @classmethod
-    def subclasses(cls) -> list:
-        '''Returns a sorted list of all Repo subclasses. Elements are unique.
-        '''
-        return sorted(list(set(cls.__subclasses__() + [g for s in cls.__subclasses__()
-                                                       for g in s.subclasses()])),
-                      key=lambda x: x.NAME)
+    def vector_meta(cls) -> dict:
+        is_success = cls.DIRECTOR_CLS is not None and cls.REPO_CLS is not None
+
+        meta = {
+            'repo': cls.NAME,
+            'root_keys': {
+                'director': [],
+                'repo': [],
+            },
+        }
+
+        if cls.DIRECTOR_CLS is not None:
+            is_success = is_success and cls.DIRECTOR_CLS.ERROR is None
+
+            for version_idx, sig_method in enumerate(cls.DIRECTOR_CLS.ROOT_KEYS[0]):
+                key_meta = {
+                    'type': key_type(sig_method),
+                    'path': '1.root-{}.pub'.format(version_idx + 1),
+                }
+
+                meta['root_keys']['director'].append(key_meta)
+
+        if cls.REPO_CLS is not None:
+            is_success = is_success and cls.REPO_CLS.ERROR is None
+
+            for version_idx, sig_method in enumerate(cls.REPO_CLS.ROOT_KEYS[0]):
+                key_meta = {
+                    'type': key_type(sig_method),
+                    'path': '1.root-{}.pub'.format(version_idx + 1),
+                }
+
+                meta['root_keys']['repo'].append(key_meta)
+
+        meta['is_success'] = is_success
+
+        if not is_success:
+            meta['errors'] = {}
+
+            if cls.DIRECTOR_CLS is None:
+                err_str = 'MissingRepo::Director'
+                err = {
+                    'error': err_str,
+                    'error_msg': human_message(err_str),
+                }
+                meta['errors']['director'] = err
+            elif cls.DIRECTOR_CLS.ERROR is not None:
+                err = {
+                    'error': cls.DIRECTOR_CLS.ERROR,
+                    'error_msg': human_message(cls.DIRECTOR_CLS.ERROR),
+                }
+                meta['errors']['director'] = err
+
+            if cls.REPO_CLS is None:
+                err_str = 'MissingRepo::Repo'
+                err = {
+                    'error': err_str,
+                    'error_msg': human_message(err_str),
+                }
+                meta['errors']['repo'] = err
+            elif cls.REPO_CLS.ERROR is not None:
+                err = {
+                    'error': cls.REPO_CLS.ERROR,
+                    'error_msg': human_message(cls.REPO_CLS.ERROR),
+                }
+                meta['errors']['repo'] = err
+
+        return meta
 
 
 class ValidEd25519Repo(Repo):
@@ -806,8 +899,346 @@ class ValidMixedKeysRepo(Repo):
     SNAPSHOT_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
 
 
+class ValidUptane(Uptane):
+    '''Everything is good. Simple repo with ed25519 keys.
+    '''
+
+    NAME = '001'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = ValidEd25519Repo
+
+
+class BadDirectorTargetHashesUptane(Uptane):
+    '''Director provides metadata with bad target hashes.
+    '''
+
+    NAME = '002'
+    DIRECTOR_CLS = TargetHashMismatchRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class BadRepoHashesUptane(Uptane):
+    '''Repo provides metadata with bad target hashes.
+    '''
+
+    NAME = '003'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = TargetHashMismatchRepo
+
+
+class MissingDirectorUptane(Uptane):
+    '''Missing director repo.
+    '''
+
+    NAME = '004'
+    DIRECTOR_CLS = None
+    REPO_CLS = ValidEd25519Repo
+
+
+class MissingRepoUptane(Uptane):
+    '''Missing repo.
+    '''
+
+    NAME = '005'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = None
+
+
+class OversizedTargetsUptane(Uptane):
+    '''Both director and repo report target with size N, but received target is N+1
+    '''
+
+    NAME = '006'
+    DIRECTOR_CLS = OversizedTargetRepo
+    REPO_CLS = OversizedTargetRepo
+
+
+class OversizedDirectorTargetsUptane(Uptane):
+    '''Director reports target with size N, but received target is N+1
+    '''
+
+    class LongerTarget(Repo):
+
+        def __init__(self, *nargs, **kwargs):
+            cls = type(self)
+            cls.TARGETS = list(map(lambda x: (x[0], x[1] + b'\n'), cls.TARGETS))
+            super(cls, self).__init__(*nargs, **kwargs)
+
+    NAME = '007'
+    DIRECTOR_CLS = OversizedTargetRepo
+    REPO_CLS = LongerTarget
+
+
+class ExpiredDirectorRootRoleUptane(Uptane):
+
+    NAME = '008'
+    DIRECTOR_CLS = ExpiredRootRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class ExpiredDirectorTargetRoleUptane(Uptane):
+
+    NAME = '009'
+    DIRECTOR_CLS = ExpiredTargetsRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class ExpiredDirectorTimestampRoleUptane(Uptane):
+
+    NAME = '010'
+    DIRECTOR_CLS = ExpiredTimestampRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class ExpiredDirectorSnapshotRoleUptane(Uptane):
+
+    NAME = '011'
+    DIRECTOR_CLS = ExpiredSnapshotRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class ExpiredRepoRootRoleUptane(Uptane):
+
+    NAME = '012'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = ExpiredRootRepo
+
+
+class ExpiredRepoTargetsRoleUptane(Uptane):
+
+    NAME = '013'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = ExpiredTargetsRepo
+
+
+class ExpiredRepoTimestampRoleUptane(Uptane):
+
+    NAME = '014'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = ExpiredTimestampRepo
+
+
+class ExpiredRepoSnapshotRoleUptane(Uptane):
+
+    NAME = '015'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = ExpiredSnapshotRepo
+
+
+class DirectorRootThresholdZeroUptane(Uptane):
+
+    NAME = '016'
+    DIRECTOR_CLS = RootThresholdZeroRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class DirectorTargetsThresholdZeroUptane(Uptane):
+
+    NAME = '017'
+    DIRECTOR_CLS = TargetsThresholdZeroRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class DirectorTimestampThresholdZeroUptane(Uptane):
+
+    NAME = '018'
+    DIRECTOR_CLS = TimestampThresholdZeroRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class DirectorSnapshotThresholdZeroUptane(Uptane):
+
+    NAME = '019'
+    DIRECTOR_CLS = SnapshotThresholdZeroRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoRootThresholdZeroUptane(Uptane):
+
+    NAME = '020'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = RootThresholdZeroRepo
+
+
+class RepoTargetsThresholdZeroUptane(Uptane):
+
+    NAME = '021'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = TargetsThresholdZeroRepo
+
+
+class RepoTimestampThresholdZeroUptane(Uptane):
+
+    NAME = '022'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = TimestampThresholdZeroRepo
+
+
+class RepoSnapshotThresholdZeroUptane(Uptane):
+
+    NAME = '023'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = SnapshotThresholdZeroRepo
+
+
+class ValidRsaUptane(Uptane):
+
+    NAME = '024'
+    DIRECTOR_CLS = Valid2048RsaSsaPssSha256Repo
+    REPO_CLS = Valid2048RsaSsaPssSha256Repo
+
+
+class BadDirectorRsaTargetHashesUptane(Uptane):
+
+    NAME = '025'
+    DIRECTOR_CLS = RsaTargetHashMismatchRepo
+    REPO_CLS = RsaTargetHashMismatchRepo
+
+
+class DirectorUnmetRootThresholdUptane(Uptane):
+
+    NAME = '026'
+    DIRECTOR_CLS = UnmetRootThresholdRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class DirectorUnmetTargetsThresholdUptane(Uptane):
+
+    NAME = '027'
+    DIRECTOR_CLS = UnmetTargetsThresholdRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class DirectorUnmetTimestampThresholdUptane(Uptane):
+
+    NAME = '028'
+    DIRECTOR_CLS = UnmetTimestampThresholdRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class DirectorUnmetSnapshotThresholdUptane(Uptane):
+
+    NAME = '029'
+    DIRECTOR_CLS = UnmetSnapshotThresholdRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoUnmetRootThresholdUptane(Uptane):
+
+    NAME = '030'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = UnmetRootThresholdRepo
+
+
+class RepoUnmetTargetsThresholdUptane(Uptane):
+
+    NAME = '031'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = UnmetTargetsThresholdRepo
+
+
+class RepoUnmetTimestampThresholdUptane(Uptane):
+
+    NAME = '032'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = UnmetTimestampThresholdRepo
+
+
+class RepoUnmetSnapshotThresholdUptane(Uptane):
+
+    NAME = '033'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = UnmetSnapshotThresholdRepo
+
+
+class DirectorBadRootKeyIdsUptane(Uptane):
+
+    NAME = '034'
+    DIRECTOR_CLS = BadRootKeyIdsRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class DirectorBadTargetsKeyIdsUptane(Uptane):
+
+    NAME = '035'
+    DIRECTOR_CLS = BadTargetsKeyIdsRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class DirectorBadTimestampKeyIdsUptane(Uptane):
+
+    NAME = '036'
+    DIRECTOR_CLS = BadTimestampKeyIdsRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class DirectorBadSnapshotKeyIdsUptane(Uptane):
+
+    NAME = '037'
+    DIRECTOR_CLS = BadSnapshotKeyIdsRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoBadRootKeyIdsUptane(Uptane):
+
+    NAME = '038'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = BadRootKeyIdsRepo
+
+
+class RepoBadTargetsKeyIdsUptane(Uptane):
+
+    NAME = '039'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = BadTargetsKeyIdsRepo
+
+
+class RepoBadTimestampKeyIdsUptane(Uptane):
+
+    NAME = '040'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = BadTimestampKeyIdsRepo
+
+
+class RepoBadSnapshotKeyIdsUptane(Uptane):
+
+    NAME = '041'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = BadSnapshotKeyIdsRepo
+
+
+class DirectorValidRootKeyRotationUptane(Uptane):
+
+    NAME = '042'
+    DIRECTOR_CLS = ValidRootKeyRotationRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class DirectorInvalidRootKeyRotationUptane(Uptane):
+
+    NAME = '043'
+    DIRECTOR_CLS = InvalidRootKeyRotationRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoValidRootKeyRotationUptane(Uptane):
+
+    NAME = '044'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = ValidRootKeyRotationRepo
+
+
+class DirectorInvalidRootKeyRotationUptane(Uptane):
+
+    NAME = '045'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = InvalidRootKeyRotationRepo
+
+
 if __name__ == '__main__':
     parser = ArgumentParser(path.basename(__file__))
+    parser.add_argument('-t', '--type', help='The type of test vectors to create',
+                        default='tuf', choices=['tuf', 'uptane'])
     parser.add_argument('-o', '--output-dir', help='The path to write the repos',
                         default=path.join(path.dirname(path.abspath(__file__)), 'vectors'))
     parser.add_argument('-r', '--repo', help='The repo to generate', default=None)
@@ -816,4 +1247,4 @@ if __name__ == '__main__':
     parser.add_argument('--compact', help='Write JSON in compact format', action='store_true')
     args = parser.parse_args()
 
-    main(args.signature_encoding, args.output_dir, args.repo, args.compact)
+    main(args.type, args.signature_encoding, args.output_dir, args.repo, args.compact)

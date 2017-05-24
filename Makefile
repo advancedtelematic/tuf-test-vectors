@@ -1,11 +1,19 @@
 .PHONY: clean generate help init run update venv
-.DEFAULT_GOAL := run
+.DEFAULT_GOAL := generate
 
 clean: ## Remove temp resources
 	@rm -rf venv
 
-generate: init ## Generate test vectors
-	@./generator.py
+generate: generate-tuf generate-uptane ## Generate all test vectors
+	@true
+
+generate-tuf: init ## Generate TUF test vectors
+	@mkdir tuf && \
+		./generator.py -t tuf -o tuf
+
+generate-uptane: init ## Generate Uptane test vectors
+	@mkdir -p uptane && \
+		./generator.py -t uptane -o uptane
 
 help: ## Show this message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%16s\033[0m : %s\n", $$1, $$2}' $(MAKEFILE_LIST)
