@@ -481,7 +481,7 @@ class Repo:
 
         self.targets_meta = {
             'signatures': sign(
-                self.targets_keys[version_idx],
+                self.targets_keys[version_idx][0:len(self.targets_keys[version_idx]) - self.TARGETS_SIGN_SKIP[version_idx]],
                 signed),
             'signed': signed}
 
@@ -519,7 +519,7 @@ class Repo:
 
         self.snapshot_meta = {
             'signatures': sign(
-                self.snapshot_keys[version_idx],
+                self.snapshot_keys[version_idx][0:len(self.snapshot_keys[version_idx]) - self.SNAPSHOT_SIGN_SKIP[version_idx]],
                 signed),
             'signed': signed}
 
@@ -545,7 +545,7 @@ class Repo:
 
         self.timestamp_meta = {
             'signatures': sign(
-                self.timestamp_keys[version_idx],
+                self.timestamp_keys[version_idx][0:len(self.timestamp_keys[version_idx]) - self.TIMESTAMP_SIGN_SKIP[version_idx]],
                 signed),
             'signed': signed}
 
