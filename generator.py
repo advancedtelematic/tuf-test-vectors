@@ -487,7 +487,7 @@ class Repo:
         file_data = dict()
 
         for target, content in self.TARGETS:
-            file_data['targets/' + target] = {
+            meta = {
                 'length': len(content),
                 'hashes': {
                     'sha512': sha512(content),
@@ -495,8 +495,22 @@ class Repo:
                 }
             }
 
-        signed = {'_type': 'Targets', 'expires': '2017-01-01T00:00:00Z' if self.EXPIRED ==
-                  'targets' else '2038-01-19T03:14:06Z', 'version': 1, 'targets': file_data, }
+            if self.uptane_role == 'director':
+                meta['custom'] = {
+                    'release_counter': 1,
+                    'hardware_identifier': 'abc-def',
+                    'ecu_identifier': '01:02:03:04:05:06',
+                }
+
+            file_data['targets/' + target] = meta
+
+        signed = {
+            '_type': 'Targets',
+            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'targets' \
+                    else '2038-01-19T03:14:06Z',
+            'version': 1,
+            'targets': file_data,
+        }
 
         self.targets_meta = {
             'signatures': sign(

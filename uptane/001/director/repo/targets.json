@@ -3,15 +3,19 @@
     {
       "keyid": "513926073bfedfbfae750598fad27f7cf5f5505e1b04cb110cfe3a0ae2f5810c",
       "method": "ed25519",
-      "sig": "fa9098dcffb7ed7f5ccc1a8bf217e52dc9b0559948bffdd3952bc809fa3c03ffb5615315d3725917eeba0cecf94562aa366c36f39f53a17b05e4efe1fa61ef00"
+      "sig": "ef7441fe973afe29fe6b86b479d117933a1bbe48705fde063bd336a690a25ffe55c9b25473d7fe129256b9e6c3e9057eada2beeea2014ad62f8c12a18778210d"
     }
   ],
   "signed": {
     "_type": "Targets",
     "expires": "2038-01-19T03:14:06Z",
-    "releaseCounter": 1,
     "targets": {
       "targets/file.txt": {
+        "custom": {
+          "ecu_identifier": "01:02:03:04:05:06",
+          "hardware_identifier": "abc-def",
+          "release_counter": 1
+        },
         "hashes": {
           "sha256": "fbf121c8e85875ffb9d50eab2cfa2a692df0e3e06afc2913492abe128bae66d0",
           "sha512": "ac51637364cff0f6802e087c8c6a51f1925384af639214282a67e093495ef746d8f1c2326cf7182a1067fd69f6049247f509a95a533032f9565c905ce4c5d5fe"

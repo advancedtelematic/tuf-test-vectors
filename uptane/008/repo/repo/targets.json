@@ -3,13 +3,12 @@
     {
       "keyid": "37c6e4f171ebb72b0e275e18fd4ec39ec94ed8a4ea8bc17d2739eaa079aae5b0",
       "method": "ed25519",
-      "sig": "7b9849f19e9a66d84ccd5b143f59abb3af29d2f7ec6347ecf9d6adb0ffe57b3e13e8871d89dce585b9e45b2e36da06a82826535719a87da767552a82b7ae6702"
+      "sig": "9b3dbf6f93e555c30700c539ba6a7038d2189191ff1d87411a6c21e9bad5c0521b7db5e6213d37783f4b8d9eaf70f918ac9abf85d0d5d4534685a233a39e9601"
     }
   ],
   "signed": {
     "_type": "Targets",
     "expires": "2038-01-19T03:14:06Z",
-    "releaseCounter": 1,
     "targets": {
       "targets/file.txt": {
         "hashes": {
