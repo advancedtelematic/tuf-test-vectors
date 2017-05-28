@@ -265,10 +265,6 @@ class Repo:
     '''
     SNAPSHOT_THRESHOLD_MOD = [0]
 
-    '''The number of signatures to skip when signing root metadata.
-    '''
-    ROOT_SIGN_SKIP = [0]
-
     '''The number of signatures to skip when signing targets metadata.
     '''
     TARGETS_SIGN_SKIP = [0]
@@ -281,10 +277,11 @@ class Repo:
     '''
     SNAPSHOT_SIGN_SKIP = [0]
 
-    '''The versions to skip root cross signing.
-       E.g, if this is set to [2], then 1.root.json will not sign 2.root.json
+    '''The keys to use for each signing. An entry with at index X means
+       "use the keys with indices in VALUE to do the cross signing for 
+       (X + 1).root.json.
     '''
-    ROOT_CROSS_SIGN_SKIP = []
+    ROOT_SIGN = [[1]]
 
     '''The key IDs to intentionally miscalculate.
     '''
@@ -486,11 +483,9 @@ class Repo:
                 'keyval': {'public': pub},
             }
 
-        keys = root_keys[0:len(root_keys) - self.ROOT_SIGN_SKIP[version_idx]]
-
-        if version_idx > 0 and (version_idx + 1) not in self.ROOT_CROSS_SIGN_SKIP:
-            for root_key_version in self.ROOT_KEYS['versions'][version_idx - 1]:
-                keys.append(self.root_keys[root_key_version - 1])
+        keys = []
+        for root_key_version in self.ROOT_SIGN[version_idx]:
+            keys.append(self.root_keys[root_key_version - 1])
 
         return {'signatures': sign(keys, signed), 'signed': signed}
 
@@ -784,7 +779,7 @@ class UnmetRootThresholdRepo(Repo):
     ROOT_KEYS = {'versions': [[1, 2]],
                  'keys': ['ed25519', 'ed25519'],
                  }
-    ROOT_SIGN_SKIP = [1]
+    ROOT_SIGN = [[1]]
 
 
 class UnmetTargetsThresholdRepo(Repo):
@@ -819,6 +814,7 @@ class ValidRootKeyRotationRepo(Repo):
     ROOT_KEYS = {'versions': [[1], [2]],
                  'keys': ['ed25519', 'ed25519'],
                  }
+    ROOT_SIGN = [[1], [1, 2]]
     TARGETS_KEYS = [['ed25519'], ['ed25519']]
     TIMESTAMP_KEYS = [['ed25519'], ['ed25519']]
     SNAPSHOT_KEYS = [['ed25519'], ['ed25519']]
@@ -826,7 +822,6 @@ class ValidRootKeyRotationRepo(Repo):
     TARGETS_THRESHOLD_MOD = [0, 0]
     TIMESTAMP_THRESHOLD_MOD = [0, 0]
     SNAPSHOT_THRESHOLD_MOD = [0, 0]
-    ROOT_SIGN_SKIP = [0, 0]
     TARGETS_SIGN_SKIP = [0, 0]
     TIMESTAMP_SIGN_SKIP = [0, 0]
     SNAPSHOT_SIGN_SKIP = [0, 0]
@@ -838,7 +833,7 @@ class InvalidRootKeyRotationRepo(ValidRootKeyRotationRepo):
 
     NAME = '016'
     ERROR = 'UnmetThreshold::Root'
-    ROOT_CROSS_SIGN_SKIP = [2]
+    ROOT_SIGN = [[1], [2]]
 
 
 class BadRootKeyIdsRepo(ValidEd25519Repo):
@@ -928,11 +923,13 @@ class Valid2048RsaSsaPssSha512Repo(Repo):
 
 
 class ValidMixedKeysRepo(Repo):
+
     NAME = '028'
 
     ROOT_KEYS = {'versions': [[1, 2, 3]],
                  'keys': ['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512'],
                  }
+    ROOT_SIGN = [[1, 2, 3]]
     TARGETS_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
     TIMESTAMP_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
     SNAPSHOT_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
