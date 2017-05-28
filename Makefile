@@ -8,7 +8,7 @@ generate: generate-tuf generate-uptane ## Generate all test vectors
 	@true
 
 generate-tuf: init ## Generate TUF test vectors
-	@mkdir tuf && \
+	@mkdir -p tuf && \
 		./generator.py -t tuf -o tuf
 
 generate-uptane: init ## Generate Uptane test vectors

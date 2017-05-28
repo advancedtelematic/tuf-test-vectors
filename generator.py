@@ -16,6 +16,7 @@ import ed25519
 import hashlib
 import json
 import logging
+import migrate
 import os
 
 from argparse import ArgumentParser
@@ -28,28 +29,38 @@ SIGNATURE_ENCODING = None
 OUTPUT_DIR = None
 COMPACT_JSON = False
 
-log = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(levelname)-8s %(message)s')
-handler.setFormatter(formatter)
-log.addHandler(handler)
-log.setLevel(logging.DEBUG)
+
+def log():
+    log = logging.getLogger(__name__)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(levelname)-8s %(message)s')
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+    log.setLevel(logging.DEBUG)
+    return log
+
+log = log()
 
 
 def main(repo_type, signature_encoding, output_dir, target_repo=None, compact=False):
+    migrate.migrate(repo_type, output_dir, log)
+
     global SIGNATURE_ENCODING, OUTPUT_DIR, COMPACT_JSON
     SIGNATURE_ENCODING = signature_encoding
     OUTPUT_DIR = output_dir
     COMPACT_JSON = bool(compact)
 
-    vector_meta = []
+    vector_meta = {'version': migrate.CURRENT_VERSION,
+                   'vectors': []
+                   }
+
     for repo in subclasses(Repo if repo_type == 'tuf' else Uptane):
-        vector_meta.append(repo.vector_meta())
+        vector_meta['vectors'].append(repo.vector_meta())
 
         if target_repo is not None and repo.NAME != target_repo:
             continue
 
-        log.info('Generating repo {}'.format(repo.NAME))
+        log.info('Generating {} repo {}'.format(repo_type, repo.NAME))
         repo = repo()
         log.info('Repo {} done'.format(repo.NAME))
 
@@ -58,13 +69,16 @@ def main(repo_type, signature_encoding, output_dir, target_repo=None, compact=Fa
 
 
 def subclasses(cls) -> list:
-    '''Returns a sorted list of all Repo subclasses. Elements are unique.
+    '''Returns a sorted list of all Repo/Uptane subclasses. Elements are unique.
     '''
     def inner(c):
         return c.__subclasses__() + [g for s in c.__subclasses__()
                                      for g in inner(s)]
 
-    return sorted(list(set(inner(cls))), key=lambda x: x.NAME)
+    # filter is to ignore unnamed inner classes
+    return sorted(list(set(filter(lambda x: hasattr(x, 'NAME'),
+                                  inner(cls)))),
+                  key=lambda x: x.NAME)
 
 
 def sha256(byts, alter=False):
@@ -215,7 +229,9 @@ class Repo:
 
     '''The signature methods for the root keys.
     '''
-    ROOT_KEYS = [['ed25519']]
+    ROOT_KEYS = {'versions': [[1]],
+                 'keys': ['ed25519'],
+                 }
 
     '''The signature methods for the targets keys.
     '''
@@ -300,19 +316,12 @@ class Repo:
 
         self.root_meta = []
 
-        for version_idx in range(len(self.ROOT_KEYS)):
-            log.info('Making keys for root version {}'.format(version_idx + 1))
-            key_group = []
+        for key_idx, sig_method in enumerate(self.ROOT_KEYS['keys']):
+            log.info('Making root key {} with method {}'.format(key_idx + 1, sig_method))
+            priv, pub = self.gen_key('root-{}'.format(key_idx + 1), sig_method)
+            self.root_keys.append((sig_method, priv, pub))
 
-            for key_idx, sig_method in enumerate(self.ROOT_KEYS[version_idx]):
-                log.info('Making root key {} with method {}'.format(key_idx + 1, sig_method))
-
-                priv, pub = self.gen_key('{}.root-{}'.format(version_idx + 1, key_idx + 1),
-                                         sig_method)
-                key_group.append((sig_method, priv, pub))
-
-            self.root_keys.append(key_group)
-
+        for version_idx in range(len(self.ROOT_KEYS['versions'])):
             log.info('Making keys for targets version {}'.format(version_idx + 1))
             key_group = []
 
@@ -431,7 +440,7 @@ class Repo:
             'roles': {
                 'root': {
                     'keyids': [],
-                    'threshold': len(self.root_keys[version_idx]) + self.ROOT_THRESHOLD_MOD[version_idx],
+                    'threshold': len(self.ROOT_KEYS['versions'][version_idx]) + self.ROOT_THRESHOLD_MOD[version_idx],
                 },
                 'targets': {
                     'keyids': [],
@@ -448,9 +457,10 @@ class Repo:
             }
         }
 
+        root_keys = list(map(lambda x: self.root_keys[x - 1], self.ROOT_KEYS['versions'][version_idx]))
         keys = []
 
-        for sig_method, _, pub in self.root_keys[version_idx]:
+        for sig_method, _, pub in root_keys:
             k_id = key_id(pub, self.BAD_KEY_IDS == 'root')
             keys.append((sig_method, pub, k_id))
             signed['roles']['root']['keyids'].append(k_id)
@@ -476,15 +486,16 @@ class Repo:
                 'keyval': {'public': pub},
             }
 
-        keys = self.root_keys[version_idx][0:len(self.ROOT_KEYS[version_idx]) - self.ROOT_SIGN_SKIP[version_idx]]
+        keys = root_keys[0:len(root_keys) - self.ROOT_SIGN_SKIP[version_idx]]
 
         if version_idx > 0 and (version_idx + 1) not in self.ROOT_CROSS_SIGN_SKIP:
-            keys.extend(self.root_keys[version_idx - 1])
+            for root_key_idx in self.ROOT_KEYS['versions'][version_idx - 1]:
+                keys.append(self.root_keys[root_key_idx])
 
         return {'signatures': sign(keys, signed), 'signed': signed}
 
     def make_targets(self, version_idx):
-        file_data = dict()
+        file_data = {} 
 
         for target, content in self.TARGETS:
             meta = {
@@ -585,10 +596,12 @@ class Repo:
     @classmethod
     def vector_meta(cls) -> dict:
         root_keys = []
-        for version_idx, sig_method in enumerate(cls.ROOT_KEYS[0]):
+
+        for version in cls.ROOT_KEYS['versions'][0]:
+            sig_method = cls.ROOT_KEYS['keys'][version - 1]
             key_meta = {
                 'type': key_type(sig_method),
-                'path': '1.root-{}.pub'.format(version_idx + 1),
+                'path': 'root-{}.pub'.format(version),
             }
             root_keys.append(key_meta)
 
@@ -632,10 +645,11 @@ class Uptane:
         if cls.DIRECTOR_CLS is not None:
             is_success = is_success and cls.DIRECTOR_CLS.ERROR is None
 
-            for version_idx, sig_method in enumerate(cls.DIRECTOR_CLS.ROOT_KEYS[0]):
+            for version in cls.DIRECTOR_CLS.ROOT_KEYS['versions'][0]:
+                sig_method = cls.DIRECTOR_CLS.ROOT_KEYS['keys'][version - 1]
                 key_meta = {
                     'type': key_type(sig_method),
-                    'path': '1.root-{}.pub'.format(version_idx + 1),
+                    'path': 'root-{}.pub'.format(version),
                 }
 
                 meta['root_keys']['director'].append(key_meta)
@@ -643,10 +657,11 @@ class Uptane:
         if cls.REPO_CLS is not None:
             is_success = is_success and cls.REPO_CLS.ERROR is None
 
-            for version_idx, sig_method in enumerate(cls.REPO_CLS.ROOT_KEYS[0]):
+            for version in cls.REPO_CLS.ROOT_KEYS['versions'][0]:
+                sig_method = cls.REPO_CLS.ROOT_KEYS['keys'][version - 1]
                 key_meta = {
                     'type': key_type(sig_method),
-                    'path': '1.root-{}.pub'.format(version_idx + 1),
+                    'path': 'root-{}.pub'.format(version),
                 }
 
                 meta['root_keys']['repo'].append(key_meta)
@@ -707,7 +722,9 @@ class Valid2048RsaSsaPssSha256Repo(Repo):
 
     NAME = '003'
 
-    ROOT_KEYS = [['rsassa-pss-sha256']]
+    ROOT_KEYS = {'versions': [[1]],
+                 'keys': ['rsassa-pss-sha256'],
+                 }
     TARGETS_KEYS = [['rsassa-pss-sha256']]
     TIMESTAMP_KEYS = [['rsassa-pss-sha256']]
     SNAPSHOT_KEYS = [['rsassa-pss-sha256']]
@@ -764,7 +781,9 @@ class UnmetRootThresholdRepo(Repo):
 
     NAME = '011'
     ERROR = 'UnmetThreshold::Root'
-    ROOT_KEYS = [['ed25519', 'ed25519']]
+    ROOT_KEYS = {'versions': [[1, 2]],
+                 'keys': ['ed25519', 'ed25519'],
+                 }
     ROOT_SIGN_SKIP = [1]
 
 
@@ -797,7 +816,9 @@ class ValidRootKeyRotationRepo(Repo):
     '''
 
     NAME = '015'
-    ROOT_KEYS = [['ed25519'], ['ed25519']]
+    ROOT_KEYS = {'versions': [[1], [2]],
+                 'keys': ['ed25519', 'ed25519'],
+                 }
     TARGETS_KEYS = [['ed25519'], ['ed25519']]
     TIMESTAMP_KEYS = [['ed25519'], ['ed25519']]
     SNAPSHOT_KEYS = [['ed25519'], ['ed25519']]
@@ -898,7 +919,9 @@ class Valid2048RsaSsaPssSha512Repo(Repo):
 
     NAME = '027'
 
-    ROOT_KEYS = [['rsassa-pss-sha512']]
+    ROOT_KEYS = {'versions': [[1]],
+                 'keys': ['rsassa-pss-sha512'],
+                 }
     TARGETS_KEYS = [['rsassa-pss-sha512']]
     TIMESTAMP_KEYS = [['rsassa-pss-sha512']]
     SNAPSHOT_KEYS = [['rsassa-pss-sha512']]
@@ -907,7 +930,9 @@ class Valid2048RsaSsaPssSha512Repo(Repo):
 class ValidMixedKeysRepo(Repo):
     NAME = '028'
 
-    ROOT_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
+    ROOT_KEYS = {'versions': [[1, 2, 3]],
+                 'keys': ['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512'],
+                 }
     TARGETS_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
     TIMESTAMP_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
     SNAPSHOT_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
@@ -1254,7 +1279,7 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--type', help='The type of test vectors to create',
                         default='tuf', choices=['tuf', 'uptane'])
     parser.add_argument('-o', '--output-dir', help='The path to write the repos',
-                        default=path.join(path.dirname(path.abspath(__file__)), 'vectors'))
+                        required=True)
     parser.add_argument('-r', '--repo', help='The repo to generate', default=None)
     parser.add_argument('--signature-encoding', help='The encoding for cryptographic signatures',
                         default='hex', choices=['hex', 'base64'])

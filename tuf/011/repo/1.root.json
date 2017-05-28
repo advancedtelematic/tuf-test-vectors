@@ -1,9 +1,9 @@
 {
   "signatures": [
     {
-      "keyid": "a4081ad2fc1bd98387e92b95ff7406c61e4d7c936969f745c4919fca34dacd4f",
+      "keyid": "bf7146ee1c6d2d815ba0678747927129ed3a00f40d39f3d92173373753d349b2",
       "method": "ed25519",
-      "sig": "d3c2b6bc91d983fefef5ca8a101d9935d53e0d56dfb18f88cf96681b9abfd710671dc8489c3e5ff879a0b2f36a6289ddb1f5c9cbbbdf685615b62ba699e6c10b"
+      "sig": "79d75db745b4b45e954638b37fe2ba3b2bcea1eab503d1f2383c35052aa54c4bf059dd6f6dc43d219a0bce327efb7822b8fe6214047ee8777c03b0167b7f9701"
     }
   ],
   "signed": {
@@ -45,8 +45,8 @@
     "roles": {
       "root": {
         "keyids": [
-          "a4081ad2fc1bd98387e92b95ff7406c61e4d7c936969f745c4919fca34dacd4f",
-          "bf7146ee1c6d2d815ba0678747927129ed3a00f40d39f3d92173373753d349b2"
+          "bf7146ee1c6d2d815ba0678747927129ed3a00f40d39f3d92173373753d349b2",
+          "a4081ad2fc1bd98387e92b95ff7406c61e4d7c936969f745c4919fca34dacd4f"
         ],
         "threshold": 2
       },
