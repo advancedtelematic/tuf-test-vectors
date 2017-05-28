@@ -489,8 +489,8 @@ class Repo:
         keys = root_keys[0:len(root_keys) - self.ROOT_SIGN_SKIP[version_idx]]
 
         if version_idx > 0 and (version_idx + 1) not in self.ROOT_CROSS_SIGN_SKIP:
-            for root_key_idx in self.ROOT_KEYS['versions'][version_idx - 1]:
-                keys.append(self.root_keys[root_key_idx])
+            for root_key_version in self.ROOT_KEYS['versions'][version_idx - 1]:
+                keys.append(self.root_keys[root_key_version - 1])
 
         return {'signatures': sign(keys, signed), 'signed': signed}
 

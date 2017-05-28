@@ -3,7 +3,7 @@
     {
       "keyid": "c3f18108d04643f2665726912c2978f3bd81ee1b50182b9a8aa248656fa490e2",
       "method": "ed25519",
-      "sig": "3227cdcee6a7a1531a6eca5d393567cb04586d7b048ef3e26a65f88edcc96bf78e03c076f0629e10a2ad4ebdc3f699792a4a131d7faa900972b353dd7a106d05"
+      "sig": "60144a3981c6f8f2a83f62ba45ba1d9fb43f8cf5b81dd66b00f40e201f047ce352f241787afd25799ecb32e44dfca13f2f223600ead54e3656e898037b7b9d0e"
     }
   ],
   "signed": {
@@ -20,16 +20,16 @@
       },
       "2.root.json": {
         "hashes": {
-          "sha256": "f9bdbe9fbcdc1c0269ba51f2545e36b38c8c4dba2631e0abfecb9caaf13ed85a",
-          "sha512": "9c2d0e701dedd1ee1efc01780b63bfc3eba0125c8203a07a4c2eb2c4cabe8ebe2bd823f5f12d26fa26308ed9c434b735219ae4d71a1f4e3d03f057a44b674bfc"
+          "sha256": "82f1016cf912a9eb4bc36b5940f14393692dc25872b184cab031a349862ee1b8",
+          "sha512": "c032139ff473050716a5a9e1ccfd18ca834e652027c7a5078fd950c3e8c407972a6b2020888630f98678a4d56d691c29d8eb7e00dcd5b4ccd31f3cbee3a25593"
         },
         "length": 2294,
         "version": 2
       },
       "root.json": {
         "hashes": {
-          "sha256": "f9bdbe9fbcdc1c0269ba51f2545e36b38c8c4dba2631e0abfecb9caaf13ed85a",
-          "sha512": "9c2d0e701dedd1ee1efc01780b63bfc3eba0125c8203a07a4c2eb2c4cabe8ebe2bd823f5f12d26fa26308ed9c434b735219ae4d71a1f4e3d03f057a44b674bfc"
+          "sha256": "82f1016cf912a9eb4bc36b5940f14393692dc25872b184cab031a349862ee1b8",
+          "sha512": "c032139ff473050716a5a9e1ccfd18ca834e652027c7a5078fd950c3e8c407972a6b2020888630f98678a4d56d691c29d8eb7e00dcd5b4ccd31f3cbee3a25593"
         },
         "length": 2294,
         "version": 2
