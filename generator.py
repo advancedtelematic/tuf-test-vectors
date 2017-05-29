@@ -982,6 +982,16 @@ class InvalidRootKeyRotationSharedKeysUnmetFirstThresholdRepo(ValidRootKeyRotati
     ROOT_SIGN = [[1, 2], [2, 3]]
 
 
+class InvalidRootKeyRotationSharedKeysUnmetSecondThresholdRepo(ValidRootKeyRotationRepo):
+    '''2.root.json has unmet threshold from own keys, and v 1 & 2 share some keys.
+    '''
+
+    NAME = '033'
+    ERROR = 'UnmetThreshold::Root'
+    ROOT_KEYS = {'versions': [[1, 2], [2, 3]],
+                 'keys': ['ed25519', 'ed25519', 'ed25519'],
+                 }
+    ROOT_SIGN = [[1, 2], [1, 2]]
 
 
 class ValidUptane(Uptane):
