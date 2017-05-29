@@ -361,6 +361,16 @@
           "type": "ed25519"
         }
       ]
+    },
+    {
+      "is_success": true,
+      "repo": "031",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        }
+      ]
     }
   ],
   "version": 1

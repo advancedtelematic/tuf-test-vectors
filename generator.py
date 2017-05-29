@@ -959,6 +959,19 @@ class InvalidRootKeyRotationUnmetFirstThresholdRepo(ValidRootKeyRotationRepo):
     ROOT_SIGN = [[1], [3]]
 
 
+class ValidRootKeyRotationFixedKeyRepo(ValidRootKeyRotationRepo):
+    '''Valid root.json rotation with fixed key between 1.root.json and 2.root.json.
+    '''
+
+    NAME = '031'
+    ROOT_KEYS = {'versions': [[1], [1]],
+                 'keys': ['ed25519'],
+                 }
+    ROOT_SIGN = [[1], [1]]
+
+
+
+
 class ValidUptane(Uptane):
     '''Everything is good. Simple repo with ed25519 keys.
     '''
