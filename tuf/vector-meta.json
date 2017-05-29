@@ -333,6 +333,90 @@
           "type": "rsa"
         }
       ]
+    },
+    {
+      "error": "UnmetThreshold::Root",
+      "error_msg": "The root metadata had an unmet threshold.",
+      "is_success": false,
+      "repo": "029",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        }
+      ]
+    },
+    {
+      "error": "UnmetThreshold::Root",
+      "error_msg": "The root metadata had an unmet threshold.",
+      "is_success": false,
+      "repo": "030",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        },
+        {
+          "path": "root-2.pub",
+          "type": "ed25519"
+        }
+      ]
+    },
+    {
+      "is_success": true,
+      "repo": "031",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        }
+      ]
+    },
+    {
+      "error": "UnmetThreshold::Root",
+      "error_msg": "The root metadata had an unmet threshold.",
+      "is_success": false,
+      "repo": "032",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        },
+        {
+          "path": "root-2.pub",
+          "type": "ed25519"
+        }
+      ]
+    },
+    {
+      "error": "UnmetThreshold::Root",
+      "error_msg": "The root metadata had an unmet threshold.",
+      "is_success": false,
+      "repo": "033",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        },
+        {
+          "path": "root-2.pub",
+          "type": "ed25519"
+        }
+      ]
+    },
+    {
+      "is_success": true,
+      "repo": "034",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        },
+        {
+          "path": "root-2.pub",
+          "type": "ed25519"
+        }
+      ]
     }
   ],
   "version": 1

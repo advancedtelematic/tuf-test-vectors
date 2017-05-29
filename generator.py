@@ -81,7 +81,7 @@ def subclasses(cls) -> list:
                   key=lambda x: x.NAME)
 
 
-def sha256(byts, alter=False):
+def sha256(byts, alter=False) -> str:
     h = hashlib.sha256()
     h.update(byts)
     d = h.digest()
@@ -94,7 +94,7 @@ def sha256(byts, alter=False):
     return binascii.hexlify(d).decode('utf-8')
 
 
-def sha512(byts, alter=False):
+def sha512(byts, alter=False) -> str:
     h = hashlib.sha512()
     h.update(byts)
     d = h.digest()
@@ -107,7 +107,7 @@ def sha512(byts, alter=False):
     return binascii.hexlify(d).decode('utf-8')
 
 
-def key_id(pub, alter=False):
+def key_id(pub, alter=False) -> str:
     if alter:
         byts = bytearray(cjson(pub).encode('utf-8'))
         byts[0] ^= 0x01
@@ -116,7 +116,7 @@ def key_id(pub, alter=False):
         return sha256(cjson(pub).encode('utf-8'))
 
 
-def key_type(sig_method):
+def key_type(sig_method) -> str:
     if sig_method == 'ed25519':
         return 'ed25519'
     elif sig_method == 'rsassa-pss-sha256':
@@ -127,7 +127,7 @@ def key_type(sig_method):
         raise Exception('unknown signature method: {}'.format(sig_method))
 
 
-def jsonify(jsn):
+def jsonify(jsn) -> str:
     global COMPACT_JSON
     kwargs = {'sort_keys': True, }
 
@@ -142,7 +142,7 @@ def jsonify(jsn):
     return out
 
 
-def human_message(err):
+def human_message(err) -> str:
     if err == 'TargetHashMismatch':
         return "The target's calculated hash did not match the hash in the metadata."
     elif err == 'OversizedTarget':
@@ -174,7 +174,7 @@ def human_message(err):
         raise Exception('Unknown err: {}'.format(err))
 
 
-def encode_signature(sig):
+def encode_signature(sig) -> str:
     global SIGNATURE_ENCODING
 
     if SIGNATURE_ENCODING == 'hex':
@@ -185,7 +185,7 @@ def encode_signature(sig):
         raise Exception('Invalid signature encoding: {}'.format(SIGNATURE_ENCODING))
 
 
-def sign(keys, signed):
+def sign(keys, signed) -> list:
     data = cjson(signed).encode('utf-8')
 
     sigs = []
@@ -265,10 +265,6 @@ class Repo:
     '''
     SNAPSHOT_THRESHOLD_MOD = [0]
 
-    '''The number of signatures to skip when signing root metadata.
-    '''
-    ROOT_SIGN_SKIP = [0]
-
     '''The number of signatures to skip when signing targets metadata.
     '''
     TARGETS_SIGN_SKIP = [0]
@@ -281,10 +277,11 @@ class Repo:
     '''
     SNAPSHOT_SIGN_SKIP = [0]
 
-    '''The versions to skip root cross signing.
-       E.g, if this is set to [2], then 1.root.json will not sign 2.root.json
+    '''The keys to use for each signing. An entry with at index X means
+       "use the keys with indices in VALUE to do the cross signing for 
+       (X + 1).root.json.
     '''
-    ROOT_CROSS_SIGN_SKIP = []
+    ROOT_SIGN = [[1]]
 
     '''The key IDs to intentionally miscalculate.
     '''
@@ -389,7 +386,7 @@ class Repo:
         return target
 
     @property
-    def output_dir(self):
+    def output_dir(self) -> str:
         if self.output_prefix is not None:
             return path.join(OUTPUT_DIR, self.output_prefix, self.uptane_role)
         else:
@@ -486,15 +483,13 @@ class Repo:
                 'keyval': {'public': pub},
             }
 
-        keys = root_keys[0:len(root_keys) - self.ROOT_SIGN_SKIP[version_idx]]
-
-        if version_idx > 0 and (version_idx + 1) not in self.ROOT_CROSS_SIGN_SKIP:
-            for root_key_version in self.ROOT_KEYS['versions'][version_idx - 1]:
-                keys.append(self.root_keys[root_key_version - 1])
+        keys = []
+        for root_key_version in self.ROOT_SIGN[version_idx]:
+            keys.append(self.root_keys[root_key_version - 1])
 
         return {'signatures': sign(keys, signed), 'signed': signed}
 
-    def make_targets(self, version_idx):
+    def make_targets(self, version_idx) -> None:
         file_data = {} 
 
         for target, content in self.TARGETS:
@@ -529,7 +524,7 @@ class Repo:
                 signed),
             'signed': signed}
 
-    def make_snapshot(self, version_idx):
+    def make_snapshot(self, version_idx) -> None:
         signed = {
             '_type': 'Snapshot',
             'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'snapshot' else '2038-01-19T03:14:06Z',
@@ -567,7 +562,7 @@ class Repo:
                 signed),
             'signed': signed}
 
-    def make_timestamp(self, version_idx):
+    def make_timestamp(self, version_idx) -> None:
         jsn = jsonify(self.snapshot_meta)
 
         signed = {
@@ -784,7 +779,7 @@ class UnmetRootThresholdRepo(Repo):
     ROOT_KEYS = {'versions': [[1, 2]],
                  'keys': ['ed25519', 'ed25519'],
                  }
-    ROOT_SIGN_SKIP = [1]
+    ROOT_SIGN = [[1]]
 
 
 class UnmetTargetsThresholdRepo(Repo):
@@ -819,6 +814,7 @@ class ValidRootKeyRotationRepo(Repo):
     ROOT_KEYS = {'versions': [[1], [2]],
                  'keys': ['ed25519', 'ed25519'],
                  }
+    ROOT_SIGN = [[1], [1, 2]]
     TARGETS_KEYS = [['ed25519'], ['ed25519']]
     TIMESTAMP_KEYS = [['ed25519'], ['ed25519']]
     SNAPSHOT_KEYS = [['ed25519'], ['ed25519']]
@@ -826,19 +822,18 @@ class ValidRootKeyRotationRepo(Repo):
     TARGETS_THRESHOLD_MOD = [0, 0]
     TIMESTAMP_THRESHOLD_MOD = [0, 0]
     SNAPSHOT_THRESHOLD_MOD = [0, 0]
-    ROOT_SIGN_SKIP = [0, 0]
     TARGETS_SIGN_SKIP = [0, 0]
     TIMESTAMP_SIGN_SKIP = [0, 0]
     SNAPSHOT_SIGN_SKIP = [0, 0]
 
 
 class InvalidRootKeyRotationRepo(ValidRootKeyRotationRepo):
-    '''Bad rotation from 1.root.json to 2.root.json.
+    '''Bad rotation. Keys from 1.root.json don't sign 2.root.json.
     '''
 
     NAME = '016'
     ERROR = 'UnmetThreshold::Root'
-    ROOT_CROSS_SIGN_SKIP = [2]
+    ROOT_SIGN = [[1], [2]]
 
 
 class BadRootKeyIdsRepo(ValidEd25519Repo):
@@ -928,14 +923,87 @@ class Valid2048RsaSsaPssSha512Repo(Repo):
 
 
 class ValidMixedKeysRepo(Repo):
+
     NAME = '028'
 
     ROOT_KEYS = {'versions': [[1, 2, 3]],
                  'keys': ['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512'],
                  }
+    ROOT_SIGN = [[1, 2, 3]]
     TARGETS_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
     TIMESTAMP_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
     SNAPSHOT_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
+
+
+class InvalidRootKeyRotationUnmetSecondThresholdRepo(ValidRootKeyRotationRepo):
+    '''2.root.json has unmet threshold from own keys.
+    '''
+
+    NAME = '029'
+    ERROR = 'UnmetThreshold::Root'
+    ROOT_KEYS = {'versions': [[1], [2, 3]],
+                 'keys': ['ed25519', 'ed25519', 'ed25519', 'ed25519'],
+                 }
+    ROOT_SIGN = [[1], [2]]
+
+
+class InvalidRootKeyRotationUnmetFirstThresholdRepo(ValidRootKeyRotationRepo):
+    '''2.root.json has unmet threshold from 1.root.json's keys.
+    '''
+
+    NAME = '030'
+    ERROR = 'UnmetThreshold::Root'
+    ROOT_KEYS = {'versions': [[1, 2], [3]],
+                 'keys': ['ed25519', 'ed25519', 'ed25519', 'ed25519'],
+                 }
+    ROOT_SIGN = [[1], [3]]
+
+
+class ValidRootKeyRotationFixedKeyRepo(ValidRootKeyRotationRepo):
+    '''Valid root.json rotation with fixed key between 1.root.json and 2.root.json.
+    '''
+
+    NAME = '031'
+    ROOT_KEYS = {'versions': [[1], [1]],
+                 'keys': ['ed25519'],
+                 }
+    ROOT_SIGN = [[1], [1]]
+
+
+class InvalidRootKeyRotationSharedKeysUnmetFirstThresholdRepo(ValidRootKeyRotationRepo):
+    '''2.root.json has unmet threshold from 1.root.json's keys, and v 1 & 2 share some keys.
+    '''
+
+    NAME = '032'
+    ERROR = 'UnmetThreshold::Root'
+    ROOT_KEYS = {'versions': [[1, 2], [2, 3]],
+                 'keys': ['ed25519', 'ed25519', 'ed25519'],
+                 }
+    ROOT_SIGN = [[1, 2], [2, 3]]
+
+
+class InvalidRootKeyRotationSharedKeysUnmetSecondThresholdRepo(ValidRootKeyRotationRepo):
+    '''2.root.json has unmet threshold from own keys, and v 1 & 2 share some keys.
+    '''
+
+    NAME = '033'
+    ERROR = 'UnmetThreshold::Root'
+    ROOT_KEYS = {'versions': [[1, 2], [2, 3]],
+                 'keys': ['ed25519', 'ed25519', 'ed25519'],
+                 }
+    ROOT_SIGN = [[1, 2], [1, 2]]
+
+
+class ValidRootKeyRotationSharedKeysUnmetVariableThresholdRepo(ValidRootKeyRotationRepo):
+    '''Valid root rotation with shared keys and variable threshold
+    '''
+
+    NAME = '034'
+    ROOT_KEYS = {'versions': [[1, 2], [2, 3]],
+                 'keys': ['ed25519', 'ed25519', 'ed25519'],
+                 }
+    ROOT_SIGN = [[1, 2], [1, 2]]
+    ROOT_THRESHOLD_MOD = [0, -1]
 
 
 class ValidUptane(Uptane):
