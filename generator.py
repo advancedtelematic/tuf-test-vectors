@@ -940,6 +940,7 @@ class InvalidRootKeyRotationUnmetSecondThresholdRepo(ValidRootKeyRotationRepo):
     '''
 
     NAME = '029'
+    ERROR = 'UnmetThreshold::Root'
     ROOT_KEYS = {'versions': [[1], [2, 3]],
                  'keys': ['ed25519', 'ed25519', 'ed25519', 'ed25519'],
                  }
@@ -951,6 +952,7 @@ class InvalidRootKeyRotationUnmetFirstThresholdRepo(ValidRootKeyRotationRepo):
     '''
 
     NAME = '030'
+    ERROR = 'UnmetThreshold::Root'
     ROOT_KEYS = {'versions': [[1, 2], [3]],
                  'keys': ['ed25519', 'ed25519', 'ed25519', 'ed25519'],
                  }

@@ -335,7 +335,9 @@
       ]
     },
     {
-      "is_success": true,
+      "error": "UnmetThreshold::Root",
+      "error_msg": "The root metadata had an unmet threshold.",
+      "is_success": false,
       "repo": "029",
       "root_keys": [
         {
@@ -345,7 +347,9 @@
       ]
     },
     {
-      "is_success": true,
+      "error": "UnmetThreshold::Root",
+      "error_msg": "The root metadata had an unmet threshold.",
+      "is_success": false,
       "repo": "030",
       "root_keys": [
         {
