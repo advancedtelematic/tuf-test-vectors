@@ -828,7 +828,7 @@ class ValidRootKeyRotationRepo(Repo):
 
 
 class InvalidRootKeyRotationRepo(ValidRootKeyRotationRepo):
-    '''Bad rotation from 1.root.json to 2.root.json.
+    '''Bad rotation. Keys from 1.root.json don't sign 2.root.json.
     '''
 
     NAME = '016'
@@ -933,6 +933,17 @@ class ValidMixedKeysRepo(Repo):
     TARGETS_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
     TIMESTAMP_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
     SNAPSHOT_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
+
+
+class InvalidRootKeyRotationUnmetSecondThresholdRepo(ValidRootKeyRotationRepo):
+    '''2.root.json has unmet threshold from own keys.
+    '''
+
+    NAME = '029'
+    ROOT_KEYS = {'versions': [[1], [2, 3]],
+                 'keys': ['ed25519', 'ed25519', 'ed25519', 'ed25519'],
+                 }
+    ROOT_SIGN = [[1], [2]]
 
 
 class ValidUptane(Uptane):

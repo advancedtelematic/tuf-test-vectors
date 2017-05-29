@@ -333,6 +333,16 @@
           "type": "rsa"
         }
       ]
+    },
+    {
+      "is_success": true,
+      "repo": "029",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        }
+      ]
     }
   ],
   "version": 1
