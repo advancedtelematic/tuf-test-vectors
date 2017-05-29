@@ -994,6 +994,18 @@ class InvalidRootKeyRotationSharedKeysUnmetSecondThresholdRepo(ValidRootKeyRotat
     ROOT_SIGN = [[1, 2], [1, 2]]
 
 
+class ValidRootKeyRotationSharedKeysUnmetVariableThresholdRepo(ValidRootKeyRotationRepo):
+    '''Valid root rotation with shared keys and variable threshold
+    '''
+
+    NAME = '034'
+    ROOT_KEYS = {'versions': [[1, 2], [2, 3]],
+                 'keys': ['ed25519', 'ed25519', 'ed25519'],
+                 }
+    ROOT_SIGN = [[1, 2], [1, 2]]
+    ROOT_THRESHOLD_MOD = [0, -1]
+
+
 class ValidUptane(Uptane):
     '''Everything is good. Simple repo with ed25519 keys.
     '''
