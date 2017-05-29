@@ -81,7 +81,7 @@ def subclasses(cls) -> list:
                   key=lambda x: x.NAME)
 
 
-def sha256(byts, alter=False):
+def sha256(byts, alter=False) -> str:
     h = hashlib.sha256()
     h.update(byts)
     d = h.digest()
@@ -94,7 +94,7 @@ def sha256(byts, alter=False):
     return binascii.hexlify(d).decode('utf-8')
 
 
-def sha512(byts, alter=False):
+def sha512(byts, alter=False) -> str:
     h = hashlib.sha512()
     h.update(byts)
     d = h.digest()
@@ -107,7 +107,7 @@ def sha512(byts, alter=False):
     return binascii.hexlify(d).decode('utf-8')
 
 
-def key_id(pub, alter=False):
+def key_id(pub, alter=False) -> str:
     if alter:
         byts = bytearray(cjson(pub).encode('utf-8'))
         byts[0] ^= 0x01
@@ -116,7 +116,7 @@ def key_id(pub, alter=False):
         return sha256(cjson(pub).encode('utf-8'))
 
 
-def key_type(sig_method):
+def key_type(sig_method) -> str:
     if sig_method == 'ed25519':
         return 'ed25519'
     elif sig_method == 'rsassa-pss-sha256':
@@ -127,7 +127,7 @@ def key_type(sig_method):
         raise Exception('unknown signature method: {}'.format(sig_method))
 
 
-def jsonify(jsn):
+def jsonify(jsn) -> str:
     global COMPACT_JSON
     kwargs = {'sort_keys': True, }
 
@@ -142,7 +142,7 @@ def jsonify(jsn):
     return out
 
 
-def human_message(err):
+def human_message(err) -> str:
     if err == 'TargetHashMismatch':
         return "The target's calculated hash did not match the hash in the metadata."
     elif err == 'OversizedTarget':
@@ -174,7 +174,7 @@ def human_message(err):
         raise Exception('Unknown err: {}'.format(err))
 
 
-def encode_signature(sig):
+def encode_signature(sig) -> str:
     global SIGNATURE_ENCODING
 
     if SIGNATURE_ENCODING == 'hex':
@@ -185,7 +185,7 @@ def encode_signature(sig):
         raise Exception('Invalid signature encoding: {}'.format(SIGNATURE_ENCODING))
 
 
-def sign(keys, signed):
+def sign(keys, signed) -> list:
     data = cjson(signed).encode('utf-8')
 
     sigs = []
@@ -386,7 +386,7 @@ class Repo:
         return target
 
     @property
-    def output_dir(self):
+    def output_dir(self) -> str:
         if self.output_prefix is not None:
             return path.join(OUTPUT_DIR, self.output_prefix, self.uptane_role)
         else:
@@ -489,7 +489,7 @@ class Repo:
 
         return {'signatures': sign(keys, signed), 'signed': signed}
 
-    def make_targets(self, version_idx):
+    def make_targets(self, version_idx) -> None:
         file_data = {} 
 
         for target, content in self.TARGETS:
@@ -524,7 +524,7 @@ class Repo:
                 signed),
             'signed': signed}
 
-    def make_snapshot(self, version_idx):
+    def make_snapshot(self, version_idx) -> None:
         signed = {
             '_type': 'Snapshot',
             'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'snapshot' else '2038-01-19T03:14:06Z',
@@ -562,7 +562,7 @@ class Repo:
                 signed),
             'signed': signed}
 
-    def make_timestamp(self, version_idx):
+    def make_timestamp(self, version_idx) -> None:
         jsn = jsonify(self.snapshot_meta)
 
         signed = {
