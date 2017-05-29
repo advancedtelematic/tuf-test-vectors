@@ -946,6 +946,17 @@ class InvalidRootKeyRotationUnmetSecondThresholdRepo(ValidRootKeyRotationRepo):
     ROOT_SIGN = [[1], [2]]
 
 
+class InvalidRootKeyRotationUnmetFirstThresholdRepo(ValidRootKeyRotationRepo):
+    '''2.root.json has unmet threshold from 1.root.json's keys.
+    '''
+
+    NAME = '030'
+    ROOT_KEYS = {'versions': [[1, 2], [3]],
+                 'keys': ['ed25519', 'ed25519', 'ed25519', 'ed25519'],
+                 }
+    ROOT_SIGN = [[1], [3]]
+
+
 class ValidUptane(Uptane):
     '''Everything is good. Simple repo with ed25519 keys.
     '''
