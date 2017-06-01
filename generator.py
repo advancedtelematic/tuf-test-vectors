@@ -168,6 +168,8 @@ def human_message(err) -> str:
                     .format(err_sub.lower())
         elif err_base == 'IllegalThreshold':
             return 'The role {} had an illegal signature threshold.'.format(err_sub.lower())
+        elif err_base == 'NonUniqueSignatures':
+            return 'The role {} had non-unique signatures.'.format(err_sub.lower())
         else:
             raise Exception('Unknown err: {}'.format(err_base))
     else:
@@ -1080,6 +1082,62 @@ class InvalidRsaKeySize1024Repo(Valid2048RsaSsaPssSha256Repo):
     NAME = '036'
     ERROR = 'IllegalRsaKeySize'
     RSA_KEY_SIZE = 1024
+
+
+class NonUniqueRootSignatureRepo(Repo):
+
+    NAME = '037'
+    ERROR = 'NonUniqueSignatures::Root'
+    ROOT_SIGN = [[1, 1]]
+
+
+class NonUniqueTargetsSignatureRepo(Repo):
+
+    NAME = '038'
+    ERROR = 'NonUniqueSignatures::Targets'
+    TARGETS_SIGN = [[1, 1]]
+
+
+class NonUniqueTimestampSignatureRepo(Repo):
+
+    NAME = '039'
+    ERROR = 'NonUniqueSignatures::Timestamp'
+    TIMESTAMP_SIGN = [[1, 1]]
+
+
+class NonUniqueSnapshotSignatureRepo(Valid2048RsaSsaPssSha256Repo):
+
+    NAME = '040'
+    ERROR = 'NonUniqueSignatures::Snapshot'
+    SNAPSHOT_SIGN = [[1, 1]]
+
+
+class NonUniqueRsaRootSignatureRepo(Valid2048RsaSsaPssSha256Repo):
+
+    NAME = '041'
+    ERROR = 'NonUniqueSignatures::Root'
+    ROOT_SIGN = [[1, 1]]
+
+
+class NonUniqueRsaTargetsSignatureRepo(Valid2048RsaSsaPssSha256Repo):
+
+    NAME = '042'
+    ERROR = 'NonUniqueSignatures::Targets'
+    TARGETS_SIGN = [[1, 1]]
+
+
+class NonUniqueRsaTimestampSignatureRepo(Valid2048RsaSsaPssSha256Repo):
+
+    NAME = '043'
+    ERROR = 'NonUniqueSignatures::Timestamp'
+    TIMESTAMP_SIGN = [[1, 1]]
+
+
+class NonUniqueRsaSnapshotSignatureRepo(Valid2048RsaSsaPssSha256Repo):
+
+    NAME = '044'
+    ERROR = 'NonUniqueSignatures::Snapshot'
+    SNAPSHOT_SIGN = [[1, 1]]
 
 
 class ValidUptane(Uptane):

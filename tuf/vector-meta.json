@@ -441,6 +441,102 @@
           "type": "rsa"
         }
       ]
+    },
+    {
+      "error": "NonUniqueSignatures::Root",
+      "error_msg": "The role root had non-unique signatures.",
+      "is_success": false,
+      "repo": "037",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        }
+      ]
+    },
+    {
+      "error": "NonUniqueSignatures::Targets",
+      "error_msg": "The role targets had non-unique signatures.",
+      "is_success": false,
+      "repo": "038",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        }
+      ]
+    },
+    {
+      "error": "NonUniqueSignatures::Timestamp",
+      "error_msg": "The role timestamp had non-unique signatures.",
+      "is_success": false,
+      "repo": "039",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        }
+      ]
+    },
+    {
+      "error": "NonUniqueSignatures::Snapshot",
+      "error_msg": "The role snapshot had non-unique signatures.",
+      "is_success": false,
+      "repo": "040",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "rsa"
+        }
+      ]
+    },
+    {
+      "error": "NonUniqueSignatures::Root",
+      "error_msg": "The role root had non-unique signatures.",
+      "is_success": false,
+      "repo": "041",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "rsa"
+        }
+      ]
+    },
+    {
+      "error": "NonUniqueSignatures::Targets",
+      "error_msg": "The role targets had non-unique signatures.",
+      "is_success": false,
+      "repo": "042",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "rsa"
+        }
+      ]
+    },
+    {
+      "error": "NonUniqueSignatures::Timestamp",
+      "error_msg": "The role timestamp had non-unique signatures.",
+      "is_success": false,
+      "repo": "043",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "rsa"
+        }
+      ]
+    },
+    {
+      "error": "NonUniqueSignatures::Snapshot",
+      "error_msg": "The role snapshot had non-unique signatures.",
+      "is_success": false,
+      "repo": "044",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "rsa"
+        }
+      ]
     }
   ],
   "version": 2
