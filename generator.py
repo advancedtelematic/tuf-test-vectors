@@ -873,7 +873,7 @@ class InvalidRootSizeInSnapshotMetaRepo(ValidRootKeyRotationRepo):
     SNAPSHOT_BAD_ROOT_SIZE_VERSIONS = [2]
 
 
-class InvalidRootHasInSnapshotMetaRepo(ValidRootKeyRotationRepo):
+class InvalidRootHashInSnapshotMetaRepo(ValidRootKeyRotationRepo):
     '''Because the first step in a download is downloading the root,
        so it shuldn't matter if the meta data is wrong.
     '''
