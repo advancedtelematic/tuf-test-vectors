@@ -147,6 +147,8 @@ def human_message(err) -> str:
         return "The target's calculated hash did not match the hash in the metadata."
     elif err == 'OversizedTarget':
         return "The target's size was greater than the size in the metadata."
+    elif err == 'IllegalRsaKeySize':
+        return 'The RSA key had an illegal size.'
     elif '::' in err:
         err_base, err_sub = err.split('::')
 
@@ -296,6 +298,10 @@ class Repo:
     '''
     SNAPSHOT_BAD_ROOT_HASH_VERSIONS = []
 
+    '''The number of bits in the public part of the RSA key
+    '''
+    RSA_KEY_SIZE = 2048
+
     def __init__(self, output_prefix=None, uptane_role=None):
         assert (output_prefix is None and uptane_role is None) or \
                 (output_prefix is not None and uptane_role is not None)
@@ -407,7 +413,7 @@ class Repo:
                 priv = binascii.hexlify(priv.to_bytes()).decode('utf-8')
                 pub = binascii.hexlify(pub.to_bytes()).decode('utf-8')
             elif typ == 'rsa':
-                rsa = RSA.generate(2048)
+                rsa = RSA.generate(self.RSA_KEY_SIZE)
                 priv = rsa.exportKey(format='PEM').decode('utf-8')
                 pub = rsa.publickey().exportKey(format='PEM').decode('utf-8')
             else:
@@ -1004,6 +1010,24 @@ class ValidRootKeyRotationSharedKeysUnmetVariableThresholdRepo(ValidRootKeyRotat
                  }
     ROOT_SIGN = [[1, 2], [1, 2]]
     ROOT_THRESHOLD_MOD = [0, -1]
+
+
+class InvalidRsaKeySize1792Repo(Valid2048RsaSsaPssSha256Repo):
+    '''Uses RSA keys with incorrect size (1792 bits)
+    '''
+
+    NAME = '035'
+    ERROR = 'IllegalRsaKeySize'
+    RSA_KEY_SIZE = 1792
+
+
+class InvalidRsaKeySize1024Repo(Valid2048RsaSsaPssSha256Repo):
+    '''Uses RSA keys with incorrect size (1024 bits)
+    '''
+
+    NAME = '036'
+    ERROR = 'IllegalRsaKeySize'
+    RSA_KEY_SIZE = 1024
 
 
 class ValidUptane(Uptane):

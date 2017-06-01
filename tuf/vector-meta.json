@@ -417,6 +417,30 @@
           "type": "ed25519"
         }
       ]
+    },
+    {
+      "error": "IllegalRsaKeySize",
+      "error_msg": "The RSA key had an illegal size.",
+      "is_success": false,
+      "repo": "035",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "rsa"
+        }
+      ]
+    },
+    {
+      "error": "IllegalRsaKeySize",
+      "error_msg": "The RSA key had an illegal size.",
+      "is_success": false,
+      "repo": "036",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "rsa"
+        }
+      ]
     }
   ],
   "version": 1
