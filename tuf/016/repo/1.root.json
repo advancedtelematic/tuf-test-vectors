@@ -3,7 +3,7 @@
     {
       "keyid": "e89e77221b4918a0a452ec8351449e050c7c56fe49f36d6890cdaed220ac0036",
       "method": "ed25519",
-      "sig": "597791f6b066b1b243606118a2d13d9858912b537cc51f240e9313725e0717250dc7722b3e00e84923387d2cbec02c3063e52f004edb109f7009aad2ea77d901"
+      "sig": "1c16eea01643f54a933222784e33a238705c06e3c3d86a022f34672973d13b6159d28c14f18c48347bd0f1715435a76ace99c3b8824f1c05da0b900033e69505"
     }
   ],
   "signed": {
@@ -23,10 +23,10 @@
           "public": "ff1f8723dcdfaab0c138e9846e4aed37ab4c6558cb425038a5e3aa2376385eeb"
         }
       },
-      "7ae4d0429996f3186d3733b0703f2dfb3d226c5acfb13bd77b1e5d448c5b3fc9": {
+      "b048f7053f27d2f88c9e790143daa6d88c56adeafb042b955626dac43cbad51b": {
         "keytype": "ed25519",
         "keyval": {
-          "public": "bc83b26435b11b8ba845b628b53dffd02c5e227e1a6ab72d06be083e372f55d0"
+          "public": "cb2c6999dd6b73f68f90df1d7dba30780d2f0f30dbda54bde80232dd52210f18"
         }
       },
       "e89e77221b4918a0a452ec8351449e050c7c56fe49f36d6890cdaed220ac0036": {
@@ -51,7 +51,7 @@
       },
       "targets": {
         "keyids": [
-          "7ae4d0429996f3186d3733b0703f2dfb3d226c5acfb13bd77b1e5d448c5b3fc9"
+          "b048f7053f27d2f88c9e790143daa6d88c56adeafb042b955626dac43cbad51b"
         ],
         "threshold": 1
       },

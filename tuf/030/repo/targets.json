@@ -1,7 +1,7 @@
 {
   "signatures": [
     {
-      "keyid": "679e5434b00dd64717883f061471359731e33ecd2f9beab366a7ec849ef55fbf",
+      "keyid": "99477200cbc8c0738f75a175a1b73878dbbefa9fa6daf22040b0ae5cee5e0207",
       "method": "ed25519",
       "sig": "b06a854f989e2ba16dcf5751ad61da8655841bb6c9ef721ac3639d40299569e6c1a8e030e3f0a1c117ffc8751309e94c756a7364fbcff60de437a34a51357e0d"
     }

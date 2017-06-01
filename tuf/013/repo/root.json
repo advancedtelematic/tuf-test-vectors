@@ -3,7 +3,7 @@
     {
       "keyid": "5f866a91b0efa965291b01f2de9e35dcd2a0844e9cdcf6ced8575d411cd1dc9a",
       "method": "ed25519",
-      "sig": "b18efab00baf72014a825860e1b733b8cfb8a19a67a384c0fb1e964d4ad46da8aa0b815ac4e01fa8ec8ed16b34d4101d2dabf6080f42f9b6bb2f0c224b3ec30b"
+      "sig": "4b42beed6441916771cade43086ff2d89238927ac774bbf2cb621eca54d476d53b24f6057f9383918773bf87d3df1ae9283ea013f31abcd0a8df279bfcc43c05"
     }
   ],
   "signed": {
@@ -63,8 +63,8 @@
       },
       "timestamp": {
         "keyids": [
-          "146c64e7d7787b58abf362f14a3cabf9ffcd2d00a6481e827336111debd16464",
-          "ccce710a7c9ff65755d85371e14ee40c05d3844b28ff8c52fd33a8650321662b"
+          "ccce710a7c9ff65755d85371e14ee40c05d3844b28ff8c52fd33a8650321662b",
+          "146c64e7d7787b58abf362f14a3cabf9ffcd2d00a6481e827336111debd16464"
         ],
         "threshold": 2
       }

@@ -3,12 +3,12 @@
     {
       "keyid": "1041f69d0a1d69094c15bf14de685d81066091c7ba42f76f581ada596abbdf56",
       "method": "ed25519",
-      "sig": "533b17644976d82016d63e8ad7bcd5126a78f422e8d5c13d84ebbbcaab76da2ed776f11b612c056d97c8d63a62354c78d8d9102cd5ff54adeabe5c74ee667707"
+      "sig": "c872b48282084aa831eb2e87ccbf4549911620ba052b5d09aa29dfd08921728d6ace6327f7b0e5ce2173765aa8f9c4ace94f9c9659fc14416d555b76ee271108"
     },
     {
       "keyid": "1c96cc34a2ca8b3289775a32f87ab7f23900cd0de16edafc0f539468897e34eb",
       "method": "ed25519",
-      "sig": "d9aac48d1f680c8907e6d37fa6d19022be200c343cce88e35ddc73699ae90c771146ccf50d217233fbddeeb9ac4d99d40ce00ab06cd3e632ef9842c61254cb01"
+      "sig": "3420e1d05d3a7a6f4c0ba83e758eb6148d0e458b837b44b5a38ed815d1bd017f7e0bb2a6534a61a0e42ec94b1267d7b69c48bef0ecb698b51c6d01178b1acf08"
     }
   ],
   "signed": {
@@ -28,16 +28,16 @@
           "public": "9901562a8dd4e44da77f430257108421e274854c089c09178f9d4eec7c5bc2de"
         }
       },
+      "44e7b4eafa6af021f0f818e2ccdd282019f5e97560b665389e696f8f39ad1c94": {
+        "keytype": "ed25519",
+        "keyval": {
+          "public": "d9aa03c5b38d391eed66563638cc988e93626a343fd0586c8404d8fa0a84a151"
+        }
+      },
       "8dd156a59628a20b15cb4f6b541b69ba48243bee4def9f2a77ffcb56e7bace9a": {
         "keytype": "ed25519",
         "keyval": {
           "public": "9e1639f5664d92f02b12ac4a6049bbb685a29d088a3b53106f1c191e642d9266"
-        }
-      },
-      "bc303b63f94801cb7e349af49c946a8ea180067a51e963579dfcc11ef45651bb": {
-        "keytype": "ed25519",
-        "keyval": {
-          "public": "bf7b18ed37dd23981660db6fbb4194b7ed1da0cfb3ba87c5a32ec5262891aad9"
         }
       },
       "fa89f5ddbabc5d735e499a67681961698dc4b15ea51fa883661b99a94096f4ee": {
@@ -63,7 +63,7 @@
       },
       "targets": {
         "keyids": [
-          "bc303b63f94801cb7e349af49c946a8ea180067a51e963579dfcc11ef45651bb"
+          "44e7b4eafa6af021f0f818e2ccdd282019f5e97560b665389e696f8f39ad1c94"
         ],
         "threshold": 1
       },

@@ -16,7 +16,6 @@ import ed25519
 import hashlib
 import json
 import logging
-import migrate
 import os
 
 from argparse import ArgumentParser
@@ -28,6 +27,7 @@ from securesystemslib.formats import encode_canonical as cjson
 SIGNATURE_ENCODING = None
 OUTPUT_DIR = None
 COMPACT_JSON = False
+CURRENT_VERSION = 2
 
 
 def log():
@@ -43,14 +43,12 @@ log = log()
 
 
 def main(repo_type, signature_encoding, output_dir, target_repo=None, compact=False):
-    migrate.migrate(repo_type, output_dir, log)
-
     global SIGNATURE_ENCODING, OUTPUT_DIR, COMPACT_JSON
     SIGNATURE_ENCODING = signature_encoding
     OUTPUT_DIR = output_dir
     COMPACT_JSON = bool(compact)
 
-    vector_meta = {'version': migrate.CURRENT_VERSION,
+    vector_meta = {'version': CURRENT_VERSION,
                    'vectors': []
                    }
 
@@ -237,15 +235,21 @@ class Repo:
 
     '''The signature methods for the targets keys.
     '''
-    TARGETS_KEYS = [['ed25519']]
+    TARGETS_KEYS = {'versions': [[1]],
+                    'keys': ['ed25519'],
+                    }
 
     '''The signature methods for the timestamp keys.
     '''
-    TIMESTAMP_KEYS = [['ed25519']]
+    TIMESTAMP_KEYS = {'versions': [[1]],
+                      'keys': ['ed25519'],
+                      }
 
     '''The signature methods for the snapshot keys.
     '''
-    SNAPSHOT_KEYS = [['ed25519']]
+    SNAPSHOT_KEYS = {'versions': [[1]],
+                     'keys': ['ed25519'],
+                     }
 
     '''The repo's targets.
     '''
@@ -267,23 +271,29 @@ class Repo:
     '''
     SNAPSHOT_THRESHOLD_MOD = [0]
 
-    '''The number of signatures to skip when signing targets metadata.
-    '''
-    TARGETS_SIGN_SKIP = [0]
-
-    '''The number of signatures to skip when signing timestamp metadata.
-    '''
-    TIMESTAMP_SIGN_SKIP = [0]
-
-    '''The number of signatures to skip when signing snapshot metadata.
-    '''
-    SNAPSHOT_SIGN_SKIP = [0]
-
     '''The keys to use for each signing. An entry with at index X means
-       "use the keys with indices in VALUE to do the cross signing for 
+       "use the keys with indices in VALUE to do the signing for
        (X + 1).root.json.
     '''
     ROOT_SIGN = [[1]]
+
+    '''The keys to use for each signing. An entry with at index X means
+       "use the keys with indices in VALUE to do the signing for
+       (X + 1).root.json.
+    '''
+    TARGETS_SIGN = [[1]]
+
+    '''The keys to use for each signing. An entry with at index X means
+       "use the keys with indices in VALUE to do the signing for
+       (X + 1).timestamp.json.
+    '''
+    TIMESTAMP_SIGN = [[1]]
+
+    '''The keys to use for each signing. An entry with at index X means
+       "use the keys with indices in VALUE to do the signing for
+       (X + 1).snapshot.json.
+    '''
+    SNAPSHOT_SIGN = [[1]]
 
     '''The key IDs to intentionally miscalculate.
     '''
@@ -304,7 +314,7 @@ class Repo:
 
     def __init__(self, output_prefix=None, uptane_role=None):
         assert (output_prefix is None and uptane_role is None) or \
-                (output_prefix is not None and uptane_role is not None)
+            (output_prefix is not None and uptane_role is not None)
 
         self.uptane_role = uptane_role
         self.output_prefix = output_prefix
@@ -324,49 +334,28 @@ class Repo:
             priv, pub = self.gen_key('root-{}'.format(key_idx + 1), sig_method)
             self.root_keys.append((sig_method, priv, pub))
 
+        for key_idx, sig_method in enumerate(self.TARGETS_KEYS['keys']):
+            log.info('Making target key {} with method {}'.format(key_idx + 1, sig_method))
+            priv, pub = self.gen_key('targets-{}'.format(key_idx + 1), sig_method)
+            self.targets_keys.append((sig_method, priv, pub))
+
+        for key_idx, sig_method in enumerate(self.TIMESTAMP_KEYS['keys']):
+            log.info('Making timestamp key {} with method {}'.format(key_idx + 1, sig_method))
+            priv, pub = self.gen_key('timestamp-{}'.format(key_idx + 1), sig_method)
+            self.timestamp_keys.append((sig_method, priv, pub))
+
+        for key_idx, sig_method in enumerate(self.SNAPSHOT_KEYS['keys']):
+            log.info('Making timestamp key {} with method {}'.format(key_idx + 1, sig_method))
+            priv, pub = self.gen_key('snapshot-{}'.format(key_idx + 1), sig_method)
+            self.snapshot_keys.append((sig_method, priv, pub))
+
+        for target, content in self.TARGETS:
+            log.info('Writing target: {}'.format(target))
+
+            with open(path.join(self.output_dir, 'repo', 'targets', target), 'wb') as f:
+                f.write(self.alter_target(content))
+
         for version_idx in range(len(self.ROOT_KEYS['versions'])):
-            log.info('Making keys for targets version {}'.format(version_idx + 1))
-            key_group = []
-
-            for key_idx, sig_method in enumerate(self.TARGETS_KEYS[version_idx]):
-                log.info('Making targets key {} with method {}'.format(key_idx + 1, sig_method))
-
-                priv, pub = self.gen_key('{}.targets-{}'.format(version_idx + 1, key_idx + 1),
-                                         sig_method)
-                key_group.append((sig_method, priv, pub))
-
-            self.targets_keys.append(key_group)
-
-            log.info('Making keys for timestamp version {}'.format(version_idx + 1))
-            key_group = []
-
-            for key_idx, sig_method in enumerate(self.TIMESTAMP_KEYS[version_idx]):
-                log.info('Making timestamp key {} with method {}'.format(key_idx + 1, sig_method))
-
-                priv, pub = self.gen_key('{}.timestamp-{}'.format(version_idx + 1, key_idx + 1),
-                                         sig_method)
-                key_group.append((sig_method, priv, pub))
-
-            self.timestamp_keys.append(key_group)
-
-            log.info('Making keys for snapshot version {}'.format(version_idx + 1))
-            key_group = []
-
-            for key_idx, sig_method in enumerate(self.SNAPSHOT_KEYS[version_idx]):
-                log.info('Making snapshot key {} with method {}'.format(key_idx + 1, sig_method))
-
-                priv, pub = self.gen_key('{}.snapshot-{}'.format(version_idx + 1, key_idx + 1),
-                                         sig_method)
-                key_group.append((sig_method, priv, pub))
-
-            self.snapshot_keys.append(key_group)
-
-            for target, content in self.TARGETS:
-                log.info('Writing target: {}'.format(target))
-
-                with open(path.join(self.output_dir, 'repo', 'targets', target), 'wb') as f:
-                    f.write(self.alter_target(content))
-
             log.info('Making root metadata')
             self.root_meta.append(self.make_root(version_idx))
 
@@ -443,24 +432,34 @@ class Repo:
             'roles': {
                 'root': {
                     'keyids': [],
-                    'threshold': len(self.ROOT_KEYS['versions'][version_idx]) + self.ROOT_THRESHOLD_MOD[version_idx],
+                    'threshold': len(
+                        self.ROOT_KEYS['versions'][version_idx]) + self.ROOT_THRESHOLD_MOD[version_idx],
                 },
                 'targets': {
                     'keyids': [],
-                    'threshold': len(self.targets_keys[version_idx]) + self.TARGETS_THRESHOLD_MOD[version_idx],
+                    'threshold': len(
+                        self.TARGETS_KEYS['versions'][version_idx]) + self.TARGETS_THRESHOLD_MOD[version_idx],
                 },
                 'timestamp': {
                     'keyids': [],
-                    'threshold': len(self.timestamp_keys[version_idx]) + self.TIMESTAMP_THRESHOLD_MOD[version_idx],
+                    'threshold': len(
+                        self.TIMESTAMP_KEYS['versions'][version_idx]) + self.TIMESTAMP_THRESHOLD_MOD[version_idx],
                 },
                 'snapshot': {
                     'keyids': [],
-                    'threshold': len(self.snapshot_keys[version_idx]) + self.SNAPSHOT_THRESHOLD_MOD[version_idx],
+                    'threshold': len(
+                        self.SNAPSHOT_KEYS['versions'][version_idx]) + self.SNAPSHOT_THRESHOLD_MOD[version_idx],
                 },
-            }
-        }
+            }}
 
-        root_keys = list(map(lambda x: self.root_keys[x - 1], self.ROOT_KEYS['versions'][version_idx]))
+        root_keys = list(map(lambda x: self.root_keys[
+                         x - 1], self.ROOT_KEYS['versions'][version_idx]))
+        targets_keys = list(map(lambda x: self.targets_keys[
+            x - 1], self.TARGETS_KEYS['versions'][version_idx]))
+        timestamp_keys = list(map(lambda x: self.timestamp_keys[
+            x - 1], self.TIMESTAMP_KEYS['versions'][version_idx]))
+        snapshot_keys = list(map(lambda x: self.snapshot_keys[
+            x - 1], self.SNAPSHOT_KEYS['versions'][version_idx]))
         keys = []
 
         for sig_method, _, pub in root_keys:
@@ -468,17 +467,17 @@ class Repo:
             keys.append((sig_method, pub, k_id))
             signed['roles']['root']['keyids'].append(k_id)
 
-        for sig_method, _, pub in self.targets_keys[version_idx]:
+        for sig_method, _, pub in targets_keys:
             k_id = key_id(pub, self.BAD_KEY_IDS == 'targets')
             keys.append((sig_method, pub, k_id))
             signed['roles']['targets']['keyids'].append(k_id)
 
-        for sig_method, _, pub in self.timestamp_keys[version_idx]:
+        for sig_method, _, pub in timestamp_keys:
             k_id = key_id(pub, self.BAD_KEY_IDS == 'timestamp')
             keys.append((sig_method, pub, k_id))
             signed['roles']['timestamp']['keyids'].append(k_id)
 
-        for sig_method, _, pub in self.snapshot_keys[version_idx]:
+        for sig_method, _, pub in snapshot_keys:
             k_id = key_id(pub, self.BAD_KEY_IDS == 'snapshot')
             keys.append((sig_method, pub, k_id))
             signed['roles']['snapshot']['keyids'].append(k_id)
@@ -490,13 +489,13 @@ class Repo:
             }
 
         keys = []
-        for root_key_version in self.ROOT_SIGN[version_idx]:
-            keys.append(self.root_keys[root_key_version - 1])
+        for key_version in self.ROOT_SIGN[version_idx]:
+            keys.append(self.root_keys[key_version - 1])
 
         return {'signatures': sign(keys, signed), 'signed': signed}
 
     def make_targets(self, version_idx) -> None:
-        file_data = {} 
+        file_data = {}
 
         for target, content in self.TARGETS:
             meta = {
@@ -518,17 +517,17 @@ class Repo:
 
         signed = {
             '_type': 'Targets',
-            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'targets' \
-                    else '2038-01-19T03:14:06Z',
+            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'targets'
+            else '2038-01-19T03:14:06Z',
             'version': 1,
             'targets': file_data,
         }
 
-        self.targets_meta = {
-            'signatures': sign(
-                self.targets_keys[version_idx][0:len(self.targets_keys[version_idx]) - self.TARGETS_SIGN_SKIP[version_idx]],
-                signed),
-            'signed': signed}
+        keys = []
+        for key_version in self.TARGETS_SIGN[version_idx]:
+            keys.append(self.targets_keys[key_version - 1])
+
+        self.targets_meta = {'signatures': sign(keys, signed), 'signed': signed}
 
     def make_snapshot(self, version_idx) -> None:
         signed = {
@@ -562,11 +561,11 @@ class Repo:
 
             signed['meta']['root.json'] = signed['meta'][name]
 
-        self.snapshot_meta = {
-            'signatures': sign(
-                self.snapshot_keys[version_idx][0:len(self.snapshot_keys[version_idx]) - self.SNAPSHOT_SIGN_SKIP[version_idx]],
-                signed),
-            'signed': signed}
+        keys = []
+        for key_version in self.SNAPSHOT_SIGN[version_idx]:
+            keys.append(self.snapshot_keys[key_version - 1])
+
+        self.snapshot_meta = {'signatures': sign(keys, signed), 'signed': signed}
 
     def make_timestamp(self, version_idx) -> None:
         jsn = jsonify(self.snapshot_meta)
@@ -588,11 +587,11 @@ class Repo:
                 },
             }}
 
-        self.timestamp_meta = {
-            'signatures': sign(
-                self.timestamp_keys[version_idx][0:len(self.timestamp_keys[version_idx]) - self.TIMESTAMP_SIGN_SKIP[version_idx]],
-                signed),
-            'signed': signed}
+        keys = []
+        for key_version in self.TIMESTAMP_SIGN[version_idx]:
+            keys.append(self.timestamp_keys[key_version - 1])
+
+        self.timestamp_meta = {'signatures': sign(keys, signed), 'signed': signed}
 
     @classmethod
     def vector_meta(cls) -> dict:
@@ -726,9 +725,22 @@ class Valid2048RsaSsaPssSha256Repo(Repo):
     ROOT_KEYS = {'versions': [[1]],
                  'keys': ['rsassa-pss-sha256'],
                  }
-    TARGETS_KEYS = [['rsassa-pss-sha256']]
-    TIMESTAMP_KEYS = [['rsassa-pss-sha256']]
-    SNAPSHOT_KEYS = [['rsassa-pss-sha256']]
+    ROOT_SIGN = [[1]]
+
+    TARGETS_KEYS = {'versions': [[1]],
+                    'keys': ['rsassa-pss-sha256'],
+                    }
+    TARGETS_SIGN = [[1]]
+
+    TIMESTAMP_KEYS = {'versions': [[1]],
+                      'keys': ['rsassa-pss-sha256'],
+                      }
+    TIMESTAMP_SIGN = [[1]]
+
+    SNAPSHOT_KEYS = {'versions': [[1]],
+                     'keys': ['rsassa-pss-sha256'],
+                     }
+    SNAPSHOT_SIGN = [[1]]
 
 
 class RsaTargetHashMismatchRepo(TargetHashMismatchRepo, Valid2048RsaSsaPssSha256Repo):
@@ -792,24 +804,30 @@ class UnmetTargetsThresholdRepo(Repo):
 
     NAME = '012'
     ERROR = 'UnmetThreshold::Targets'
-    TARGETS_KEYS = [['ed25519', 'ed25519']]
-    TARGETS_SIGN_SKIP = [1]
+    TARGETS_KEYS = {'versions': [[1, 2]],
+                    'keys': ['ed25519', 'ed25519'],
+                    }
+    TARGETS_SIGN = [[1]]
 
 
 class UnmetTimestampThresholdRepo(Repo):
 
     NAME = '013'
     ERROR = 'UnmetThreshold::Timestamp'
-    TIMESTAMP_KEYS = [['ed25519', 'ed25519']]
-    TIMESTAMP_SIGN_SKIP = [1]
+    TIMESTAMP_KEYS = {'versions': [[1, 2]],
+                      'keys': ['ed25519', 'ed25519'],
+                      }
+    TIMESTAMP_SIGN = [[1]]
 
 
 class UnmetSnapshotThresholdRepo(Repo):
 
     NAME = '014'
     ERROR = 'UnmetThreshold::Snapshot'
-    SNAPSHOT_KEYS = [['ed25519', 'ed25519']]
-    SNAPSHOT_SIGN_SKIP = [1]
+    SNAPSHOT_KEYS = {'versions': [[1, 2]],
+                     'keys': ['ed25519', 'ed25519'],
+                     }
+    SNAPSHOT_SIGN = [[1]]
 
 
 class ValidRootKeyRotationRepo(Repo):
@@ -821,16 +839,25 @@ class ValidRootKeyRotationRepo(Repo):
                  'keys': ['ed25519', 'ed25519'],
                  }
     ROOT_SIGN = [[1], [1, 2]]
-    TARGETS_KEYS = [['ed25519'], ['ed25519']]
-    TIMESTAMP_KEYS = [['ed25519'], ['ed25519']]
-    SNAPSHOT_KEYS = [['ed25519'], ['ed25519']]
     ROOT_THRESHOLD_MOD = [0, 0]
+
+    TARGETS_KEYS = {'versions': [[1], [2]],
+                    'keys': ['ed25519', 'ed25519'],
+                    }
+    TARGETS_SIGN = [[1], [2]]
     TARGETS_THRESHOLD_MOD = [0, 0]
+
+    TIMESTAMP_KEYS = {'versions': [[1], [2]],
+                      'keys': ['ed25519', 'ed25519'],
+                      }
+    TIMESTAMP_SIGN = [[1], [2]]
     TIMESTAMP_THRESHOLD_MOD = [0, 0]
+
+    SNAPSHOT_KEYS = {'versions': [[1], [2]],
+                     'keys': ['ed25519', 'ed25519'],
+                     }
+    SNAPSHOT_SIGN = [[1], [2]]
     SNAPSHOT_THRESHOLD_MOD = [0, 0]
-    TARGETS_SIGN_SKIP = [0, 0]
-    TIMESTAMP_SIGN_SKIP = [0, 0]
-    SNAPSHOT_SIGN_SKIP = [0, 0]
 
 
 class InvalidRootKeyRotationRepo(ValidRootKeyRotationRepo):
@@ -923,9 +950,22 @@ class Valid2048RsaSsaPssSha512Repo(Repo):
     ROOT_KEYS = {'versions': [[1]],
                  'keys': ['rsassa-pss-sha512'],
                  }
-    TARGETS_KEYS = [['rsassa-pss-sha512']]
-    TIMESTAMP_KEYS = [['rsassa-pss-sha512']]
-    SNAPSHOT_KEYS = [['rsassa-pss-sha512']]
+    ROOT_SIGN = [[1]]
+
+    TARGETS_KEYS = {'versions': [[1]],
+                    'keys': ['rsassa-pss-sha512'],
+                    }
+    TARGETS_SIGN = [[1]]
+
+    TIMESTAMP_KEYS = {'versions': [[1]],
+                      'keys': ['rsassa-pss-sha512'],
+                      }
+    TIMESTAMP_SIGN = [[1]]
+
+    SNAPSHOT_KEYS = {'versions': [[1]],
+                     'keys': ['rsassa-pss-sha512'],
+                     }
+    SNAPSHOT_SIGN = [[1]]
 
 
 class ValidMixedKeysRepo(Repo):
@@ -936,9 +976,21 @@ class ValidMixedKeysRepo(Repo):
                  'keys': ['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512'],
                  }
     ROOT_SIGN = [[1, 2, 3]]
-    TARGETS_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
-    TIMESTAMP_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
-    SNAPSHOT_KEYS = [['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512']]
+
+    TARGETS_KEYS = {'versions': [[1, 2, 3]],
+                    'keys': ['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512'],
+                    }
+    TARGETS_SIGN = [[1, 2, 3]]
+
+    TIMESTAMP_KEYS = {'versions': [[1, 2, 3]],
+                      'keys': ['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512'],
+                      }
+    TIMESTAMP_SIGN = [[1, 2, 3]]
+
+    SNAPSHOT_KEYS = {'versions': [[1, 2, 3]],
+                     'keys': ['ed25519', 'rsassa-pss-sha256', 'rsassa-pss-sha512'],
+                     }
+    SNAPSHOT_SIGN = [[1, 2, 3]]
 
 
 class InvalidRootKeyRotationUnmetSecondThresholdRepo(ValidRootKeyRotationRepo):

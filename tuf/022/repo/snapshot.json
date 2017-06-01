@@ -1,9 +1,9 @@
 {
   "signatures": [
     {
-      "keyid": "5dabd3315527d9db70ef297c94b84a6b12d1c9df3d1c1771828689cdca3c4409",
+      "keyid": "f24058b5a5442112efd77ea85cc0f746481f85bf928a79abefe5a34ed6dda72e",
       "method": "ed25519",
-      "sig": "0a834d163aebb66fab1cf898bcf9ab8d2bd52c853b35f551811431335715df373537a23d62d5c0f00be784010da4fa62e1f5f5560fc2685272842779bcb68600"
+      "sig": "a019d50a97ec4b0d4a276f60f1a9736bc1ba232e9d7373f15e7ab0b90d51a5e2d19355c29c08020686e913b7d7f2e08f7c9e236395fb511930a592d0608bfd08"
     }
   ],
   "signed": {
@@ -12,24 +12,24 @@
     "meta": {
       "1.root.json": {
         "hashes": {
-          "sha256": "f1e06eede76a429aab988cfc260c1d20ae34ced9bed68591a71bc70827562418",
-          "sha512": "040db9948800db9e1b6efc1c401e71acdd075b42c265440e520cb16ddb38692acacaafc7c7791d38efaf210f2f0c0a045d8de735e6c9727f6a38b5cb0b6f1b88"
+          "sha256": "edda2156d229edaf7b562f35365968b9b0678fd2fb4f4ff466e0a4343796add5",
+          "sha512": "200acf51566a4229eba3d2beb55e433e2e90ccdb2224376c961fd711f7426284602927fdef7fe5b3eddd6ed0569009f845b1cb5b2548b29b443624580dcbd993"
         },
         "length": 2027,
         "version": 1
       },
       "2.root.json": {
         "hashes": {
-          "sha256": "19b09b637525cc134cb43619fefc26b62eb2d3d019deba609fe92f4d25856c21",
-          "sha512": "0ac5434db2b87461c80063d5ca64b94e664fec8e528177f5aebe97ad16d102728254531146ff5fba502c86ca403985f2011d188b4a3a1e7422c6aa8a23ce4c2a"
+          "sha256": "813eacd6c49ecc95e8c8743ebc148388e291ec9868ec39dd6ba6f988dfda9a56",
+          "sha512": "32c52260a16ef699299ae1fc038374c4352eac1951829a58e8c05c6971c9c1de704128ec035d3c93772ec05ad8a5bfb372a56c3bb6bca8758aee42c87df54121"
         },
         "length": 2294,
         "version": 2
       },
       "root.json": {
         "hashes": {
-          "sha256": "19b09b637525cc134cb43619fefc26b62eb2d3d019deba609fe92f4d25856c21",
-          "sha512": "0ac5434db2b87461c80063d5ca64b94e664fec8e528177f5aebe97ad16d102728254531146ff5fba502c86ca403985f2011d188b4a3a1e7422c6aa8a23ce4c2a"
+          "sha256": "813eacd6c49ecc95e8c8743ebc148388e291ec9868ec39dd6ba6f988dfda9a56",
+          "sha512": "32c52260a16ef699299ae1fc038374c4352eac1951829a58e8c05c6971c9c1de704128ec035d3c93772ec05ad8a5bfb372a56c3bb6bca8758aee42c87df54121"
         },
         "length": 2294,
         "version": 2

@@ -3,12 +3,12 @@
     {
       "keyid": "bba827bc65296a61755253d22383df56539d65a4459252c586d1e6c2e0aec964",
       "method": "ed25519",
-      "sig": "a648adae842207012fdba95f0dfe546d51ad17b4996ff0db3e7b7385bf0bed454900ff9591b4b8d2b0b5091761db20d052b58a35fe91245de05501446b13d909"
+      "sig": "7be027a668ab2862146b9555bd4de3e75011c6c8d3b8e8292cccf304ca21e594ed5703198dc3b6409afb34d3d9b04724b4e0059202e7dceea9dcd8a471eeeb07"
     },
     {
       "keyid": "4a6a3bb2673b063bb4d3809570d6d732ab877f2cc8c1176514ee2d1843c080a3",
       "method": "ed25519",
-      "sig": "bc4012b0be96d7f2e410a79fff129df0d2e1adec7d19042cbaf25998a3678af20d5a5ee28958cab6b1f297bd232f00388f3a66807943a82ec0cb6f208c06a700"
+      "sig": "25c9dd1745ca06bd5f6621be463aa8640cd6b4a22fee2cd394dc6fbe55b852b6cdf7c565546e56a017ac82f78fecd548a2d5113d61911de6a4a1617cc3e36d0d"
     }
   ],
   "signed": {
@@ -16,6 +16,12 @@
     "consistent_snapshot": false,
     "expires": "2038-01-19T03:14:06Z",
     "keys": {
+      "088c2754c075306ca8151ace362603d5501977b1282fb03626e462ab3d26391f": {
+        "keytype": "ed25519",
+        "keyval": {
+          "public": "ec41e7457a86b42ef46c43a28d705a1254763f0f634212d5210a67c1110b214a"
+        }
+      },
       "0fe0e437d5a111e0733199fa58f7352f4b96f34c4661d7cac1e19cc6ab4ac7b5": {
         "keytype": "ed25519",
         "keyval": {
@@ -26,12 +32,6 @@
         "keytype": "ed25519",
         "keyval": {
           "public": "95c5833636fe5e34d05713a93d37f09e837a07d53a3420f31b4444f408681f18"
-        }
-      },
-      "b11f5db6c5d71b6901eba909e28bf970a262f0d9c0b2112b9704da874160be9d": {
-        "keytype": "ed25519",
-        "keyval": {
-          "public": "1efbc93ab08b02ee4a78dd65af9309eba3c9213e2ce748dd86c4cf85b93f0cd9"
         }
       },
       "bba827bc65296a61755253d22383df56539d65a4459252c586d1e6c2e0aec964": {
@@ -63,7 +63,7 @@
       },
       "targets": {
         "keyids": [
-          "b11f5db6c5d71b6901eba909e28bf970a262f0d9c0b2112b9704da874160be9d"
+          "088c2754c075306ca8151ace362603d5501977b1282fb03626e462ab3d26391f"
         ],
         "threshold": 1
       },
