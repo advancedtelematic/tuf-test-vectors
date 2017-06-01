@@ -1105,7 +1105,7 @@ class NonUniqueTimestampSignatureRepo(Repo):
     TIMESTAMP_SIGN = [[1, 1]]
 
 
-class NonUniqueSnapshotSignatureRepo(Valid2048RsaSsaPssSha256Repo):
+class NonUniqueSnapshotSignatureRepo(Repo):
 
     NAME = '040'
     ERROR = 'NonUniqueSignatures::Snapshot'
