@@ -219,6 +219,38 @@ def sign(keys, signed) -> list:
     return sigs
 
 
+def gen_key(role, sig_method, rsa_key_size, output_dir):
+    typ = key_type(sig_method)
+
+    try:
+        with open(path.join(output_dir, 'keys', '{}.priv'.format(role)), 'r') as f:
+            priv = f.read().strip()
+
+        with open(path.join(output_dir, 'keys', '{}.pub'.format(role)), 'r') as f:
+            pub = f.read().strip()
+    except FileNotFoundError:
+        if typ == 'ed25519':
+            priv, pub = ed25519.create_keypair()
+            priv = binascii.hexlify(priv.to_bytes()).decode('utf-8')
+            pub = binascii.hexlify(pub.to_bytes()).decode('utf-8')
+        elif typ == 'rsa':
+            rsa = RSA.generate(rsa_key_size)
+            priv = rsa.exportKey(format='PEM').decode('utf-8')
+            pub = rsa.publickey().exportKey(format='PEM').decode('utf-8')
+        else:
+            raise Exception('unknown key type: {}'.format(typ))
+    finally:
+        with open(path.join(output_dir, 'keys', '{}.priv'.format(role)), 'w') as f:
+            f.write(priv)
+            f.write('\n')
+
+        with open(path.join(output_dir, 'keys', '{}.pub'.format(role)), 'w') as f:
+            f.write(pub)
+            f.write('\n')
+
+    return (priv, pub)
+
+
 class Repo:
 
     '''The error that TUF should encounter, if any. None implies success.
@@ -314,6 +346,8 @@ class Repo:
     '''
     RSA_KEY_SIZE = 2048
 
+    DELEGATIONS_GROUP_CLS = None
+
     def __init__(self, output_prefix=None, uptane_role=None):
         assert (output_prefix is None and uptane_role is None) or \
             (output_prefix is not None and uptane_role is not None)
@@ -324,6 +358,12 @@ class Repo:
         for d in ['keys', path.join('repo', 'targets')]:
             os.makedirs(path.join(self.output_dir, d), exist_ok=True)
 
+        if self.DELEGATIONS_GROUP_CLS is not None:
+            self.delegations_group = self.DELEGATIONS_GROUP_CLS(
+                output_prefix, uptane_role, self.output_dir)
+        else:
+            self.delegations_group = None
+
         self.root_keys = []
         self.targets_keys = []
         self.timestamp_keys = []
@@ -333,29 +373,29 @@ class Repo:
 
         for key_idx, sig_method in enumerate(self.ROOT_KEYS['keys']):
             log.info('Making root key {} with method {}'.format(key_idx + 1, sig_method))
-            priv, pub = self.gen_key('root-{}'.format(key_idx + 1), sig_method)
+            priv, pub = gen_key('root-{}'.format(key_idx + 1), sig_method,
+                                self.RSA_KEY_SIZE, self.output_dir)
             self.root_keys.append((sig_method, priv, pub))
 
         for key_idx, sig_method in enumerate(self.TARGETS_KEYS['keys']):
             log.info('Making target key {} with method {}'.format(key_idx + 1, sig_method))
-            priv, pub = self.gen_key('targets-{}'.format(key_idx + 1), sig_method)
+            priv, pub = gen_key('targets-{}'.format(key_idx + 1), sig_method,
+                                self.RSA_KEY_SIZE, self.output_dir)
             self.targets_keys.append((sig_method, priv, pub))
 
         for key_idx, sig_method in enumerate(self.TIMESTAMP_KEYS['keys']):
             log.info('Making timestamp key {} with method {}'.format(key_idx + 1, sig_method))
-            priv, pub = self.gen_key('timestamp-{}'.format(key_idx + 1), sig_method)
+            priv, pub = gen_key('timestamp-{}'.format(key_idx + 1),
+                                sig_method, self.RSA_KEY_SIZE, self.output_dir)
             self.timestamp_keys.append((sig_method, priv, pub))
 
         for key_idx, sig_method in enumerate(self.SNAPSHOT_KEYS['keys']):
             log.info('Making timestamp key {} with method {}'.format(key_idx + 1, sig_method))
-            priv, pub = self.gen_key('snapshot-{}'.format(key_idx + 1), sig_method)
+            priv, pub = gen_key('snapshot-{}'.format(key_idx + 1), sig_method,
+                                self.RSA_KEY_SIZE, self.output_dir)
             self.snapshot_keys.append((sig_method, priv, pub))
 
-        for target, content in self.TARGETS:
-            log.info('Writing target: {}'.format(target))
-
-            with open(path.join(self.output_dir, 'repo', 'targets', target), 'wb') as f:
-                f.write(self.alter_target(content))
+        self.write_targets_content()
 
         for version_idx in range(len(self.ROOT_KEYS['versions'])):
             log.info('Making root metadata')
@@ -382,43 +422,18 @@ class Repo:
     def alter_target(self, target) -> bytes:
         return target
 
+    def write_targets_content(self):
+        for target, content in self.TARGETS:
+            log.info('Writing target: {}'.format(target))
+            with open(path.join(self.output_dir, 'repo', 'targets', target), 'wb') as f:
+                f.write(self.alter_target(content))
+
     @property
     def output_dir(self) -> str:
         if self.output_prefix is not None:
             return path.join(OUTPUT_DIR, self.output_prefix, self.uptane_role)
         else:
             return path.join(OUTPUT_DIR, self.NAME)
-
-    def gen_key(self, role, sig_method):
-        typ = key_type(sig_method)
-
-        try:
-            with open(path.join(self.output_dir, 'keys', '{}.priv'.format(role)), 'r') as f:
-                priv = f.read().strip()
-
-            with open(path.join(self.output_dir, 'keys', '{}.pub'.format(role)), 'r') as f:
-                pub = f.read().strip()
-        except FileNotFoundError:
-            if typ == 'ed25519':
-                priv, pub = ed25519.create_keypair()
-                priv = binascii.hexlify(priv.to_bytes()).decode('utf-8')
-                pub = binascii.hexlify(pub.to_bytes()).decode('utf-8')
-            elif typ == 'rsa':
-                rsa = RSA.generate(self.RSA_KEY_SIZE)
-                priv = rsa.exportKey(format='PEM').decode('utf-8')
-                pub = rsa.publickey().exportKey(format='PEM').decode('utf-8')
-            else:
-                raise Exception('unknown key type: {}'.format(typ))
-        finally:
-            with open(path.join(self.output_dir, 'keys', '{}.priv'.format(role)), 'w') as f:
-                f.write(priv)
-                f.write('\n')
-
-            with open(path.join(self.output_dir, 'keys', '{}.pub'.format(role)), 'w') as f:
-                f.write(pub)
-                f.write('\n')
-
-        return (priv, pub)
 
     def write_meta(self, name, data) -> None:
         with open(path.join(self.output_dir, 'repo', name + '.json'), 'w') as f:
@@ -525,6 +540,9 @@ class Repo:
             'targets': file_data,
         }
 
+        if self.delegations_group is not None:
+            signed['delegations'] = self.delegations_group.make_targets_section()
+
         keys = []
         for key_version in self.TARGETS_SIGN[version_idx]:
             keys.append(self.targets_keys[key_version - 1])
@@ -538,12 +556,14 @@ class Repo:
             'version': 1,
             'meta': {
                 'targets.json': {
-                    'version': version_idx + 1,  # TODO this might need updating
+                    'version': version_idx + 1,
                 },
-            }
-        }
+            }}
 
-        # TODO not sure if all versions of root need to be included
+        if self.delegations_group is not None:
+            for role, version in self.delegations_group.list_all():
+                signed['meta']['{}.json'.format(role)] = {'version': version}
+
         for root_version_idx, root in enumerate(self.root_meta):
             name = '{}.root.json'.format(root_version_idx + 1)
             jsn = jsonify(root)
@@ -613,11 +633,87 @@ class Repo:
             'root_keys': root_keys,
         }
 
+        # TODO include ordered list of files to download from cls.TARGETS & delegations.TARGETS
+
         if cls.ERROR is not None:
             meta['error'] = cls.ERROR
             meta['error_msg'] = human_message(cls.ERROR)
 
         return meta
+
+
+class DelegationsGroup:
+
+    '''List of sig_methods
+    '''
+    KEYS = []
+
+    '''List of delegated roles
+    '''
+    ROLES = []
+
+    def __init__(self, output_prefix, uptane_role, repo_dir):
+        self.output_prefix = output_prefix
+        self.uptane_role = uptane_role
+        self.repo_dir = repo_dir
+        self.roles = []
+        self.keys = []
+
+        for key_idx, key in enumerate(self.KEYS):
+            priv, pub = gen_key('delegation-{}'.format(key_idx + 1), key, 2048, self.repo_dir)
+            self.keys.append((key, priv, pub))
+
+        for role in self.ROLES:
+            role['role'](role['name'], output_prefix, uptane_role, repo_dir,
+                         list(map(lambda x: self.keys[x - 1], role['keys'])))
+            self.roles.append(role)
+
+    def make_targets_section(self) -> dict:
+        roles = []
+        for role in self.roles:
+            role_meta = {
+                'name': role['name'],
+                'threshold': role['threshold'],
+                'keyids': list(map(lambda x: key_id(self.keys[x - 1][2]), role['keys'])),
+                'paths': role['paths'],
+                'terminating': False,  # TODO allow terminating, test
+            }
+            roles.append(role_meta)
+
+        keys = {}
+        for sig_method, _, pub in self.keys:
+            keys[key_id(pub)] = {
+                'keytype': key_type(sig_method),
+                'keyval': {'public': pub},
+            }
+
+        return {'keys': keys,
+                'roles': roles,
+                }
+
+    def list_all(self) -> list:
+        '''Returns a list of (role_name, role_version)
+        '''
+        return list(map(lambda x: (x['name'], 1), self.roles))
+
+
+class Delegation(Repo):
+
+    def __init__(self, name, output_prefix, uptane_role, output_dir, keys):
+        '''Keys is list[('method', 'priv', 'pub')]
+        '''
+        if self.DELEGATIONS_GROUP_CLS is not None:
+            self.delegations_group = self.DELEGATIONS_GROUP_CLS(uptane_role, self.output_dir)
+        else:
+            self.delegations_group = None
+
+        self.NAME = path.basename(output_dir)
+        self.output_prefix = output_prefix
+        self.uptane_role = uptane_role
+        self.targets_keys = keys
+        self.make_targets(0)
+        self.write_meta(name, self.targets_meta)
+        self.write_targets_content()
 
 
 class Uptane:
@@ -1138,6 +1234,31 @@ class NonUniqueRsaSnapshotSignatureRepo(Valid2048RsaSsaPssSha256Repo):
     NAME = '044'
     ERROR = 'NonUniqueSignatures::Snapshot'
     SNAPSHOT_SIGN = [[1, 1]]
+
+
+class SimpleDelegation(Delegation):
+
+    pass
+
+
+class SimpleDelegationsGroup(DelegationsGroup):
+
+    KEYS = ['ed25519']
+
+    ROLES = [{'keys': [1],
+              'role': SimpleDelegation,
+              'name': 'delegation-1',
+              'threshold': 1,
+              'paths': ['targets/file.txt'],
+              }
+             ]
+
+
+class SimpleDelegationRepo(Repo):
+
+    NAME = '045'
+    DELEGATIONS_GROUP_CLS = SimpleDelegationsGroup
+    TARGETS = []
 
 
 class ValidUptane(Uptane):
