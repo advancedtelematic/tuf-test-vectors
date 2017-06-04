@@ -664,8 +664,9 @@ class DelegationsGroup:
             self.keys.append((key, priv, pub))
 
         for role in self.ROLES:
-            role['role'](role['name'], output_prefix, uptane_role, repo_dir,
+            r = role['role'](role['name'], output_prefix, uptane_role, repo_dir,
                          list(map(lambda x: self.keys[x - 1], role['keys'])))
+            role['role'] = r
             self.roles.append(role)
 
     def make_targets_section(self) -> dict:
@@ -694,7 +695,13 @@ class DelegationsGroup:
     def list_all(self) -> list:
         '''Returns a list of (role_name, role_version)
         '''
-        return list(map(lambda x: (x['name'], 1), self.roles))
+        roles = list(map(lambda x: (x['name'], 1), self.roles))
+
+        for role in self.roles:
+            if role['role'].delegations_group is not None:
+                roles += role['role'].delegations_group.list_all()
+
+        return roles
 
 
 class Delegation(Repo):
@@ -702,14 +709,16 @@ class Delegation(Repo):
     def __init__(self, name, output_prefix, uptane_role, output_dir, keys):
         '''Keys is list[('method', 'priv', 'pub')]
         '''
-        if self.DELEGATIONS_GROUP_CLS is not None:
-            self.delegations_group = self.DELEGATIONS_GROUP_CLS(uptane_role, self.output_dir)
-        else:
-            self.delegations_group = None
-
         self.NAME = path.basename(output_dir)
         self.output_prefix = output_prefix
         self.uptane_role = uptane_role
+
+        if self.DELEGATIONS_GROUP_CLS is not None:
+            self.delegations_group = \
+                self.DELEGATIONS_GROUP_CLS(output_prefix, uptane_role, self.output_dir)
+        else:
+            self.delegations_group = None
+
         self.targets_keys = keys
         self.make_targets(0)
         self.write_meta(name, self.targets_meta)
@@ -1258,6 +1267,32 @@ class SimpleDelegationRepo(Repo):
 
     NAME = '045'
     DELEGATIONS_GROUP_CLS = SimpleDelegationsGroup
+    TARGETS = []
+
+
+class NestedDelegation(Delegation):
+
+    TARGETS = []
+    DELEGATIONS_GROUP_CLS = SimpleDelegationsGroup
+
+
+class NestedDelegationsGroup(DelegationsGroup):
+
+    KEYS = ['ed25519']
+
+    ROLES = [{'keys': [1],
+              'role': NestedDelegation,
+              'name': 'delegation-2',
+              'threshold': 1,
+              'paths': ['targets/file.txt'],
+              }
+             ]
+
+
+class NestedDelegationRepo(Repo):
+
+    NAME = '046'
+    DELEGATIONS_GROUP_CLS = NestedDelegationsGroup
     TARGETS = []
 
 
