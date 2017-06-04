@@ -147,6 +147,8 @@ def human_message(err) -> str:
         return "The target's size was greater than the size in the metadata."
     elif err == 'IllegalRsaKeySize':
         return 'The RSA key had an illegal size.'
+    elif err == 'UnavailableTarget':
+        return 'The target either does not exist or was not in the chain of trusted metadata.'
     elif '::' in err:
         err_base, err_sub = err.split('::')
 
@@ -171,9 +173,9 @@ def human_message(err) -> str:
         elif err_base == 'NonUniqueSignatures':
             return 'The role {} had non-unique signatures.'.format(err_sub.lower())
         else:
-            raise Exception('Unknown err: {}'.format(err_base))
+            raise Exception('Unavailable err: {}'.format(err_base))
     else:
-        raise Exception('Unknown err: {}'.format(err))
+        raise Exception('Unavailable err: {}'.format(err))
 
 
 def encode_signature(sig) -> str:
@@ -346,7 +348,13 @@ class Repo:
     '''
     RSA_KEY_SIZE = 2048
 
+    '''The group to use for delegated roles.
+    '''
     DELEGATIONS_GROUP_CLS = None
+
+    '''Which pieces of metadata to not include in the snapshot.json
+    '''
+    SNAPSHOT_META_SKIP = []
 
     def __init__(self, output_prefix=None, uptane_role=None):
         assert (output_prefix is None and uptane_role is None) or \
@@ -583,6 +591,9 @@ class Repo:
 
             signed['meta']['root.json'] = signed['meta'][name]
 
+        for skip in self.SNAPSHOT_META_SKIP:
+            signed['meta'].pop(skip, None)
+
         keys = []
         for key_version in self.SNAPSHOT_SIGN[version_idx]:
             keys.append(self.snapshot_keys[key_version - 1])
@@ -665,9 +676,10 @@ class DelegationsGroup:
 
         for role in self.ROLES:
             r = role['role'](role['name'], output_prefix, uptane_role, repo_dir,
-                         list(map(lambda x: self.keys[x - 1], role['keys'])))
-            role['role'] = r
-            self.roles.append(role)
+                             list(map(lambda x: self.keys[x - 1], role['keys'])))
+            role_copy = role.copy()
+            role_copy['role'] = r
+            self.roles.append(role_copy)
 
     def make_targets_section(self) -> dict:
         roles = []
@@ -1294,6 +1306,20 @@ class NestedDelegationRepo(Repo):
     NAME = '046'
     DELEGATIONS_GROUP_CLS = NestedDelegationsGroup
     TARGETS = []
+
+
+class NestedDelegationFirstLinkMissingRepo(NestedDelegationRepo):
+
+    NAME = '047'
+    ERROR = 'UnavailableTarget'
+    SNAPSHOT_META_SKIP = ['delegation-2.json']
+
+
+class NestedDelegationSecondLinkMissingRepo(NestedDelegationRepo):
+
+    NAME = '048'
+    ERROR = 'UnavailableTarget'
+    SNAPSHOT_META_SKIP = ['delegation-1.json']
 
 
 class ValidUptane(Uptane):
