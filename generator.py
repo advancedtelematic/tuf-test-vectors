@@ -22,11 +22,12 @@ from argparse import ArgumentParser
 from Crypto.Hash import SHA256, SHA512
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_PSS
-from securesystemslib.formats import encode_canonical as cjson
+from securesystemslib.formats import encode_canonical as olpc_cjson
 
 SIGNATURE_ENCODING = None
 OUTPUT_DIR = None
 COMPACT_JSON = False
+CANONICAL_JSON = None
 CURRENT_VERSION = 2
 
 
@@ -42,11 +43,16 @@ def log():
 log = log()
 
 
-def main(repo_type, signature_encoding, output_dir, target_repo=None, compact=False):
-    global SIGNATURE_ENCODING, OUTPUT_DIR, COMPACT_JSON
+def main(repo_type, signature_encoding, output_dir, target_repo, compact, cjson_format):
+    global SIGNATURE_ENCODING, OUTPUT_DIR, COMPACT_JSON, CANONICAL_JSON
     SIGNATURE_ENCODING = signature_encoding
     OUTPUT_DIR = output_dir
     COMPACT_JSON = bool(compact)
+    CANONICAL_JSON = cjson_format
+
+    if cjson_format == 'json-subset':
+        log.warn('Using a subset of JSON for canonicalizing JSON. '
+                 'This might change in the future')
 
     vector_meta = {'version': CURRENT_VERSION,
                    'vectors': []
@@ -125,12 +131,43 @@ def key_type(sig_method) -> str:
         raise Exception('unknown signature method: {}'.format(sig_method))
 
 
+def cjson(jsn):
+    if CANONICAL_JSON == 'olpc':
+        return olpc_cjson(jsn)
+    elif CANONICAL_JSON == 'json-subset':
+        cjson_subset_check(jsn)
+        return json.dumps(jsn, sort_keys=True, separators=(',', ':'))
+    else:
+        raise Exception('Unsupported CJSON format: {}'.format(CANONICAL_JSON))
+
+
+def cjson_subset_check(jsn):
+    if isinstance(jsn, list):
+        for j in jsn:
+            cjson_subset_check(j)
+    elif isinstance(jsn, dict):
+        for _, v in jsn.items():
+            cjson_subset_check(v)
+    elif isinstance(jsn, str):
+        pass
+    elif isinstance(jsn, bool):
+        pass
+    elif jsn is None:
+        pass
+    elif isinstance(jsn, int):
+        pass
+    elif isinstance(jsn, float):
+        raise Exception('CJSON does not allow floats')
+    else:
+        raise Exception('What sort of type is this? {}'.format(jsn))
+
 def jsonify(jsn) -> str:
-    global COMPACT_JSON
     kwargs = {'sort_keys': True, }
 
     if not COMPACT_JSON:
         kwargs['indent'] = 2
+    else:
+        kwargs['separators'] = (':', ',')
 
     out = json.dumps(jsn, **kwargs)
 
@@ -179,8 +216,6 @@ def human_message(err) -> str:
 
 
 def encode_signature(sig) -> str:
-    global SIGNATURE_ENCODING
-
     if SIGNATURE_ENCODING == 'hex':
         return binascii.hexlify(sig).decode('utf-8')
     elif SIGNATURE_ENCODING == 'base64':
@@ -1670,6 +1705,8 @@ if __name__ == '__main__':
     parser.add_argument('--signature-encoding', help='The encoding for cryptographic signatures',
                         default='hex', choices=['hex', 'base64'])
     parser.add_argument('--compact', help='Write JSON in compact format', action='store_true')
+    parser.add_argument('--cjson', help='The formatter to use for canonical JSON',
+                        default='olpc', choices=['olpc', 'json-subset'])
     args = parser.parse_args()
 
-    main(args.type, args.signature_encoding, args.output_dir, args.repo, args.compact)
+    main(args.type, args.signature_encoding, args.output_dir, args.repo, args.compact, args.cjson)
