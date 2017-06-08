@@ -581,6 +581,18 @@
           "type": "ed25519"
         }
       ]
+    },
+    {
+      "error": "UnmetThreshold::Delegation",
+      "error_msg": "The delegation metadata had an unmet threshold.",
+      "is_success": false,
+      "repo": "049",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        }
+      ]
     }
   ],
   "version": 2

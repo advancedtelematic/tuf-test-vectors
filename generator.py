@@ -193,7 +193,7 @@ def human_message(err) -> str:
             assert err_sub in ['Director', 'Repo'], err_sub
             return 'The {} repo is missing.'.format(err_sub.lower())
 
-        assert err_sub in ['Root', 'Targets', 'Timestamp', 'Snapshot'], err_sub
+        assert err_sub in ['Root', 'Targets', 'Timestamp', 'Snapshot', 'Delegation'], err_sub
 
         if err_base == 'ExpiredMetadata':
             return "The {} metadata was expired.".format(err_sub.lower())
@@ -1357,6 +1357,32 @@ class NestedDelegationSecondLinkMissingRepo(NestedDelegationRepo):
     NAME = '048'
     ERROR = 'UnavailableTarget'
     SNAPSHOT_META_SKIP = ['delegation-1.json']
+
+
+class ThresholdUnmetDelegation(Delegation):
+
+    TARGETS_SIGN = [[]]
+
+
+class ThresholdUnmetDelegationGroup(DelegationsGroup):
+
+    KEYS = ['ed25519']
+
+    ROLES = [{'keys': [1],
+              'role': ThresholdUnmetDelegation,
+              'name': 'delegation-1',
+              'threshold': 1,
+              'paths': ['targets/file.txt'],
+              }
+             ]
+
+
+class DelegationThresholdUnmetRepo(Repo):
+
+    NAME = '049'
+    ERROR = 'UnmetThreshold::Delegation'
+    DELEGATIONS_GROUP_CLS = ThresholdUnmetDelegationGroup
+    TARGETS = []
 
 
 class ValidUptane(Uptane):
