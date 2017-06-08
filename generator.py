@@ -671,6 +671,8 @@ class DelegationsGroup:
         self.keys = []
 
         for key_idx, key in enumerate(self.KEYS):
+            # TODO this key name is shared by all nested delegation groups and therefore 
+            # means that they all share keys which makes some of the tests BS
             priv, pub = gen_key('delegation-{}'.format(key_idx + 1), key, 2048, self.repo_dir)
             self.keys.append((key, priv, pub))
 
