@@ -1388,6 +1388,47 @@ class DelegationThresholdUnmetRepo(Repo):
     TARGETS = []
 
 
+class NoPathTargetDelegationsGroup(DelegationsGroup):
+
+    KEYS = ['ed25519']
+
+    ROLES = [{'keys': [1],
+              'role': SimpleDelegation,
+              'name': 'delegation-1',
+              'threshold': 1,
+              'paths': [],
+              }
+             ]
+
+class NoPathTargetDelegationRepo(Repo):
+
+    NAME = '050'
+    ERROR = 'UnavailableTarget'
+    DELEGATIONS_GROUP_CLS = NoPathTargetDelegationsGroup
+    TARGETS = []
+
+
+class BadPathTargetDelegationsGroup(DelegationsGroup):
+
+    KEYS = ['ed25519']
+
+    ROLES = [{'keys': [1],
+              'role': SimpleDelegation,
+              'name': 'delegation-1',
+              'threshold': 1,
+              'paths': ['targets-file.txt'],
+              }
+             ]
+
+
+class BadPathTargetDelegationRepo(Repo):
+
+    NAME = '051'
+    ERROR = 'UnavailableTarget'
+    DELEGATIONS_GROUP_CLS = BadPathTargetDelegationsGroup
+    TARGETS = []
+
+
 class ValidUptane(Uptane):
     '''Everything is good. Simple repo with ed25519 keys.
     '''
