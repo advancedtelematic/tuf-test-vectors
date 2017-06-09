@@ -4,11 +4,15 @@
 from os import path
 
 # activate the virtual environment
-activate_this = path.join(path.abspath(path.dirname(__file__)),
-                          path.join('venv', 'bin', 'activate_this.py'))
-with open(activate_this) as f:
-    code = compile(f.read(), activate_this, 'exec')
-    exec(code, dict(__file__=activate_this))
+if __name__ == '__main__':
+    try:
+        activate_this = path.join(path.abspath(path.dirname(__file__)),
+                                  path.join('venv', 'bin', 'activate_this.py'))
+        with open(activate_this) as f:
+            code = compile(f.read(), activate_this, 'exec')
+            exec(code, dict(__file__=activate_this))
+    except FileNotFoundError:
+        pass
 
 import gzip
 from argparse import ArgumentParser
