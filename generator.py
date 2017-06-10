@@ -1500,6 +1500,34 @@ class TerminatingDelegationErrorRepo(Repo):
     DELEGATIONS_GROUP_CLS = TerminatingErrorDelegationsGroup
     TARGETS = []
 
+
+class TerminatingSecondErrorDelegationsGroup(DelegationsGroup):
+
+    KEYS = ['ed25519', 'ed25519']
+
+    ROLES = [
+        {'keys': [1],
+         'role': TargetHashMismatchDelegation,
+         'name': 'delegation-1',
+         'threshold': 1,
+         'paths': ['targets/file.txt'],
+         },
+        {'keys': [2],
+         'role': SimpleDelegationNoWrite,
+         'name': 'delegation-2',
+         'threshold': 1,
+         'paths': ['targets/file.txt'],
+         }
+    ]
+
+
+class TerminatingDelegationSecondErrorRepo(Repo):
+
+    NAME = '054'
+    DELEGATIONS_GROUP_CLS = TerminatingSecondErrorDelegationsGroup
+    TARGETS = []
+
+
 class ValidUptane(Uptane):
     '''Everything is good. Simple repo with ed25519 keys.
     '''
