@@ -18,6 +18,7 @@ import gzip
 from argparse import ArgumentParser
 from flask import Flask, send_from_directory, safe_join, Response
 
+
 def init_app(vector_dir):
     app = Flask(__name__, static_folder=None, template_folder=None)
 

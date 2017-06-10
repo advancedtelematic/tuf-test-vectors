@@ -164,6 +164,7 @@ def cjson_subset_check(jsn):
     else:
         raise Exception('What sort of type is this? {}'.format(jsn))
 
+
 def jsonify(jsn) -> str:
     kwargs = {'sort_keys': True, }
 
@@ -709,7 +710,7 @@ class DelegationsGroup:
         self.keys = []
 
         for key_idx, key in enumerate(self.KEYS):
-            # TODO this key name is shared by all nested delegation groups and therefore 
+            # TODO this key name is shared by all nested delegation groups and therefore
             # means that they all share keys which makes some of the tests BS
             priv, pub = gen_key('delegation-{}'.format(key_idx + 1), key, 2048, self.repo_dir)
             self.keys.append((key, priv, pub))
@@ -729,7 +730,7 @@ class DelegationsGroup:
                 'threshold': role['threshold'],
                 'keyids': list(map(lambda x: key_id(self.keys[x - 1][2]), role['keys'])),
                 'paths': role['paths'],
-                'terminating': False,  # TODO allow terminating, test
+                'terminating': role.get('terminating', False),
             }
             roles.append(role_meta)
 
@@ -758,6 +759,8 @@ class DelegationsGroup:
 
 class Delegation(Repo):
 
+    SKIP_TARGETS_WRITE = False
+
     def __init__(self, name, output_prefix, uptane_role, output_dir, keys):
         '''Keys is list[('method', 'priv', 'pub')]
         '''
@@ -774,7 +777,8 @@ class Delegation(Repo):
         self.targets_keys = keys
         self.make_targets(0)
         self.write_meta(name, self.targets_meta)
-        self.write_targets_content()
+        if not self.SKIP_TARGETS_WRITE:
+            self.write_targets_content()
 
 
 class Uptane:
@@ -1400,6 +1404,7 @@ class NoPathTargetDelegationsGroup(DelegationsGroup):
               }
              ]
 
+
 class NoPathTargetDelegationRepo(Repo):
 
     NAME = '050'
@@ -1428,6 +1433,72 @@ class BadPathTargetDelegationRepo(Repo):
     DELEGATIONS_GROUP_CLS = BadPathTargetDelegationsGroup
     TARGETS = []
 
+
+class TerminatingNoErrorDelegationsGroup(DelegationsGroup):
+
+    KEYS = ['ed25519', 'ed25519']
+
+    ROLES = [
+        {'keys': [1],
+         'role': SimpleDelegation,
+         'name': 'delegation-1',
+         'threshold': 1,
+         'paths': ['targets/file.txt'],
+         'terminating': True,
+         },
+        {'keys': [2],
+         'role': SimpleDelegation,
+         'name': 'delegation-2',
+         'threshold': 1,
+         'paths': ['targets/file.txt'],
+         }
+    ]
+
+
+class TerminatingDelegationNoErrorRepo(Repo):
+
+    NAME = '052'
+    DELEGATIONS_GROUP_CLS = TerminatingNoErrorDelegationsGroup
+    TARGETS = []
+
+
+class TargetHashMismatchDelegation(Delegation, TargetHashMismatchRepo):
+
+    pass
+
+
+class SimpleDelegationNoWrite(SimpleDelegation):
+
+    SKIP_TARGETS_WRITE = True
+
+
+class TerminatingErrorDelegationsGroup(DelegationsGroup):
+
+    KEYS = ['ed25519', 'ed25519']
+
+    ROLES = [
+        {'keys': [1],
+         'role': TargetHashMismatchDelegation,
+         'name': 'delegation-1',
+         'threshold': 1,
+         'paths': ['targets/file.txt'],
+         'terminating': True,
+         },
+        {'keys': [2],
+         'role': SimpleDelegationNoWrite,
+         'name': 'delegation-2',
+         'threshold': 1,
+         'paths': ['targets/file.txt'],
+         }
+    ]
+
+
+class TerminatingDelegationErrorRepo(Repo):
+
+    NAME = '053'
+    ERROR = 'UnavailableTarget'
+    DELEGATIONS_GROUP_CLS = TerminatingErrorDelegationsGroup
+    TARGETS = []
 
 class ValidUptane(Uptane):
     '''Everything is good. Simple repo with ed25519 keys.

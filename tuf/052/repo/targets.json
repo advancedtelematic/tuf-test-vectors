@@ -1,0 +1,55 @@
+{
+  "signatures": [
+    {
+      "keyid": "91ffa0ff2c5be7933144cd30826747973be22164719a7c8b94d69bc8773fa1a1",
+      "method": "ed25519",
+      "sig": "890d14459f0dc5521f5c88203a6cade0a40b93f8d4452bfe6e260a27cd143e2222cac402e57fd6e07be958343c4f4c01bd6e3a985bf858fa17b2c387fb50f303"
+    }
+  ],
+  "signed": {
+    "_type": "Targets",
+    "delegations": {
+      "keys": {
+        "c1efbff1c1ad47bd2f284fc2313139c4558ddbd1ef475b8ee8a972581ae2803b": {
+          "keytype": "ed25519",
+          "keyval": {
+            "public": "99e19d11c3aef0b8269237f82c8aa4032acae3bdd9af95d4442d231a652a03f9"
+          }
+        },
+        "dc44675b869b2904edc1df84e564f478d12b96f29150bb81bc785202c13b2811": {
+          "keytype": "ed25519",
+          "keyval": {
+            "public": "f64b7406d9362955c999d1b3f3e8a2c18d5d9e247d4a1752080c93e98c006ac9"
+          }
+        }
+      },
+      "roles": [
+        {
+          "keyids": [
+            "c1efbff1c1ad47bd2f284fc2313139c4558ddbd1ef475b8ee8a972581ae2803b"
+          ],
+          "name": "delegation-1",
+          "paths": [
+            "targets/file.txt"
+          ],
+          "terminating": true,
+          "threshold": 1
+        },
+        {
+          "keyids": [
+            "dc44675b869b2904edc1df84e564f478d12b96f29150bb81bc785202c13b2811"
+          ],
+          "name": "delegation-2",
+          "paths": [
+            "targets/file.txt"
+          ],
+          "terminating": false,
+          "threshold": 1
+        }
+      ]
+    },
+    "expires": "2038-01-19T03:14:06Z",
+    "targets": {},
+    "version": 1
+  }
+}

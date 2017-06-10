@@ -23,6 +23,18 @@
       ]
     },
     {
+      "error": "TargetHashMismatch",
+      "error_msg": "The target's calculated hash did not match the hash in the metadata.",
+      "is_success": false,
+      "repo": "002",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        }
+      ]
+    },
+    {
       "is_success": true,
       "repo": "003",
       "root_keys": [
@@ -611,6 +623,28 @@
       "error_msg": "The target either does not exist or was not in the chain of trusted metadata.",
       "is_success": false,
       "repo": "051",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        }
+      ]
+    },
+    {
+      "is_success": true,
+      "repo": "052",
+      "root_keys": [
+        {
+          "path": "root-1.pub",
+          "type": "ed25519"
+        }
+      ]
+    },
+    {
+      "error": "UnavailableTarget",
+      "error_msg": "The target either does not exist or was not in the chain of trusted metadata.",
+      "is_success": false,
+      "repo": "053",
       "root_keys": [
         {
           "path": "root-1.pub",
