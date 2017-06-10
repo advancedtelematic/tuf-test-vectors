@@ -1462,9 +1462,12 @@ class TerminatingDelegationNoErrorRepo(Repo):
     TARGETS = []
 
 
-class TargetHashMismatchDelegation(Delegation, TargetHashMismatchRepo):
+class TargetHashMismatchDelegation(Delegation):
 
-    pass
+    def alter_target(self, target) -> bytes:
+        new = bytearray(target)
+        new[0] ^= 0x01
+        return bytes(new)
 
 
 class SimpleDelegationNoWrite(SimpleDelegation):
@@ -1501,19 +1504,24 @@ class TerminatingDelegationErrorRepo(Repo):
     TARGETS = []
 
 
+class TargetHashMismatchDelegationNoWrite(TargetHashMismatchDelegation):
+
+    SKIP_TARGETS_WRITE = True
+
+
 class TerminatingSecondErrorDelegationsGroup(DelegationsGroup):
 
     KEYS = ['ed25519', 'ed25519']
 
     ROLES = [
         {'keys': [1],
-         'role': TargetHashMismatchDelegation,
+         'role': SimpleDelegation,
          'name': 'delegation-1',
          'threshold': 1,
          'paths': ['targets/file.txt'],
          },
         {'keys': [2],
-         'role': SimpleDelegationNoWrite,
+         'role': TargetHashMismatchDelegationNoWrite,
          'name': 'delegation-2',
          'threshold': 1,
          'paths': ['targets/file.txt'],
