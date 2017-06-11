@@ -298,9 +298,9 @@ class Repo:
     '''
     ERROR = None
 
-    '''The name of the metadata that is expired.
+    '''The name and versions of the metadata that is expired.
     '''
-    EXPIRED = None
+    EXPIRED = []
 
     '''The signature methods for the root keys.
     '''
@@ -490,7 +490,7 @@ class Repo:
         signed = {
             '_type': 'Root',
             'consistent_snapshot': False,
-            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'root' else '2038-01-19T03:14:06Z',
+            'expires': '2017-01-01T00:00:00Z' if ('root', version_idx + 1) in self.EXPIRED else '2038-01-19T03:14:06Z',
             'version': version_idx + 1,
             'keys': {},
             'roles': {
@@ -581,8 +581,7 @@ class Repo:
 
         signed = {
             '_type': 'Targets',
-            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'targets'
-            else '2038-01-19T03:14:06Z',
+            'expires': '2017-01-01T00:00:00Z' if ('targets', version_idx + 1) in self.EXPIRED else '2038-01-19T03:14:06Z',
             'version': 1,
             'targets': file_data,
         }
@@ -599,7 +598,7 @@ class Repo:
     def make_snapshot(self, version_idx) -> None:
         signed = {
             '_type': 'Snapshot',
-            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'snapshot' else '2038-01-19T03:14:06Z',
+            'expires': '2017-01-01T00:00:00Z' if ('snapshot', version_idx + 1) in self.EXPIRED else '2038-01-19T03:14:06Z',
             'version': 1,
             'meta': {
                 'targets.json': {
@@ -644,7 +643,7 @@ class Repo:
 
         signed = {
             '_type': 'Timestamp',
-            'expires': '2017-01-01T00:00:00Z' if self.EXPIRED == 'timestamp' else '2038-01-19T03:14:06Z',
+            'expires': '2017-01-01T00:00:00Z' if ('timestamp', version_idx + 1) in self.EXPIRED else '2038-01-19T03:14:06Z',
             'version': 1,
             'meta': {
                 'snapshot.json': {
@@ -929,28 +928,28 @@ class ExpiredRootRepo(Repo):
 
     NAME = '007'
     ERROR = 'ExpiredMetadata::Root'
-    EXPIRED = 'root'
+    EXPIRED = [('root', 1)]
 
 
 class ExpiredTargetsRepo(Repo):
 
     NAME = '008'
     ERROR = 'ExpiredMetadata::Targets'
-    EXPIRED = 'targets'
+    EXPIRED = [('targets', 1)]
 
 
 class ExpiredTimestampRepo(Repo):
 
     NAME = '009'
     ERROR = 'ExpiredMetadata::Timestamp'
-    EXPIRED = 'timestamp'
+    EXPIRED = [('timestamp', 1)]
 
 
 class ExpiredSnapshotRepo(Repo):
 
     NAME = '010'
     ERROR = 'ExpiredMetadata::Snapshot'
-    EXPIRED = 'snapshot'
+    EXPIRED = [('snapshot', 1)]
 
 
 class UnmetRootThresholdRepo(Repo):
@@ -1534,6 +1533,13 @@ class TerminatingDelegationSecondErrorRepo(Repo):
     NAME = '054'
     DELEGATIONS_GROUP_CLS = TerminatingSecondErrorDelegationsGroup
     TARGETS = []
+
+
+class ExpiredInitialRootMetadata(ValidRootKeyRotationRepo):
+
+    NAME = '055'
+    ERROR = None
+    EXPIRED = [('root', 1)]
 
 
 class ValidUptane(Uptane):
