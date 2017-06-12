@@ -3,7 +3,7 @@
     {
       "keyid": "b4a92a32a778404f0b9cbc070f08211e7952ad21b2ba7f4bcd39b4bd6ed52c3e",
       "method": "ed25519",
-      "sig": "ce13f93cfa6955b97beb38e9f26659e87f692b2ad47a3e8860a4737f2ff15d2c50dfca8818bfe346cb021838a037632a8287e819f7e34883b2fbcea1a632e302"
+      "sig": "6c61940a6d43a5f236ef4a3edf05bdc064c229bad41e8e552c74e4f010ad584fe52e777575adb470a7c4e3727b051ecacf2beebf334fee3219f355a9a791af0a"
     }
   ],
   "signed": {
@@ -11,28 +11,28 @@
     "consistent_snapshot": false,
     "expires": "2038-01-19T03:14:06Z",
     "keys": {
-      "0b5c9781e3c160272ed8f18287627d1132ce154274f3abea2b612b0cef6eb648": {
+      "5af59d418b30e69c9dbabf4b6eadfa551c2ad6ad879361d08140e8ef05aa91db": {
         "keytype": "ed25519",
         "keyval": {
-          "public": "2ecde61ff937d7714f552e5b536bb375eaa2368dbe66d810d5e7968627c14b5e"
+          "public": "538f8d6b49e752d28a9eb17543f418fd912bf34eb88bb1ca7c10577934a2fadf"
         }
       },
-      "34b2d83b9a51ff2f4319c29c65fc9ac244ee7587919c094eca4763de80d9d55e": {
+      "840ca73863b2c8bfc699ef863ec0332323d873182be990c313e9898ef85364ec": {
         "keytype": "ed25519",
         "keyval": {
-          "public": "a6d03ddfa718b6908b08d9296ca77a695fe7bb5a600a66105836d4d3cbb8663a"
-        }
-      },
-      "6817b043e05ff950587a20c8823422291ca1e940efb8d9a87f294715581dba93": {
-        "keytype": "ed25519",
-        "keyval": {
-          "public": "0bd8e99ca3a1b706e29612ba6ae91893c2034ca180f2f4df6fa83f373d9a8fe2"
+          "public": "6ec7da4238cefb2a18cc2b73eb6e42304499041eea936150f0c50a52c1ccce39"
         }
       },
       "b4a92a32a778404f0b9cbc070f08211e7952ad21b2ba7f4bcd39b4bd6ed52c3e": {
         "keytype": "ed25519",
         "keyval": {
           "public": "06046bca6a4c8e73e2fb9f25178994dee811e300b3496985497a33b4e23cb5bb"
+        }
+      },
+      "e22f3126eca69d254b550a2ddf1e44620491d9ddaceacc389fefcc07c69efa3e": {
+        "keytype": "ed25519",
+        "keyval": {
+          "public": "b325d6d85acc8585da22db79fd2b894980a18d085ddcae9b88db987223623ed4"
         }
       }
     },
@@ -45,19 +45,19 @@
       },
       "snapshot": {
         "keyids": [
-          "0b5c9781e3c160272ed8f18287627d1132ce154274f3abea2b612b0cef6eb648"
+          "5af59d418b30e69c9dbabf4b6eadfa551c2ad6ad879361d08140e8ef05aa91db"
         ],
         "threshold": 1
       },
       "targets": {
         "keyids": [
-          "6817b043e05ff950587a20c8823422291ca1e940efb8d9a87f294715581dba93"
+          "840ca73863b2c8bfc699ef863ec0332323d873182be990c313e9898ef85364ec"
         ],
         "threshold": 1
       },
       "timestamp": {
         "keyids": [
-          "34b2d83b9a51ff2f4319c29c65fc9ac244ee7587919c094eca4763de80d9d55e"
+          "e22f3126eca69d254b550a2ddf1e44620491d9ddaceacc389fefcc07c69efa3e"
         ],
         "threshold": 1
       }

@@ -997,30 +997,6 @@
       }
     },
     {
-      "errors": {
-        "director": {
-          "error": "UnmetThreshold::Root",
-          "error_msg": "The root metadata had an unmet threshold."
-        }
-      },
-      "is_success": false,
-      "repo": "043",
-      "root_keys": {
-        "director": [
-          {
-            "path": "root-1.pub",
-            "type": "ed25519"
-          }
-        ],
-        "repo": [
-          {
-            "path": "root-1.pub",
-            "type": "ed25519"
-          }
-        ]
-      }
-    },
-    {
       "is_success": true,
       "repo": "044",
       "root_keys": {
@@ -1063,5 +1039,5 @@
       }
     }
   ],
-  "version": 1
+  "version": 2
 }

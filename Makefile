@@ -1,8 +1,14 @@
-.PHONY: clean generate help init run update venv
+.PHONY: clean clean-rsa generate generate-tuf generate-uptane help init run update venv
 .DEFAULT_GOAL := generate
 
 clean: ## Remove temp resources
 	@rm -rf venv
+
+clean-rsa: ## `git checkout` on the repos with RSA keys (because of non-determinism)
+	@grep -HrnIl -- '-----BEGIN' tuf/ uptane/ \
+		| sed -e 's:^\([^/]*/[^/]*/\)\(.*\):\1:g' \
+		| sort -u \
+		| xargs git checkout --
 
 generate: generate-tuf generate-uptane ## Generate all test vectors
 	@true
