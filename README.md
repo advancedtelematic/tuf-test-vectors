@@ -70,7 +70,14 @@ Uptane errors are a little more specific:
 
 ### Notes
 
-- All signatures and hashes are hex encoded.
+To ensure a test hits all its cases, you need to:
+
+1. Start at `1.root.json`
+2. Download the full metadata chain
+3. Verify `targets/file.txt`
+
+Failures may happen at any step in which case the test is over and the client
+should report the appropriate error.
 
 ## License
 

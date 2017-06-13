@@ -1,0 +1,67 @@
+{
+  "signatures": [
+    {
+      "keyid": "187f31f37c740d22bebb341193d06df409190f7e5a4186247852e834987d525f",
+      "method": "rsassa-pss-sha256",
+      "sig": "1f797ff3d5a47fa4a01eeed6e9a0592027c22ded31aa1210829889b4863d35e0d1f3544e8f1723c395356f49b525ac55c40bd83e62e88d945d889cdde977010a26bc588cee5e1371b637be0150534f6bfe31267a1b313031ca6eb4e74ee9ebf0aa65afca0824f59a41d920933ce04beacf879cc06637867c85bdd3ca7d6c64bc"
+    }
+  ],
+  "signed": {
+    "_type": "Root",
+    "consistent_snapshot": false,
+    "expires": "2038-01-19T03:14:06Z",
+    "keys": {
+      "0563bb5788913eb3a4397533dae8706bbc141c05cb14eabdc283f6c8a764f802": {
+        "keytype": "rsa",
+        "keyval": {
+          "public": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDSMSVjvuzAMTIO4N2AXgQpn5Lr\nfh2mGUa0avIQ3Bi41YEOFtp9M0+ztXVMWOvNMc0r5dFg0Z0gGCHWaYbysKQc3r6d\ncn8MPD1tEnVwYUkrGYkHRPRmF/haBdPCfTZcuD+MnViB5PlbKE+2PbcZNU6Sn1sa\njyMclUqY2LsQlXM5iQIDAQAB\n-----END PUBLIC KEY-----"
+        }
+      },
+      "187f31f37c740d22bebb341193d06df409190f7e5a4186247852e834987d525f": {
+        "keytype": "rsa",
+        "keyval": {
+          "public": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCa6siM4Xt1nm2nZ8jSY49h2qgF\nW5vIpsaV8iLCF7wDaJsxGUwzT5dDV6KK8WcTXfBLC9CUfymaNHQiqDsUppWOfEO/\nuz+Dq9xx9e4p/GDTunp08eZ26NB8kQvPj3PcZedFLwGMcjknkwlNGcR8Eek3dtxR\nf3N2RP5UHbpn9rYl3wIDAQAB\n-----END PUBLIC KEY-----"
+        }
+      },
+      "833bc79cb5f3fa9dbf73668c5badf8414459300cce0ec2861cb4c71504f24a07": {
+        "keytype": "rsa",
+        "keyval": {
+          "public": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDISv2wnc61FyGk1ewyx2xP+3Q1\nMAJ7kiOoMXxj02a554tJO+BY6mjfZLEFPpAiAbALqwLDm8JIlT/q1EEwY8DEMtLY\nn1tqCFM7AW6BIu0SiX+jtk5dohOKiRWgNv+g96SBurtSKx2OvMwTigJ7N04E/vL7\nfbGbntka+eN1CKNT8QIDAQAB\n-----END PUBLIC KEY-----"
+        }
+      },
+      "cb76c4b64f672ffeb2c54ae558a4852d9487bc0918fad8757f0cca9c49ab1255": {
+        "keytype": "rsa",
+        "keyval": {
+          "public": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCLvP8gO+dDte5Fruci0oMoL8CI\nn4n/dBv9N6w33d2abht6f/VQHi0kv44yiqcDEP5gwpUm4ZnRxVHNMi4iz3gJG4Ca\nJL4pNtdGjLlpgl7FslWl4C6rMB6MWzY4/YLYzuK/6mdiuRrvkBhVMbS4E5V3FyXp\n5bJPVMmVl8eeY/ygkwIDAQAB\n-----END PUBLIC KEY-----"
+        }
+      }
+    },
+    "roles": {
+      "root": {
+        "keyids": [
+          "187f31f37c740d22bebb341193d06df409190f7e5a4186247852e834987d525f"
+        ],
+        "threshold": 1
+      },
+      "snapshot": {
+        "keyids": [
+          "0563bb5788913eb3a4397533dae8706bbc141c05cb14eabdc283f6c8a764f802"
+        ],
+        "threshold": 1
+      },
+      "targets": {
+        "keyids": [
+          "833bc79cb5f3fa9dbf73668c5badf8414459300cce0ec2861cb4c71504f24a07"
+        ],
+        "threshold": 1
+      },
+      "timestamp": {
+        "keyids": [
+          "cb76c4b64f672ffeb2c54ae558a4852d9487bc0918fad8757f0cca9c49ab1255"
+        ],
+        "threshold": 1
+      }
+    },
+    "version": 1
+  }
+}

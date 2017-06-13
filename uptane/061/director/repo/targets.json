@@ -1,0 +1,28 @@
+{
+  "signatures": [
+    {
+      "keyid": "99302587e0599a1d0710db86af31fcc823506ce5bf4e6dea15d9bfc55d3972cd",
+      "method": "ed25519",
+      "sig": "b5805e17f046adab962a7fd86a26204b5bb84037ce657f4adef520674d7f937ce8a24d84883820f7c340f6ea97f45c142f9a9db08140a425715513783944d60e"
+    }
+  ],
+  "signed": {
+    "_type": "Targets",
+    "expires": "2038-01-19T03:14:06Z",
+    "targets": {
+      "targets/file.txt": {
+        "custom": {
+          "ecu_identifier": "01:02:03:04:05:06",
+          "hardware_identifier": "abc-def",
+          "release_counter": 1
+        },
+        "hashes": {
+          "sha256": "fbf121c8e85875ffb9d50eab2cfa2a692df0e3e06afc2913492abe128bae66d0",
+          "sha512": "ac51637364cff0f6802e087c8c6a51f1925384af639214282a67e093495ef746d8f1c2326cf7182a1067fd69f6049247f509a95a533032f9565c905ce4c5d5fe"
+        },
+        "length": 12
+      }
+    },
+    "version": 1
+  }
+}

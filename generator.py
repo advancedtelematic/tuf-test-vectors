@@ -1878,6 +1878,224 @@ class DirectorInvalidRootKeyRotationUptane(Uptane):
     REPO_CLS = InvalidRootKeyRotationRepo
 
 
+class DirectorBadRootKeyIdsUptane(Uptane):
+
+    NAME = '046'
+    DIRECTOR_CLS = BadRootKeyIdsRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoBadRootKeyIdsUptane(Uptane):
+
+    NAME = '047'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = BadRootKeyIdsRepo
+
+
+class DirectorBadTargetsKeyIdsUptane(Uptane):
+
+    NAME = '048'
+    DIRECTOR_CLS = BadTargetsKeyIdsRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoBadTargetsKeyIdsUptane(Uptane):
+
+    NAME = '049'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = BadTargetsKeyIdsRepo
+
+
+class DirectorBadTimestampKeyIdsUptane(Uptane):
+
+    NAME = '050'
+    DIRECTOR_CLS = BadTimestampKeyIdsRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoBadTimestampKeyIdsUptane(Uptane):
+
+    NAME = '051'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = BadTimestampKeyIdsRepo
+
+
+class DirectorBadSnapshotKeyIdsUptane(Uptane):
+
+    NAME = '052'
+    DIRECTOR_CLS = BadSnapshotKeyIdsRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoBadSnapshotKeyIdsUptane(Uptane):
+
+    NAME = '053'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = BadSnapshotKeyIdsRepo
+
+
+# note: skipping InvalidRootSizeInSnapshotMetaRepo
+# note: skipping InvalidRootHashInSnapshotMetaRepo
+
+
+class DirectorRootThresholdZeroUptane(Uptane):
+
+    NAME = '054'
+    DIRECTOR_CLS = RootThresholdZeroRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoRootThresholdZeroUptane(Uptane):
+
+    NAME = '055'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = RootThresholdZeroRepo
+
+
+class DirectorTargetsThresholdZeroUptane(Uptane):
+
+    NAME = '056'
+    DIRECTOR_CLS = TargetsThresholdZeroRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoTargetsThresholdZeroUptane(Uptane):
+
+    NAME = '057'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = TargetsThresholdZeroRepo
+
+
+class DirectorTimestampThresholdZeroUptane(Uptane):
+
+    NAME = '058'
+    DIRECTOR_CLS = TimestampThresholdZeroRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoTimestampThresholdZeroUptane(Uptane):
+
+    NAME = '059'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = TimestampThresholdZeroRepo
+
+
+class DirectorSnapshotThresholdZeroUptane(Uptane):
+
+    NAME = '060'
+    DIRECTOR_CLS = SnapshotThresholdZeroRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoSnapshotThresholdZeroUptane(Uptane):
+
+    NAME = '061'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = SnapshotThresholdZeroRepo
+
+
+# note: skipping Valid2048RsaSsaPssSha512Repo
+# note: skipping ValidMixedKeysRepo
+
+
+class DirectorInvalidRootKeyRotationUnmetSecondThresholdUptane(Uptane):
+
+    NAME = '062'
+    DIRECTOR_CLS = InvalidRootKeyRotationUnmetSecondThresholdRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoInvalidRootKeyRotationUnmetSecondThresholdUptane(Uptane):
+
+    NAME = '063'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = InvalidRootKeyRotationUnmetSecondThresholdRepo
+
+
+class DirectorInvalidRootKeyRotationUnmetFirstThresholdUptane(Uptane):
+
+    NAME = '064'
+    DIRECTOR_CLS = InvalidRootKeyRotationUnmetFirstThresholdRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoInvalidRootKeyRotationUnmetFirstThresholdUptane(Uptane):
+
+    NAME = '065'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = InvalidRootKeyRotationUnmetFirstThresholdRepo
+
+
+class DirectorInvalidRootKeyRotationSharedKeysUnmetFirstThresholdUptane(Uptane):
+
+    NAME = '066'
+    DIRECTOR_CLS = InvalidRootKeyRotationSharedKeysUnmetFirstThresholdRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoInvalidRootKeyRotationSharedKeysUnmetFirstThresholdUptane(Uptane):
+
+    NAME = '067'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = InvalidRootKeyRotationSharedKeysUnmetFirstThresholdRepo
+
+
+class DirectorInvalidRootKeyRotationSharedKeysUnmetSecondThresholdUptane(Uptane):
+
+    NAME = '068'
+    DIRECTOR_CLS = InvalidRootKeyRotationSharedKeysUnmetSecondThresholdRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoInvalidRootKeyRotationSharedKeysUnmetSecondThresholdUptane(Uptane):
+
+    NAME = '069'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = InvalidRootKeyRotationSharedKeysUnmetSecondThresholdRepo
+
+
+class DirectorValidRootKeyRotationSharedKeysUnmetVariableThresholdUptane(Uptane):
+
+    NAME = '070'
+    DIRECTOR_CLS = ValidRootKeyRotationSharedKeysUnmetVariableThresholdRepo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoValidRootKeyRotationSharedKeysUnmetVariableThresholdUptane(Uptane):
+
+    NAME = '071'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = ValidRootKeyRotationSharedKeysUnmetVariableThresholdRepo
+
+
+class DirectorInvalidRsaKeySize1792Uptane(Uptane):
+
+    NAME = '072'
+    DIRECTOR_CLS = InvalidRsaKeySize1792Repo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoInvalidRsaKeySize1792Uptane(Uptane):
+
+    NAME = '073'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = InvalidRsaKeySize1792Repo
+
+
+class DirectorInvalidRsaKeySize1024Uptane(Uptane):
+
+    NAME = '074'
+    DIRECTOR_CLS = InvalidRsaKeySize1024Repo
+    REPO_CLS = ValidEd25519Repo
+
+
+class RepoInvalidRsaKeySize1024Uptane(Uptane):
+
+    NAME = '075'
+    DIRECTOR_CLS = ValidEd25519Repo
+    REPO_CLS = InvalidRsaKeySize1024Repo
+
+
 if __name__ == '__main__':
     parser = ArgumentParser(path.basename(__file__))
     parser.add_argument('-t', '--type', help='The type of test vectors to create',
