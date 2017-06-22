@@ -171,7 +171,7 @@ def jsonify(jsn) -> str:
     if not COMPACT_JSON:
         kwargs['indent'] = 2
     else:
-        kwargs['separators'] = (':', ',')
+        kwargs['separators'] = (',', ':')
 
     out = json.dumps(jsn, **kwargs)
 
