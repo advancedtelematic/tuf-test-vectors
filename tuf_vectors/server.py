@@ -13,8 +13,7 @@ from tuf_vectors.uptane import Uptane
 def json_response(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        out = f(*args, **kwargs)
-        resp = make_response(json.dumps(out, separators=(',', ':')))
+        resp = make_response(f(*args, **kwargs))
         resp.headers['Content-Type'] = 'application/json'
         return resp
     return decorated_function
@@ -40,25 +39,7 @@ def init_app(
     @app.route('/')
     @json_response
     def index():
-        return list(repos.keys())
-
-    @app.route('/<string:repo>/step', methods=['POST'])
-    @json_response
-    def step(repo):
-        current = counter.get(repo, 0)
-        try:
-            step_meta = repos[repo].steps[current].generate_meta()
-        except KeyError:
-            abort(400)
-        except IndexError:
-            return '', 204
-
-        counter[repo] = current + 1
-        # TODO if current step == 0, include root keys for pinning
-        return {
-            'update': step_meta['update'],
-            'targets': step_meta['targets'],
-        }
+        return json.dumps(list(repos.keys()))
 
     @app.route('/<string:repo>/reset', methods=['POST'])
     def reset(repo):
@@ -66,7 +47,26 @@ def init_app(
         return '', 204
 
     if repo_type == 'tuf':
+        @app.route('/<string:repo>/step', methods=['POST'])
+        @json_response
+        def step(repo):
+            current = counter.get(repo, 0)
+            try:
+                step_meta = repos[repo].steps[current].generate_meta()
+            except KeyError:
+                abort(400)
+            except IndexError:
+                return '', 204
+
+            counter[repo] = current + 1
+            # TODO if current step == 0, include root keys for pinning
+            return json.dumps({
+                'update': step_meta['update'],
+                'targets': step_meta['targets'],
+            })
+
         @app.route('/<string:repo>/<int:root_version>.root.json')
+        @json_response
         def root(repo, root_version):
             current = counter.get(repo)
             if current is None:
@@ -75,11 +75,31 @@ def init_app(
             root_idx = root_version - 1
             if current >= root_idx:
                 try:
-                    return repos[repo].steps[root_idx].root
-                except (IndexError, ValueError):
+                    return json.dumps(repos[repo].steps[root_idx].root)
+                except (IndexError, ValueError) as e:
+                    app.logger.warn(e)
                     abort(400)
             else:
                 return abort(404)
+
+        @app.route('/<string:repo>/<string:metadata>.json')
+        @json_response
+        def meta(repo, metadata):
+            current = counter.get(repo)
+            if current is None:
+                abort(400)
+
+            if metadata not in ['root', 'timestamp', 'targets', 'snapshot']:
+                abort(404)
+
+            try:
+                return json.dumps(getattr(repos[repo].steps[current - 1], metadata))
+            except (IndexError, ValueError) as e:
+                app.logger.warn(e)
+                abort(400)
+            except AttributeError as e:
+                app.logger.warn(e)
+                abort(404)
 
         @app.route('/<string:repo>/<path:content_path>')
         def repo(repo, content_path):
@@ -87,6 +107,7 @@ def init_app(
                 current = counter[repo]
                 repo = repos[repo].steps[current - 1]
             except (IndexError, KeyError) as e:
+                app.logger.warn(e)
                 abort(400)
 
             for target in repo.TARGETS:
@@ -95,6 +116,85 @@ def init_app(
 
             abort(404)
     else:
-        pass # TODO
+        @app.route('/<string:repo>/step', methods=['POST'])
+        @json_response
+        def step(repo):
+            current = counter.get(repo, 0)
+            try:
+                step_meta = repos[repo].generate_meta()['steps'][current]
+            except KeyError:
+                abort(400)
+            except IndexError:
+                return '', 204
+
+            counter[repo] = current + 1
+            # TODO if current step == 0, include root keys for pinning
+            return json.dumps({
+                'director': {
+                    'update': step_meta['director']['update'],
+                },
+                'image_repo': {
+                    'update': step_meta['image_repo']['update'],
+                    'targets': step_meta['image_repo']['targets'],
+                }
+            })
+
+        @app.route('/<string:repo>/<string:uptane>/<int:root_version>.root.json')
+        @json_response 
+        def root(repo, uptane, root_version):
+            current = counter.get(repo)
+            if current is None:
+                abort(400)
+
+            if uptane not in ['director', 'image_repo']:
+                abort(404)
+
+            root_idx = root_version - 1
+            if current >= root_idx:
+                try:
+                    return json.dumps(getattr(repos[repo], uptane).steps[root_idx].root)
+                except (IndexError, ValueError) as e:
+                    app.logger.warn(e)
+                    abort(400)
+            else:
+                return abort(404)
+
+        @app.route('/<string:repo>/<string:uptane>/<string:metadata>.json')
+        @json_response
+        def meta(repo, uptane, metadata):
+            current = counter.get(repo)
+            if current is None:
+                abort(400)
+
+            if uptane == 'director':
+                if metadata not in ['root', 'targets']:
+                    abort(404)
+            else:
+                if metadata not in ALL_ROLES:
+                    abort(404)
+
+            try:
+                return json.dumps(getattr(getattr(repos[repo], uptane).steps[current - 1], metadata))
+            except (IndexError, ValueError) as e:
+                app.logger.warn(e)
+                abort(400)
+            except AttributeError as e:
+                app.logger.warn(e)
+                abort(404)
+
+        @app.route('/<string:repo>/image_repo/<path:content_path>')
+        def repo(repo, content_path):
+            try:
+                current = counter[repo]
+                repo = repos[repo].image_repo.steps[current - 1]
+            except (IndexError, KeyError) as e:
+                app.logger.warn(e)
+                abort(400)
+
+            for target in repo.TARGETS:
+                if target[0] == content_path:
+                    return target[1]
+
+            abort(404)
 
     return app

@@ -57,7 +57,7 @@ class Uptane(Generator):
 
             del meta['director']['meta']['timestamp']
             del meta['director']['meta']['snapshot']
-
+            del meta['director']['targets']
             # TODO ? merge dir/img targets into one
             steps.append(meta)
 
