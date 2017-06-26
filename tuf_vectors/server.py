@@ -2,7 +2,7 @@
 
 import json
 
-from flask import Flask, send_from_directory,  Response, abort
+from flask import Flask, send_from_directory, Response, abort
 from os import path
 from tuf_vectors import subclasses
 from tuf_vectors.tuf import Tuf
@@ -27,7 +27,14 @@ def init_app(repo_type, vector_dir):
     @app.route('/<string:repo>/step', methods=['POST'])
     def step(repo):
         current = counter.get(repo, 0)
-        step_meta = repos[repo].STEPS[current].generate_meta()
+        try:
+            r = repos[repo]
+            try:
+                step_meta = r.STEPS[current].generate_meta()
+            except IndexError:
+                abort(400)
+        except KeyError:
+            abort(404)
 
         # TODO if current step == 0, include root keys for pinning
         out = {
@@ -46,8 +53,11 @@ def init_app(repo_type, vector_dir):
 
     @app.route('/<string:repo>/<int:root_version>.root.json')
     def root(repo, root_version):
+        current = counter.get(repo)
+        if current is None:
+            abort(400)
+
         root_idx = root_version - 1
-        current = counter.get(repo, 0)
         if current >= root_idx:
             return send_from_directory(vector_dir,
                                        path.join(repo,
@@ -58,7 +68,10 @@ def init_app(repo_type, vector_dir):
 
     @app.route('/<string:repo>/<path:content_path>')
     def repo(repo, content_path):
-        current = counter.get(repo, 0)
+        current = counter.get(repo)
+        if current is None:
+            abort(400)
+
         return send_from_directory(vector_dir,
                                    path.join(repo,
                                              str(current),

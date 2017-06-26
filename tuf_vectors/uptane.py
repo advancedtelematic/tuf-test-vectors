@@ -41,10 +41,9 @@ class Uptane(Generator):
                                               signature_encoding=signature_encoding,
                                               cjson_strategy=cjson_strategy)
 
-    @classmethod
-    def generate_meta(cls) -> dict:
-        director_meta = cls.DIRECTOR_CLS.generate_meta()
-        image_repo_meta = cls.IMAGE_REPO_CLS.generate_meta()
+    def generate_meta(self) -> dict:
+        director_meta = self.director.generate_meta()
+        image_repo_meta = self.image_repo.generate_meta()
 
         if len(director_meta['steps']) != len(image_repo_meta['steps']):  # pragma: no cover
             raise Exception('Director steps did not equal image repo steps')
@@ -69,11 +68,10 @@ class Uptane(Generator):
 
         return update_meta
 
-    @classmethod
-    def write_meta(cls) -> None:
+    def write_meta(self) -> None:
         with open(path.join(path.dirname(__file__), '..', 'metadata', 'uptane',
-                            '{}.json'.format(cls.name())), 'w') as f:
-            f.write(json.dumps(cls.generate_meta(), indent=2, sort_keys=True))
+                            '{}.json'.format(self.name())), 'w') as f:
+            f.write(json.dumps(self.generate_meta(), indent=2, sort_keys=True))
 
     def write_static(self) -> None:
         self.director.write_static()
@@ -96,7 +94,12 @@ class SimpleUptane(Uptane):
     IMAGE_REPO_CLS = tuf.SimpleTuf
 
 
-for _name in ['Expired', 'UnmetThreshold', 'NonUniqueSignatures', 'ZeroThreshold', 'NegativeThreshold']:
+for _name in [
+    'Expired',
+    'UnmetThreshold',
+    'NonUniqueSignatures',
+    'ZeroThreshold',
+        'NegativeThreshold']:
     for uptane_role in ALL_UPTANE_ROLES:
         for role in ALL_ROLES:
             if uptane_role == 'Director' and role in ['Snapshot', 'Timestamp']:

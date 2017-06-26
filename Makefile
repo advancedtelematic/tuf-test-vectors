@@ -1,7 +1,7 @@
-.PHONY: all clean generate generate-tuf generate-uptane help init init-dev metadata test update venv
+.PHONY: all clean generate generate-tuf generate-uptane help init init-dev run test update venv
 .DEFAULT_GOAL := generate
 
-all: generate metadata test ## DO ALL THE THINGS
+all: generate test ## DO ALL THE THINGS
 	@true
 
 clean: ## Remove temp resources
@@ -30,9 +30,9 @@ init-dev: init ## Initialize the dev environment
 	@. venv/bin/activate && \
 		pip install -Ur requirements-dev.txt
 
-metadata: init ## Generate the generic test metadata
+run: init ## Run the server
 	@. venv/bin/activate && \
-		./metadata.py
+		./server.py -t tuf -p vectors/tuf
 
 test: init-dev ## Run the test suite
 	@. venv/bin/activate && \

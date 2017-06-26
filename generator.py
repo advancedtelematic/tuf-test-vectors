@@ -23,6 +23,7 @@ def main(
                       signature_encoding=signature_encoding,
                       compact=compact, cjson_strategy=cjson_strategy)
             sub.write_static()
+            sub.write_meta()
 
 
 if __name__ == '__main__':

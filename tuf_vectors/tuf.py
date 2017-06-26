@@ -41,23 +41,21 @@ class Tuf(Generator):
                         cjson_strategy=cjson_strategy)
             self.steps.append(step)
 
-    @classmethod
-    def generate_meta(cls) -> dict:
+    def generate_meta(self) -> dict:
         meta = {
             'version': TEST_META_VERSION,
             'steps': [],
         }
 
-        for step in cls.STEPS:
+        for step in self.steps:
             meta['steps'].append(step.generate_meta())
 
         return meta
 
-    @classmethod
-    def write_meta(cls) -> None:
+    def write_meta(self) -> None:
         with open(path.join(path.dirname(__file__), '..', 'metadata', 'tuf',
-                            '{}.json'.format(cls.name())), 'w') as f:
-            f.write(json.dumps(cls.generate_meta(), indent=2, sort_keys=True))
+                            '{}.json'.format(self.name())), 'w') as f:
+            f.write(json.dumps(self.generate_meta(), indent=2, sort_keys=True))
 
     def write_static(self) -> None:
         for step in self.steps:
@@ -73,7 +71,12 @@ class SimpleTuf(Tuf):
     STEPS = [step.SimpleStep]
 
 
-for _name in ['Expired', 'UnmetThreshold', 'NonUniqueSignatures', 'ZeroThreshold', 'NegativeThreshold']:
+for _name in [
+    'Expired',
+    'UnmetThreshold',
+    'NonUniqueSignatures',
+    'ZeroThreshold',
+        'NegativeThreshold']:
     for role in ALL_ROLES:
         fields = {
             'STEPS': [getattr(step, role + _name + 'Step')],

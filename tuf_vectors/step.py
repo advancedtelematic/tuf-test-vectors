@@ -55,7 +55,8 @@ class Step(Generator):
             signature_scheme,
             signature_encoding,
             compact,
-            cjson_strategy):
+            cjson_strategy,
+            uptane_role=None):
         self.index = step_index
 
         p = path.join(output_dir, str(step_index))
@@ -67,111 +68,128 @@ class Step(Generator):
         self.signature_encoding = signature_encoding
         self.compact = compact
         self.cjson_strategy = cjson_strategy
+        self.uptane_role = uptane_role
+
         self.key_store = {}
 
         self.generate_root()
         self.generate_targets()
-        self.generate_snapshot()
-        self.generate_timestamp()
+        if self.uptane_role != 'director':
+            self.generate_snapshot()
+            self.generate_timestamp()
 
         # TODO delegations
 
-    @classmethod
-    def generate_meta(cls) -> dict:
+    def generate_meta(self) -> dict:
+        root_meta = {
+            'signatures': [],
+            'signed': {
+                'consistent_snapshot': False,  # TODO configure
+                'version': self.ROOT_VERSION,
+                # TODO 'key': {}
+                'roles': {
+                    'root': {
+                        'keys': [{'key_index': i, 'bad_id': i in self.ROOT_KEYS_BAD_IDS}
+                                 for i in self.ROOT_KEYS],
+                        'threshold': len(self.ROOT_KEYS) + self.ROOT_THRESHOLD_MOD
+                    },
+                    'targets': {
+                        'keys': [{'key_index': i, 'bad_id': i in self.TARGETS_KEYS_BAD_IDS}
+                                 for i in self.TARGETS_KEYS],
+                        'threshold': len(self.TARGETS_KEYS) + self.TARGETS_THRESHOLD_MOD
+                    },
+                },
+            },
+        }
+
+        if self.uptane_role != 'director':
+            root_meta['signed']['roles']['timestamp'] = {
+                'keys': [{'key_index': i, 'bad_id': i in self.TIMESTAMP_KEYS_BAD_IDS}
+                         for i in self.TIMESTAMP_KEYS],
+                'threshold': len(self.TIMESTAMP_KEYS) + self.TIMESTAMP_THRESHOLD_MOD
+            }
+            root_meta['signed']['roles']['snapshot'] = {
+                'keys': [{'key_index': i, 'bad_id': i in self.SNAPSHOT_KEYS_BAD_IDS}
+                         for i in self.SNAPSHOT_KEYS],
+                'threshold': len(self.SNAPSHOT_KEYS) + self.SNAPSHOT_THRESHOLD_MOD
+            }
+
+        targets_meta = {
+            'signatures': [],
+            'signed': {
+                'version': self.TARGETS_VERSION,
+                'targets': {
+                },
+            },
+        }
+
+        if self.uptane_role != 'director':
+            timestamp_meta = {
+                'signatures': [],
+                'signed': {
+                    'version': self.TIMESTAMP_VERSION,
+                    'meta': {
+                        'snapshot': {
+                            'has_hash': True,
+                            'bad_hash': False,
+                            'has_length': True,
+                            'bad_length': False,
+                            'has_version': True,
+                            'bad_version': False,
+                        },
+                    },
+                },
+            }
+            snapshot_meta = {
+                'signatures': [],
+                'signed': {
+                    'version': self.SNAPSHOT_VERSION,
+                    'meta': {
+                        'root': {
+                            'has_hash': True,
+                            'bad_hash': False,
+                            'has_length': True,
+                            'bad_length': False,
+                            'has_version': True,
+                            'bad_version': False,
+                        },
+                        'targets': {
+                            'has_hash': False,
+                            'bad_hash': False,
+                            'has_length': False,
+                            'bad_length': False,
+                            'has_version': True,
+                            'bad_version': False,
+                        },
+                    },
+                },
+            }
+
+        meta_meta = {
+            'root': root_meta,
+            'targets': targets_meta,
+        }
+
+        if self.uptane_role != 'director':
+            meta_meta['timestamp'] = timestamp_meta
+            meta_meta['snapshot'] = snapshot_meta
+
         meta = {
             'server': {
                 # TODO directives on how to slow traffic, etc
             },
+            'meta': meta_meta,
             # TODO directives for renaming _type
-            'meta': {
-                'root': {
-                    'signatures': [],
-                    'signed': {
-                        'consistent_snapshot': False,  # TODO configure
-                        'version': cls.ROOT_VERSION,
-                        'roles': {
-                            'root': {
-                                'keys': [{'key_index': i, 'bad_id': i in cls.ROOT_KEYS_BAD_IDS}
-                                         for i in cls.ROOT_KEYS],
-                                'threshold': len(cls.ROOT_KEYS) + cls.ROOT_THRESHOLD_MOD
-                            },
-                            'targets': {
-                                'keys': [{'key_index': i, 'bad_id': i in cls.TARGETS_KEYS_BAD_IDS}
-                                         for i in cls.TARGETS_KEYS],
-                                'threshold': len(cls.TARGETS_KEYS) + cls.TARGETS_THRESHOLD_MOD
-                            },
-                            'timestamp': {
-                                'keys': [{'key_index': i, 'bad_id': i in cls.TIMESTAMP_KEYS_BAD_IDS}
-                                         for i in cls.TIMESTAMP_KEYS],
-                                'threshold': len(cls.TIMESTAMP_KEYS) + cls.TIMESTAMP_THRESHOLD_MOD
-                            },
-                            'snapshot': {
-                                'keys': [{'key_index': i, 'bad_id': i in cls.SNAPSHOT_KEYS_BAD_IDS}
-                                         for i in cls.SNAPSHOT_KEYS],
-                                'threshold': len(cls.SNAPSHOT_KEYS) + cls.SNAPSHOT_THRESHOLD_MOD
-                            },
-                        },
-                    },
-                },
-                'targets': {
-                    'signatures': [],
-                    'signed': {
-                        'version': cls.TARGETS_VERSION,
-                        'targets': {
-                        },
-                    },
-                },
-                'timestamp': {
-                    'signatures': [],
-                    'signed': {
-                        'version': cls.TIMESTAMP_VERSION,
-                        'meta': {
-                            'snapshot': {
-                                'has_hash': True,
-                                'bad_hash': False,
-                                'has_length': True,
-                                'bad_length': False,
-                                'has_version': True,
-                                'bad_version': False,
-                            },
-                        },
-                    },
-                },
-                'snapshot': {
-                    'signatures': [],
-                    'signed': {
-                        'version': cls.SNAPSHOT_VERSION,
-                        'meta': {
-                            'root': {
-                                'has_hash': True,
-                                'bad_hash': False,
-                                'has_length': True,
-                                'bad_length': False,
-                                'has_version': True,
-                                'bad_version': False,
-                            },
-                            'targets': {
-                                'has_hash': False,
-                                'bad_hash': False,
-                                'has_length': False,
-                                'bad_length': False,
-                                'has_version': True,
-                                'bad_version': False,
-                            },
-                        },
-                    },
-                },
-            },
             'update': {
-                'is_success': cls.UPDATE_ERROR is None,
+                'is_success': self.UPDATE_ERROR is None,
             },
             'targets': {},
         }
 
-        for meta_key, keys, bads in [('root', cls.ROOT_KEYS_SIGN, cls.ROOT_KEYS_BAD_SIGN),
-                                     ('targets', cls.TARGETS_KEYS_SIGN, cls.TARGETS_KEYS_BAD_SIGN),
-                                     ('timestamp', cls.TIMESTAMP_KEYS_SIGN, cls.TIMESTAMP_KEYS_BAD_SIGN),
-                                     ('snapshot', cls.SNAPSHOT_KEYS_SIGN, cls.SNAPSHOT_KEYS_BAD_SIGN)]:
+        for meta_key, keys, bads in [('root', self.ROOT_KEYS_SIGN, self.ROOT_KEYS_BAD_SIGN),
+                                     ('targets', self.TARGETS_KEYS_SIGN, self.TARGETS_KEYS_BAD_SIGN),
+                                     ('timestamp', self.TIMESTAMP_KEYS_SIGN, self.TIMESTAMP_KEYS_BAD_SIGN),
+                                     ('snapshot', self.SNAPSHOT_KEYS_SIGN, self.SNAPSHOT_KEYS_BAD_SIGN)]:
             for key_idx in keys:
                 key_meta = {
                     'key_index': key_idx,
@@ -181,15 +199,15 @@ class Step(Generator):
 
         for role in ['root', 'targets', 'timestamp', 'snapshot']:
             meta['meta'][role]['signed']['expired'] = \
-                bool(getattr(cls, '{}_EXPIRED'.format(role.upper())))
+                bool(getattr(self, '{}_EXPIRED'.format(role.upper())))
 
-        if cls.UPDATE_ERROR is not None:
-            meta['update']['err'] = cls.UPDATE_ERROR
-            meta['update']['err_msg'] = human_message(cls.UPDATE_ERROR)
+        if self.UPDATE_ERROR is not None:
+            meta['update']['err'] = self.UPDATE_ERROR
+            meta['update']['err_msg'] = human_message(self.UPDATE_ERROR)
         else:
             # don't include targets if we can't update correctly?
             # TODO handle delegation case
-            for target, _, alterations in cls.TARGETS:
+            for target, _, alterations in self.TARGETS:
                 target_meta = {
                     # TODO specify alterations
                 }
@@ -205,9 +223,11 @@ class Step(Generator):
     def write_static(self) -> None:
         self.write_metadata('root.json', self.root)
         self.write_metadata('targets.json', self.targets)
-        self.write_metadata('snapshot.json', self.snapshot)
-        self.write_metadata('timestamp.json', self.timestamp)
-        self.write_targets_content()
+
+        if self.uptane_role != 'director':
+            self.write_metadata('snapshot.json', self.snapshot)
+            self.write_metadata('timestamp.json', self.timestamp)
+            self.write_targets_content()
 
     def generate_root(self) -> None:
         signed = {
@@ -369,7 +389,7 @@ class SimpleStep(Step):
             assert meta['meta'][role]['signed']['expired'] == False
 
             assert len(meta['targets']) == 1
-            assert list(meta['targets'].items())[0][1]['is_success'] == True
+            assert list(meta['targets'].items())[0][1]['is_success']
 
 for _role in ALL_ROLES:
     def gen_test():
@@ -451,7 +471,7 @@ for _role in ALL_ROLES:
         '{}_KEYS_SIGN'.format(_role.upper()): getattr(Step, '{}_KEYS'.format(_role.upper())) * 2,
     }
 
-    name = _role + 'NonUniqueSignaturesStep' 
+    name = _role + 'NonUniqueSignaturesStep'
     setattr(sys.modules[__name__], name, type(name, (Step,), fields))
 
 
@@ -467,7 +487,7 @@ for _role in ALL_ROLES:
 
             for r in ALL_ROLES:
                 assert meta['meta']['root']['signed']['roles'][r.lower()]['threshold'] == \
-                        0 if r.lower() == role.lower() else 1
+                    0 if r.lower() == role.lower() else 1
 
             err = 'IllegalThreshold::{}'.format(role)
             assert self.UPDATE_ERROR == err
@@ -481,7 +501,7 @@ for _role in ALL_ROLES:
         '{}_THRESHOLD_MOD'.format(_role.upper()): -1 * len(getattr(Step, '{}_KEYS'.format(_role.upper()))),
     }
 
-    name = _role + 'ZeroThresholdStep' 
+    name = _role + 'ZeroThresholdStep'
     setattr(sys.modules[__name__], name, type(name, (Step,), fields))
 
 
@@ -497,7 +517,7 @@ for _role in ALL_ROLES:
 
             for r in ALL_ROLES:
                 assert meta['meta']['root']['signed']['roles'][r.lower()]['threshold'] == \
-                        -1 if r.lower() == role.lower() else 1
+                    -1 if r.lower() == role.lower() else 1
 
             err = 'IllegalThreshold::{}'.format(role)
             assert self.UPDATE_ERROR == err
@@ -511,5 +531,5 @@ for _role in ALL_ROLES:
         '{}_THRESHOLD_MOD'.format(_role.upper()): -1 - len(getattr(Step, '{}_KEYS'.format(_role.upper()))),
     }
 
-    name = _role + 'NegativeThresholdStep' 
+    name = _role + 'NegativeThresholdStep'
     setattr(sys.modules[__name__], name, type(name, (Step,), fields))
