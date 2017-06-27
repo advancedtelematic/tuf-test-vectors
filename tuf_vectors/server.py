@@ -83,7 +83,7 @@ def init_app(
                         abort(400)
 
                     return json.dumps(repos[repo].steps[root_idx].root)
-                except (IndexError, ValueError) as e:
+                except (IndexError, KeyError) as e:
                     app.logger.warn(e)
                     abort(400)
             else:
@@ -101,7 +101,7 @@ def init_app(
 
             try:
                 return json.dumps(getattr(repos[repo].steps[current - 1], metadata))
-            except (IndexError, ValueError) as e:
+            except (IndexError, KeyError) as e:
                 app.logger.warn(e)
                 abort(400)
             except AttributeError as e:
@@ -163,7 +163,7 @@ def init_app(
                         abort(400)
 
                     return json.dumps(getattr(repos[repo], uptane).steps[root_idx].root)
-                except (IndexError, ValueError) as e:
+                except (IndexError, KeyError) as e:
                     app.logger.warn(e)
                     abort(400)
             else:
@@ -192,7 +192,7 @@ def init_app(
                             current -
                             1],
                         metadata))
-            except (IndexError, ValueError) as e:
+            except (IndexError, KeyError) as e:
                 app.logger.warn(e)
                 abort(400)
             except AttributeError as e:

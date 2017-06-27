@@ -4,7 +4,7 @@ import json
 import sys
 
 from os import path
-from tuf_vectors import tuf, Generator, TEST_META_VERSION, ALL_ROLES, ALL_UPTANE_ROLES
+from tuf_vectors import tuf, step, Generator, TEST_META_VERSION, ALL_ROLES, ALL_UPTANE_ROLES
 
 
 class Uptane(Generator):
@@ -114,3 +114,20 @@ for _name in [
 
             name = uptane_role + role + _name + 'Uptane'
             setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))
+
+
+for _name in ['ValidRootRotation', 'RootRotationNoCrossSign']:
+    for uptane_role in ALL_UPTANE_ROLES:
+        cls = getattr(tuf, _name + 'Tuf')
+
+        class SimpleRepeatedTuf(tuf.Tuf):
+            IS_INNER = True
+            STEPS = [step.SimpleStep, step.SimpleStep]
+
+        fields = {
+            'DIRECTOR_CLS': cls if uptane_role == 'Director' else SimpleRepeatedTuf,
+            'IMAGE_REPO_CLS': cls if uptane_role == 'ImageRepo' else SimpleRepeatedTuf,
+        }
+
+        name = uptane_role + _name + 'Uptane'
+        setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))

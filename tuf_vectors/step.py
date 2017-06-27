@@ -86,7 +86,7 @@ class Step(Generator):
             'signed': {
                 'consistent_snapshot': False,  # TODO configure
                 'version': self.ROOT_VERSION,
-                # TODO 'key': {}
+                # TODO 'keys': {}
                 'roles': {
                     'root': {
                         'keys': [{'key_index': i, 'bad_id': i in self.ROOT_KEYS_BAD_IDS}
@@ -389,7 +389,8 @@ class SimpleStep(Step):
             assert meta['meta'][role]['signed']['expired'] == False
 
             assert len(meta['targets']) == 1
-            assert list(meta['targets'].items())[0][1]['is_success']
+            assert list(meta['targets'].items())[0][1]['is_success'] is True
+
 
 for _role in ALL_ROLES:
     def gen_test():
@@ -432,7 +433,7 @@ for _role in ALL_ROLES:
 
             err = 'UnmetThreshold::{}'.format(role)
             assert self.UPDATE_ERROR == err
-            assert not meta['update']['is_success']
+            assert not meta['update']['is_success'] is True
             assert meta['update']['err'] == err
         return self_test
 

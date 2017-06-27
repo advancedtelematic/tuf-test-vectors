@@ -84,3 +84,51 @@ for _name in [
 
         name = role + _name + 'Tuf'
         setattr(sys.modules[__name__], name, type(name, (Tuf,), fields))
+
+
+class ValidRootRotationTuf(Tuf):
+
+    class RootSignedBy0and4Step(step.Step):
+
+        IS_INNER = True
+        ROOT_VERSION = 2
+        ROOT_KEYS = [4]
+        ROOT_KEYS_SIGN = [0, 4]
+
+        def self_test(self) -> None:
+            meta = self.generate_meta()
+            assert meta['update']['is_success'] is True
+            assert meta['update'].get('err') is None
+            assert self.UPDATE_ERROR is None
+
+            assert len(self.root['signatures']) == 2
+            assert len(self.root['signed']['roles']['root']['keyids']) == 1
+
+    STEPS = [
+        step.SimpleStep,
+        RootSignedBy0and4Step,
+    ]
+
+
+class RootRotationNoCrossSignTuf(Tuf):
+
+    class RootSignedByOnly4Step(step.Step):
+
+        IS_INNER = True
+        ROOT_VERSION = 2
+        ROOT_KEYS = [4]
+        ROOT_KEYS_SIGN = [4]
+        UPDATE_ERROR = 'UnmetThreshold::Root'
+
+        def self_test(self) -> None:
+            meta = self.generate_meta()
+            assert meta['update']['is_success'] == False
+            assert meta['update']['err'] == 'UnmetThreshold::Root'
+
+            assert len(self.root['signatures']) == 1
+            assert len(self.root['signed']['roles']['root']['keyids']) == 1
+
+    STEPS = [
+        step.SimpleStep,
+        RootSignedByOnly4Step,
+    ]
