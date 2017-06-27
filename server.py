@@ -16,8 +16,13 @@ def main(
         signature_encoding,
         compact,
         cjson_strategy):
-    app = init_app(repo_type, key_type=key_type, signature_scheme=signature_scheme,
-            signature_encoding=signature_encoding, compact=compact, cjson_strategy=cjson_strategy)
+    app = init_app(
+        repo_type,
+        key_type=key_type,
+        signature_scheme=signature_scheme,
+        signature_encoding=signature_encoding,
+        compact=compact,
+        cjson_strategy=cjson_strategy)
     app.run(host='127.0.0.1', port=port, debug=True)
 
 if __name__ == '__main__':

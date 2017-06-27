@@ -32,7 +32,7 @@ init-dev: init ## Initialize the dev environment
 
 run: init ## Run the server
 	@. venv/bin/activate && \
-		./server.py -t tuf -p vectors/tuf
+		./server.py -t tuf
 
 test: init-dev ## Run the test suite
 	@. venv/bin/activate && \

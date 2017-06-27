@@ -18,6 +18,7 @@ def json_response(f):
         return resp
     return decorated_function
 
+
 def init_app(
         repo_type,
         key_type,
@@ -43,7 +44,10 @@ def init_app(
 
     @app.route('/<string:repo>/reset', methods=['POST'])
     def reset(repo):
-        counter.pop(repo, None)
+        try:
+            counter.pop(repo, None)
+        except KeyError:
+            pass
         return '', 204
 
     if repo_type == 'tuf':
@@ -51,6 +55,7 @@ def init_app(
         @json_response
         def step(repo):
             current = counter.get(repo, 0)
+            counter[repo] = current + 1
             try:
                 step_meta = repos[repo].steps[current].generate_meta()
             except KeyError:
@@ -58,7 +63,6 @@ def init_app(
             except IndexError:
                 return '', 204
 
-            counter[repo] = current + 1
             # TODO if current step == 0, include root keys for pinning
             return json.dumps({
                 'update': step_meta['update'],
@@ -75,6 +79,9 @@ def init_app(
             root_idx = root_version - 1
             if current >= root_idx:
                 try:
+                    if current > len(repos[repo].steps):
+                        abort(400)
+
                     return json.dumps(repos[repo].steps[root_idx].root)
                 except (IndexError, ValueError) as e:
                     app.logger.warn(e)
@@ -120,6 +127,7 @@ def init_app(
         @json_response
         def step(repo):
             current = counter.get(repo, 0)
+            counter[repo] = current + 1
             try:
                 step_meta = repos[repo].generate_meta()['steps'][current]
             except KeyError:
@@ -127,7 +135,6 @@ def init_app(
             except IndexError:
                 return '', 204
 
-            counter[repo] = current + 1
             # TODO if current step == 0, include root keys for pinning
             return json.dumps({
                 'director': {
@@ -140,7 +147,7 @@ def init_app(
             })
 
         @app.route('/<string:repo>/<string:uptane>/<int:root_version>.root.json')
-        @json_response 
+        @json_response
         def root(repo, uptane, root_version):
             current = counter.get(repo)
             if current is None:
@@ -152,6 +159,9 @@ def init_app(
             root_idx = root_version - 1
             if current >= root_idx:
                 try:
+                    if current > len(getattr(repos[repo], uptane).steps):
+                        abort(400)
+
                     return json.dumps(getattr(repos[repo], uptane).steps[root_idx].root)
                 except (IndexError, ValueError) as e:
                     app.logger.warn(e)
@@ -170,11 +180,18 @@ def init_app(
                 if metadata not in ['root', 'targets']:
                     abort(404)
             else:
-                if metadata not in ALL_ROLES:
+                if metadata not in ['root', 'targets', 'timestamp', 'snapshot']:
                     abort(404)
 
             try:
-                return json.dumps(getattr(getattr(repos[repo], uptane).steps[current - 1], metadata))
+                return json.dumps(
+                    getattr(
+                        getattr(
+                            repos[repo],
+                            uptane).steps[
+                            current -
+                            1],
+                        metadata))
             except (IndexError, ValueError) as e:
                 app.logger.warn(e)
                 abort(400)
