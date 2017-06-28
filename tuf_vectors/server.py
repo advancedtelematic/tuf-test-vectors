@@ -81,8 +81,8 @@ def init_app(
                 try:
                     if current > len(repos[repo].steps):
                         abort(400)
-
-                    return json.dumps(repos[repo].steps[root_idx].root)
+                    repo = repos[repo]
+                    return repo.jsonify(repo.steps[root_idx].root)
                 except (IndexError, KeyError) as e:
                     app.logger.warn(e)
                     abort(400)
@@ -100,7 +100,8 @@ def init_app(
                 abort(404)
 
             try:
-                return json.dumps(getattr(repos[repo].steps[current - 1], metadata))
+                repo = repos[repo]
+                return repo.jsonify(getattr(repo.steps[current - 1], metadata))
             except (IndexError, KeyError) as e:
                 app.logger.warn(e)
                 abort(400)
@@ -162,7 +163,8 @@ def init_app(
                     if current > len(getattr(repos[repo], uptane).steps):
                         abort(400)
 
-                    return json.dumps(getattr(repos[repo], uptane).steps[root_idx].root)
+                    repo = repos[repo]
+                    return repo.jsonify(getattr(repo, uptane).steps[root_idx].root)
                 except (IndexError, KeyError) as e:
                     app.logger.warn(e)
                     abort(400)
@@ -184,10 +186,11 @@ def init_app(
                     abort(404)
 
             try:
-                return json.dumps(
+                repo = repos[repo]
+                return repo.jsonify(
                     getattr(
                         getattr(
-                            repos[repo],
+                            repo,
                             uptane).steps[
                             current -
                             1],

@@ -175,7 +175,7 @@ class Generator:
         if not self.compact:
             kwargs['indent'] = 2
         else:
-            kwargs['separators'] = (':', ',')
+            kwargs['separators'] = (',', ':')
 
         out = json.dumps(jsn, **kwargs)
 
