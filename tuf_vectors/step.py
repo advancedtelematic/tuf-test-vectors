@@ -118,8 +118,8 @@ class Step(Generator):
         if self.uptane_role != 'director':
             keys.extend([{'key_index': i, 'bad_id': i in self.TIMESTAMP_KEYS_BAD_IDS}
                          for i in self.TIMESTAMP_KEYS])
-            keys.extend([{'key_index': i, 'bad_id': i in self.TARGETS_KEYS_BAD_IDS}
-                         for i in self.TARGETS_KEYS])
+            keys.extend([{'key_index': i, 'bad_id': i in self.SNAPSHOT_KEYS_BAD_IDS}
+                         for i in self.SNAPSHOT_KEYS])
 
         root_meta['signed']['keys'] = keys
 
@@ -233,7 +233,7 @@ class Step(Generator):
                         err = 'TargetHashMismatch'
                     elif alteration == 'oversized':
                         err = 'OversizedTarget'
-                    else:
+                    else:  # pragma: no cover
                         raise Exception('Unknown alteration: {}'.format(alteration))
                     target_meta['err'] = err
                     target_meta['err_msg'] = human_message(err)
@@ -316,7 +316,7 @@ class Step(Generator):
                 bad_hash = True
             elif alteration == 'oversized':
                 len_diff = 1
-            else:
+            else:  # pragma: no cover
                 raise Exception('Unknown alteration: {}'.format(alteration))
 
             # TODO uptane custom
@@ -415,6 +415,9 @@ class SimpleStep(Step):
 
             assert getattr(self, '{}_THRESHOLD_MOD'.format(role.upper())) == 0
             assert meta['meta']['root']['signed']['roles'][role]['threshold'] == 1
+
+            assert len(meta['meta']['root']['signed']['keys']) == \
+                len(set(x['key_index'] for x in meta['meta']['root']['signed']['keys']))
 
             assert len(getattr(self, role)['signatures']) == 1
             assert len(meta['meta'][role]['signatures']) == 1
@@ -591,3 +594,35 @@ class OversizedTargetStep(Step):
         assert meta['targets']['targets/file.txt']['err'] == 'OversizedTarget'
         assert meta['meta']['targets']['signed']['targets'][
             'targets/file.txt']['length_too_short'] is True
+
+
+for _role in ALL_ROLES:
+    def gen_test():
+        role = _role
+
+        def self_test(self) -> None:
+            meta = self.generate_meta()
+            assert len(getattr(self, '{}_KEYS_BAD_IDS'.format(role.upper()))) == 1
+
+            keys = getattr(self, '{}_KEYS'.format(role.upper()))
+            bad_key_ids = set()
+            for k in meta['meta']['root']['signed']['keys']:
+                if k['key_index'] in keys and k['bad_id'] is True:
+                    bad_key_ids.add(k['key_index'])
+
+            assert len(bad_key_ids) == len(keys)
+
+            err = 'UnmetThreshold::{}'.format(role)
+            assert self.UPDATE_ERROR == err
+            assert not meta['update']['is_success'] is True
+            assert meta['update']['err'] == err
+        return self_test
+
+    fields = {
+        'self_test': gen_test(),
+        'UPDATE_ERROR': 'UnmetThreshold::{}'.format(_role),
+        '{}_KEYS_BAD_IDS'.format(_role.upper()): getattr(Step, '{}_KEYS'.format(_role.upper())),
+    }
+
+    name = _role + 'BadKeyIdsStep'
+    setattr(sys.modules[__name__], name, type(name, (Step,), fields))
