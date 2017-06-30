@@ -45,7 +45,7 @@ class Step(Generator):
     SNAPSHOT_THRESHOLD_MOD = 0
 
     UPDATE_ERROR = None
-    TARGETS = [('targets/file.txt', b'wat wat wat', [])]
+    TARGETS = [('targets/file.txt', b'wat wat wat', None)]
 
     def __init__(
             self,
@@ -86,16 +86,14 @@ class Step(Generator):
             'signed': {
                 'consistent_snapshot': False,  # TODO configure
                 'version': self.ROOT_VERSION,
-                # TODO 'keys': {}
+                'keys': [],
                 'roles': {
                     'root': {
-                        'keys': [{'key_index': i, 'bad_id': i in self.ROOT_KEYS_BAD_IDS}
-                                 for i in self.ROOT_KEYS],
+                        'keys': [{'key_index': i} for i in self.ROOT_KEYS],
                         'threshold': len(self.ROOT_KEYS) + self.ROOT_THRESHOLD_MOD
                     },
                     'targets': {
-                        'keys': [{'key_index': i, 'bad_id': i in self.TARGETS_KEYS_BAD_IDS}
-                                 for i in self.TARGETS_KEYS],
+                        'keys': [{'key_index': i} for i in self.TARGETS_KEYS],
                         'threshold': len(self.TARGETS_KEYS) + self.TARGETS_THRESHOLD_MOD
                     },
                 },
@@ -104,15 +102,26 @@ class Step(Generator):
 
         if self.uptane_role != 'director':
             root_meta['signed']['roles']['timestamp'] = {
-                'keys': [{'key_index': i, 'bad_id': i in self.TIMESTAMP_KEYS_BAD_IDS}
-                         for i in self.TIMESTAMP_KEYS],
+                'keys': [{'key_index': i} for i in self.TIMESTAMP_KEYS],
                 'threshold': len(self.TIMESTAMP_KEYS) + self.TIMESTAMP_THRESHOLD_MOD
             }
             root_meta['signed']['roles']['snapshot'] = {
-                'keys': [{'key_index': i, 'bad_id': i in self.SNAPSHOT_KEYS_BAD_IDS}
-                         for i in self.SNAPSHOT_KEYS],
+                'keys': [{'key_index': i} for i in self.SNAPSHOT_KEYS],
                 'threshold': len(self.SNAPSHOT_KEYS) + self.SNAPSHOT_THRESHOLD_MOD
             }
+
+        keys = []
+        keys.extend([{'key_index': i, 'bad_id': i in self.ROOT_KEYS_BAD_IDS}
+                     for i in self.ROOT_KEYS])
+        keys.extend([{'key_index': i, 'bad_id': i in self.TARGETS_KEYS_BAD_IDS}
+                     for i in self.TARGETS_KEYS])
+        if self.uptane_role != 'director':
+            keys.extend([{'key_index': i, 'bad_id': i in self.TIMESTAMP_KEYS_BAD_IDS}
+                         for i in self.TIMESTAMP_KEYS])
+            keys.extend([{'key_index': i, 'bad_id': i in self.TARGETS_KEYS_BAD_IDS}
+                         for i in self.TARGETS_KEYS])
+
+        root_meta['signed']['keys'] = keys
 
         targets_meta = {
             'signatures': [],
@@ -207,15 +216,28 @@ class Step(Generator):
         else:
             # don't include targets if we can't update correctly?
             # TODO handle delegation case
-            for target, _, alterations in self.TARGETS:
+            for target, _, alteration in self.TARGETS:
                 target_meta = {
-                    # TODO specify alterations
+                    'bad_hash': alteration == 'bad-hash',
+                    'length_too_short': alteration == 'oversized',
                 }
                 meta['meta']['targets']['signed']['targets'][target] = target_meta
 
+                # TODO need to handle delegation cases, like broken chains, etc.
                 target_meta = {
-                    'is_success': not alterations,
+                    'is_success': alteration is None,
                 }
+
+                if alteration is not None:
+                    if alteration == 'bad-hash':
+                        err = 'TargetHashMismatch'
+                    elif alteration == 'oversized':
+                        err = 'OversizedTarget'
+                    else:
+                        raise Exception('Unknown alteration: {}'.format(alteration))
+                    target_meta['err'] = err
+                    target_meta['err_msg'] = human_message(err)
+
                 meta['targets'][target] = target_meta
 
         return meta
@@ -284,13 +306,25 @@ class Step(Generator):
             'targets': {},
         }
 
-        for target, content, alterations in self.TARGETS:
+        for target, content, alteration in self.TARGETS:
+            len_diff = 0
+            bad_hash = False
+
+            if alteration is None:
+                pass
+            elif alteration == 'bad-hash':
+                bad_hash = True
+            elif alteration == 'oversized':
+                len_diff = 1
+            else:
+                raise Exception('Unknown alteration: {}'.format(alteration))
+
             # TODO uptane custom
             meta = {
-                'length': len(content),
+                'length': len(content) - len_diff,
                 'hashes': {
-                    'sha256': sha256(content, bad_hash=False),
-                    'sha512': sha512(content, bad_hash=False),
+                    'sha256': sha256(content, bad_hash=bad_hash),
+                    'sha512': sha512(content, bad_hash=bad_hash),
                 }
             }
 
@@ -534,3 +568,26 @@ for _role in ALL_ROLES:
 
     name = _role + 'NegativeThresholdStep'
     setattr(sys.modules[__name__], name, type(name, (Step,), fields))
+
+
+class TargetHashMismatchStep(Step):
+
+    TARGETS = [('targets/file.txt', b'wat wat wat', 'bad-hash')]
+
+    def self_test(self) -> None:
+        meta = self.generate_meta()
+        assert meta['targets']['targets/file.txt']['is_success'] == False
+        assert meta['targets']['targets/file.txt']['err'] == 'TargetHashMismatch'
+        assert meta['meta']['targets']['signed']['targets']['targets/file.txt']['bad_hash'] is True
+
+
+class OversizedTargetStep(Step):
+
+    TARGETS = [('targets/file.txt', b'wat wat wat', 'oversized')]
+
+    def self_test(self) -> None:
+        meta = self.generate_meta()
+        assert meta['targets']['targets/file.txt']['is_success'] == False
+        assert meta['targets']['targets/file.txt']['err'] == 'OversizedTarget'
+        assert meta['meta']['targets']['signed']['targets'][
+            'targets/file.txt']['length_too_short'] is True

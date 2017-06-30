@@ -132,3 +132,13 @@ class RootRotationNoCrossSignTuf(Tuf):
         step.SimpleStep,
         RootSignedByOnly4Step,
     ]
+
+
+class TargetHashMismatchTuf(Tuf):
+
+    STEPS = [step.TargetHashMismatchStep]
+
+
+class OversizedTargetTuf(Tuf):
+
+    STEPS = [step.OversizedTargetStep]

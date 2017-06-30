@@ -131,3 +131,15 @@ for _name in ['ValidRootRotation', 'RootRotationNoCrossSign']:
 
         name = uptane_role + _name + 'Uptane'
         setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))
+
+
+for _name in ['OversizedTarget', 'TargetHashMismatch']:
+    cls = getattr(tuf, _name + 'Tuf')
+
+    fields = {
+        'DIRECTOR_CLS': cls if uptane_role == 'Director' else tuf.SimpleTuf,
+        'IMAGE_REPO_CLS': cls if uptane_role == 'ImageRepo' else tuf.SimpleTuf,
+    }
+
+    name = uptane_role + _name + 'Uptane'
+    setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))
