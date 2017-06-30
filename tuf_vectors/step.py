@@ -626,3 +626,24 @@ for _role in ALL_ROLES:
 
     name = _role + 'BadKeyIdsStep'
     setattr(sys.modules[__name__], name, type(name, (Step,), fields))
+
+
+for _role in ALL_ROLES:
+    def gen_test():
+        role = _role
+
+        def self_test(self) -> None:
+            meta = self.generate_meta()
+            assert len(meta['meta'][role.lower()]['signatures']) == 0
+            assert meta['update']['is_success'] == False
+            assert len(getattr(self, role.lower())['signatures']) == 0
+        return self_test
+
+    fields = {
+        'self_test': gen_test(),
+        'UPDATE_ERROR': 'UnmetThreshold::{}'.format(_role),
+        '{}_KEYS_SIGN'.format(_role.upper()): [],
+    }
+
+    name = _role + 'UnsignedStep'
+    setattr(sys.modules[__name__], name, type(name, (Step,), fields))

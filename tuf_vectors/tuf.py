@@ -76,8 +76,10 @@ for _name in [
     'UnmetThreshold',
     'NonUniqueSignatures',
     'ZeroThreshold',
-        'NegativeThreshold',
-        'BadKeyIds']:
+    'NegativeThreshold',
+    'BadKeyIds',
+    'Unsigned', 
+    ]:
     for role in ALL_ROLES:
         fields = {
             'STEPS': [getattr(step, role + _name + 'Step')],
