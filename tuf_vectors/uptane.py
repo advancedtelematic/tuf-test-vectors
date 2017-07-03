@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import os
 import sys
 
 from os import path
@@ -69,8 +70,9 @@ class Uptane(Generator):
         return update_meta
 
     def write_meta(self) -> None:
-        with open(path.join(path.dirname(__file__), '..', 'metadata', 'uptane',
-                            '{}.json'.format(self.name())), 'w') as f:
+        base_path = path.join(path.dirname(path.abspath(__file__)), '..', 'metadata', 'uptane')
+        os.makedirs(base_path, exist_ok=True)
+        with open(path.join(base_path, '{}.json'.format(self.name())), 'w') as f:
             f.write(json.dumps(self.generate_meta(), indent=2, sort_keys=True))
 
     def write_static(self) -> None:

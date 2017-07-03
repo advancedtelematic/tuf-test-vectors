@@ -53,8 +53,9 @@ class Tuf(Generator):
         return meta
 
     def write_meta(self) -> None:
-        with open(path.join(path.dirname(__file__), '..', 'metadata', 'tuf',
-                            '{}.json'.format(self.name())), 'w') as f:
+        base_path = path.join(path.dirname(path.abspath(__file__)), '..', 'metadata', 'tuf')
+        os.makedirs(base_path, exist_ok=True)
+        with open(path.join(base_path, '{}.json'.format(self.name())), 'w') as f:
             f.write(json.dumps(self.generate_meta(), indent=2, sort_keys=True))
 
     def write_static(self) -> None:
