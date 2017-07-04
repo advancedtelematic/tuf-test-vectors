@@ -28,13 +28,13 @@ class TestTufServer:
             assert 'signatures' in jsn, m
 
         for t in meta['targets'].keys():
-            resp = tuf_app.get('/simple/{}'.format(t))
+            resp = tuf_app.get('/simple/targets/{}'.format(t))
             assert resp.status_code == 200, t
 
         resp = tuf_app.post('/simple/step')
         assert resp.status_code == 204
 
-        for p in ['root.json', '1.root.json', list(meta['targets'].keys())[0]]:
+        for p in ['root.json', '1.root.json', 'targets/{}'.format(list(meta['targets'].keys())[0])]:
             resp = tuf_app.get('/simple/{}'.format(p))
             assert resp.status_code == 400, p
 
@@ -44,14 +44,14 @@ class TestTufServer:
         resp = tuf_app.post('/simple/reset')
         assert resp.status_code == 204
 
-        for p in ['root.json', '1.root.json', list(meta['targets'].keys())[0]]:
+        for p in ['root.json', '1.root.json', 'targets/{}'.format(list(meta['targets'].keys())[0])]:
             resp = tuf_app.get('/simple/{}'.format(p))
             assert resp.status_code == 400, p
 
         resp = tuf_app.post('/simple/step')
         assert resp.status_code == 200
 
-        for p in ['root.json', '1.root.json', list(meta['targets'].keys())[0]]:
+        for p in ['root.json', '1.root.json', 'targets/{}'.format(list(meta['targets'].keys())[0])]:
             resp = tuf_app.get('/simple/{}'.format(p))
             assert resp.status_code == 200, p
 
@@ -118,13 +118,13 @@ class TestUptaneServer:
             assert resp.status_code == 404, m
 
         for t in meta['image_repo']['targets'].keys():
-            resp = uptane_app.get('/simple/image_repo/{}'.format(t))
+            resp = uptane_app.get('/simple/image_repo/targets/{}'.format(t))
             assert resp.status_code == 200, t
 
         resp = uptane_app.post('/simple/step')
         assert resp.status_code == 204
 
-        for p in ['root.json', '1.root.json', list(meta['image_repo']['targets'].keys())[0]]:
+        for p in ['root.json', '1.root.json', 'targets/{}'.format(list(meta['image_repo']['targets'].keys())[0])]:
             resp = uptane_app.get('/simple/image_repo/{}'.format(p))
             assert resp.status_code == 400, p
 
@@ -138,7 +138,7 @@ class TestUptaneServer:
         resp = uptane_app.post('/simple/reset')
         assert resp.status_code == 204
 
-        for p in ['root.json', '1.root.json', list(meta['image_repo']['targets'].keys())[0]]:
+        for p in ['root.json', '1.root.json', 'targets/{}'.format(list(meta['image_repo']['targets'].keys())[0])]:
             resp = uptane_app.get('/simple/image_repo/{}'.format(p))
             assert resp.status_code == 400, p
 
@@ -149,7 +149,7 @@ class TestUptaneServer:
         resp = uptane_app.post('/simple/step')
         assert resp.status_code == 200
 
-        for p in ['root.json', '1.root.json', list(meta['image_repo']['targets'].keys())[0]]:
+        for p in ['root.json', '1.root.json', 'targets/{}'.format(list(meta['image_repo']['targets'].keys())[0])]:
             resp = uptane_app.get('/simple/image_repo/{}'.format(p))
             assert resp.status_code == 200, p
 

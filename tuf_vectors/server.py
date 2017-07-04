@@ -109,7 +109,7 @@ def init_app(
                 app.logger.warn(e)
                 abort(404)
 
-        @app.route('/<string:repo>/<path:content_path>')
+        @app.route('/<string:repo>/targets/<path:content_path>')
         def repo(repo, content_path):
             try:
                 current = counter[repo]
@@ -202,7 +202,7 @@ def init_app(
                 app.logger.warn(e)
                 abort(404)
 
-        @app.route('/<string:repo>/image_repo/<path:content_path>')
+        @app.route('/<string:repo>/image_repo/targets/<path:content_path>')
         def repo(repo, content_path):
             try:
                 current = counter[repo]

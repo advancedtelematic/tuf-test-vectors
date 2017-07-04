@@ -5,7 +5,10 @@ all: generate test ## DO ALL THE THINGS
 	@true
 
 clean: ## Remove temp resources
-	@rm -rf venv vectors metadata
+	@rm -rf venv vectors metadata *.egg-info \
+		`find . -type d -name __pycache__` \
+		`find . -type f -name '*.pyc'` \
+		.cache .coverage htmlcov
 
 generate: generate-tuf generate-uptane ## Generate all test vectors
 	@true

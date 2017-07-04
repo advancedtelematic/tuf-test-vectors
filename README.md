@@ -32,7 +32,7 @@ $ curl -X POST localhost:8080/$vector_name/step
     "is_success": true
   },
   "targets": {
-    "targets/file.txt": {
+    "file.txt": {
         "is_success": true
      }
   }

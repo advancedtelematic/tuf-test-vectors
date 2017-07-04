@@ -45,7 +45,7 @@ class Step(Generator):
     SNAPSHOT_THRESHOLD_MOD = 0
 
     UPDATE_ERROR = None
-    TARGETS = [('targets/file.txt', b'wat wat wat', None)]
+    TARGETS = [('file.txt', b'wat wat wat', None)]
 
     def __init__(
             self,
@@ -575,25 +575,25 @@ for _role in ALL_ROLES:
 
 class TargetHashMismatchStep(Step):
 
-    TARGETS = [('targets/file.txt', b'wat wat wat', 'bad-hash')]
+    TARGETS = [('file.txt', b'wat wat wat', 'bad-hash')]
 
     def self_test(self) -> None:
         meta = self.generate_meta()
-        assert meta['targets']['targets/file.txt']['is_success'] == False
-        assert meta['targets']['targets/file.txt']['err'] == 'TargetHashMismatch'
-        assert meta['meta']['targets']['signed']['targets']['targets/file.txt']['bad_hash'] is True
+        assert meta['targets']['file.txt']['is_success'] == False
+        assert meta['targets']['file.txt']['err'] == 'TargetHashMismatch'
+        assert meta['meta']['targets']['signed']['targets']['file.txt']['bad_hash'] is True
 
 
 class OversizedTargetStep(Step):
 
-    TARGETS = [('targets/file.txt', b'wat wat wat', 'oversized')]
+    TARGETS = [('file.txt', b'wat wat wat', 'oversized')]
 
     def self_test(self) -> None:
         meta = self.generate_meta()
-        assert meta['targets']['targets/file.txt']['is_success'] == False
-        assert meta['targets']['targets/file.txt']['err'] == 'OversizedTarget'
+        assert meta['targets']['file.txt']['is_success'] == False
+        assert meta['targets']['file.txt']['err'] == 'OversizedTarget'
         assert meta['meta']['targets']['signed']['targets'][
-            'targets/file.txt']['length_too_short'] is True
+            'file.txt']['length_too_short'] is True
 
 
 for _role in ALL_ROLES:
