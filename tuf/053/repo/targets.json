@@ -3,7 +3,7 @@
     {
       "keyid": "2de2a4a3c1f6ff4b17a1d5335d45ed633aa13b0998c440373e387205e662dc75",
       "method": "ed25519",
-      "sig": "3611e612dadb11517f2a8f6cb36d531a5a5eefd08f02d2aa53dde064d0ae99bb5d69f65933a9c78519afb044ab0b9ec0c1297eeb9d51652c267df39a1d2b5d0b"
+      "sig": "debf3e87e17057d25aadf03a74e6a8f870601ac4f2694590607f3ee8ec84283cd1f30a7b77366ea088bb77c0775c44d720bd4281a8a45d2a2100ba7ef7b56206"
     }
   ],
   "signed": {
@@ -30,7 +30,7 @@
           ],
           "name": "delegation-1",
           "paths": [
-            "targets/file.txt"
+            "file.txt"
           ],
           "terminating": true,
           "threshold": 1
@@ -41,7 +41,7 @@
           ],
           "name": "delegation-2",
           "paths": [
-            "targets/file.txt"
+            "file.txt"
           ],
           "terminating": false,
           "threshold": 1

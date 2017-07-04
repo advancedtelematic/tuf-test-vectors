@@ -3,19 +3,19 @@
     {
       "keyid": "203fdacc21c424ac535933e5a8c43ec5e837105ffbc18f2274ea474dfd6b47bc",
       "method": "ed25519",
-      "sig": "7d15a35c7420e957fc34d72524600b680f4ee6a58d0f75bc28e75dc76f684dbc9a4b3906b4a16639c89005850f16814f5a9f77e372dfcc09e6c7b3ba7399b90d"
+      "sig": "ae46cc4198fc8d3e3a4a6c2c989c6abc54f9d39fd0c6d9fac19ed70ac9585e6fb77c42e457e0b6030ef0265008189b9ff0ab397a163a2e82ee7f18138cbd6709"
     },
     {
       "keyid": "203fdacc21c424ac535933e5a8c43ec5e837105ffbc18f2274ea474dfd6b47bc",
       "method": "ed25519",
-      "sig": "7d15a35c7420e957fc34d72524600b680f4ee6a58d0f75bc28e75dc76f684dbc9a4b3906b4a16639c89005850f16814f5a9f77e372dfcc09e6c7b3ba7399b90d"
+      "sig": "ae46cc4198fc8d3e3a4a6c2c989c6abc54f9d39fd0c6d9fac19ed70ac9585e6fb77c42e457e0b6030ef0265008189b9ff0ab397a163a2e82ee7f18138cbd6709"
     }
   ],
   "signed": {
     "_type": "Targets",
     "expires": "2038-01-19T03:14:06Z",
     "targets": {
-      "targets/file.txt": {
+      "file.txt": {
         "hashes": {
           "sha256": "fbf121c8e85875ffb9d50eab2cfa2a692df0e3e06afc2913492abe128bae66d0",
           "sha512": "ac51637364cff0f6802e087c8c6a51f1925384af639214282a67e093495ef746d8f1c2326cf7182a1067fd69f6049247f509a95a533032f9565c905ce4c5d5fe"

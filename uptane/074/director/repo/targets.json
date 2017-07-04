@@ -3,14 +3,14 @@
     {
       "keyid": "ce4558cb296c77242eeca08b17219c5d78694e31f0ff30be5871c05118343a20",
       "method": "rsassa-pss-sha256",
-      "sig": "50ca9c2d2e6d7bc9020d5a96e77d97a7ecb1f581cd12872a9514fdd33190fea80984541914ac920a4538ad25c354de0a9d4705b04785e6c809a85ab23f00eb9edfa6bc71086d01864ba8c403416014a8ba2c42793ab0b0d5fbc1ba2d3c2d9df48eee2db3b78690ed7d310d12e2a3a949141e68c6ac25a3235d1428438fd9a4e8"
+      "sig": "12fd4f9663c31501a8e015ab057c162aad6c5b8e9b155666c7cda464e4e0fc5a1add2a6e171189881de4eb14b4cd04953c010fc13ef83b8a443b8c6a77bfda67347a2b5357af934cfcc70f4be1343570845eb75201f6215aae5b987e58e5320c62067a3894e00833b9a2e527821ae1726a02a0bb43552c9de7c73768baf92f1d"
     }
   ],
   "signed": {
     "_type": "Targets",
     "expires": "2038-01-19T03:14:06Z",
     "targets": {
-      "targets/file.txt": {
+      "file.txt": {
         "custom": {
           "ecu_identifier": "01:02:03:04:05:06",
           "hardware_identifier": "abc-def",

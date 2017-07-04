@@ -24,6 +24,7 @@ def init_app(vector_dir):
 
     @app.route('/<path:path>')
     def static(path):
+        app.logger.info(path)
         if path.endswith('.gz'):
             path = safe_join(vector_dir, path[:-3])
             with open(path, 'rb') as f:

@@ -577,7 +577,7 @@ class Repo:
                     'ecu_identifier': '01:02:03:04:05:06',
                 }
 
-            file_data['targets/' + target] = meta
+            file_data[target] = meta
 
         signed = {
             '_type': 'Targets',
@@ -1313,7 +1313,7 @@ class SimpleDelegationsGroup(DelegationsGroup):
               'role': SimpleDelegation,
               'name': 'delegation-1',
               'threshold': 1,
-              'paths': ['targets/file.txt'],
+              'paths': ['file.txt'],
               }
              ]
 
@@ -1339,7 +1339,7 @@ class NestedDelegationsGroup(DelegationsGroup):
               'role': NestedDelegation,
               'name': 'delegation-2',
               'threshold': 1,
-              'paths': ['targets/file.txt'],
+              'paths': ['file.txt'],
               }
              ]
 
@@ -1378,7 +1378,7 @@ class ThresholdUnmetDelegationGroup(DelegationsGroup):
               'role': ThresholdUnmetDelegation,
               'name': 'delegation-1',
               'threshold': 1,
-              'paths': ['targets/file.txt'],
+              'paths': ['file.txt'],
               }
              ]
 
@@ -1420,7 +1420,7 @@ class BadPathTargetDelegationsGroup(DelegationsGroup):
               'role': SimpleDelegation,
               'name': 'delegation-1',
               'threshold': 1,
-              'paths': ['targets-file.txt'],
+              'paths': ['foo-file.txt'],
               }
              ]
 
@@ -1442,14 +1442,14 @@ class TerminatingNoErrorDelegationsGroup(DelegationsGroup):
          'role': SimpleDelegation,
          'name': 'delegation-1',
          'threshold': 1,
-         'paths': ['targets/file.txt'],
+         'paths': ['file.txt'],
          'terminating': True,
          },
         {'keys': [2],
          'role': SimpleDelegation,
          'name': 'delegation-2',
          'threshold': 1,
-         'paths': ['targets/file.txt'],
+         'paths': ['file.txt'],
          }
     ]
 
@@ -1483,14 +1483,14 @@ class TerminatingErrorDelegationsGroup(DelegationsGroup):
          'role': TargetHashMismatchDelegation,
          'name': 'delegation-1',
          'threshold': 1,
-         'paths': ['targets/file.txt'],
+         'paths': ['file.txt'],
          'terminating': True,
          },
         {'keys': [2],
          'role': SimpleDelegationNoWrite,
          'name': 'delegation-2',
          'threshold': 1,
-         'paths': ['targets/file.txt'],
+         'paths': ['file.txt'],
          }
     ]
 
@@ -1517,13 +1517,13 @@ class TerminatingSecondErrorDelegationsGroup(DelegationsGroup):
          'role': SimpleDelegation,
          'name': 'delegation-1',
          'threshold': 1,
-         'paths': ['targets/file.txt'],
+         'paths': ['file.txt'],
          },
         {'keys': [2],
          'role': TargetHashMismatchDelegationNoWrite,
          'name': 'delegation-2',
          'threshold': 1,
-         'paths': ['targets/file.txt'],
+         'paths': ['file.txt'],
          }
     ]
 

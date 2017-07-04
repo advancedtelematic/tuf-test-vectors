@@ -3,14 +3,14 @@
     {
       "keyid": "e8f1cc5da5fd36fd0548d9d24a631043fb5103a384135f3f183681fec58ead44",
       "method": "ed25519",
-      "sig": "d11d30b8738dce9b00865519629b889158cd600f51dceb4c213f0f338c26e854154dde9bb55917ee21bf2bd69b7d919de9c69f84f04d1f1e28662b2a49594b0a"
+      "sig": "52741dff69b7ab4ab0219ac6e098bade59ac8829183e78b4e5c116c3d6c21ba521a437c9424ed618ca0215daed50639e8de921acf23f80957d0ecab55e42b303"
     }
   ],
   "signed": {
     "_type": "Targets",
     "expires": "2038-01-19T03:14:06Z",
     "targets": {
-      "targets/file.txt": {
+      "file.txt": {
         "custom": {
           "ecu_identifier": "01:02:03:04:05:06",
           "hardware_identifier": "abc-def",
