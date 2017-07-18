@@ -1,49 +1,54 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from os import path
+import json
 
-# activate the virtual environment
-if __name__ == '__main__':
-    try:
-        activate_this = path.join(path.abspath(path.dirname(__file__)),
-                                  path.join('venv', 'bin', 'activate_this.py'))
-        with open(activate_this) as f:
-            code = compile(f.read(), activate_this, 'exec')
-            exec(code, dict(__file__=activate_this))
-    except FileNotFoundError:
-        pass
-
-import gzip
 from argparse import ArgumentParser
-from flask import Flask, send_from_directory, safe_join, Response
+from os import path
+from tuf_vectors.server import init_app
 
 
-def init_app(vector_dir):
-    app = Flask(__name__, static_folder=None, template_folder=None)
-
-    @app.route('/<path:path>')
-    def static(path):
-        app.logger.info(path)
-        if path.endswith('.gz'):
-            path = safe_join(vector_dir, path[:-3])
-            with open(path, 'rb') as f:
-                out = gzip.compress(f.read())
-            return Response(response=out, headers={'Content-Type': 'application/gzip'})
-        else:
-            return send_from_directory(vector_dir, path)
-
-    return app
-
-
-def main(vector_dir):
-    app = init_app(vector_dir)
-    app.run(host='127.0.0.1', port=8080, debug=True)
+def main(
+        repo_type,
+        port,
+        key_type,
+        signature_scheme,
+        signature_encoding,
+        compact,
+        cjson_strategy):
+    app = init_app(
+        repo_type,
+        key_type=key_type,
+        signature_scheme=signature_scheme,
+        signature_encoding=signature_encoding,
+        compact=compact,
+        cjson_strategy=cjson_strategy)
+    app.run(host='127.0.0.1', port=port, debug=True)
 
 if __name__ == '__main__':
     parser = ArgumentParser(path.basename(__file__),
                             description='Runs a TUF repo HTTP server')
-    parser.add_argument('-p', '--path', help='The path to serve content from',
-                        default=path.dirname(path.abspath(__file__)))
+    parser.add_argument('-P', '--port', help='The port to bind the app to',
+                        type=int, default=8080)
+    parser.add_argument('-t', '--type', help='The type of repo to serve',
+                        default='tuf', choices=['tuf', 'uptane'])
+    parser.add_argument('--signature-encoding', help='The encoding for cryptographic signatures',
+                        default='hex', choices=['hex', 'base64'])
+    parser.add_argument('--compact', help='Write JSON in compact format', action='store_true')
+    parser.add_argument('--cjson', help='The formatter to use for canonical JSON',
+                        default='olpc', choices=['olpc', 'json-subset'])
+    parser.add_argument('--key-type', help='The key type to use',
+                        default='ed25519', choices=['ed25519', 'rsa-2048', 'rsa-4096', 'rsa-8192'])
+    parser.add_argument(
+        '--signature-scheme',
+        help='The signature scheme to use',
+        default='ed25519',
+        choices=[
+            'ed25519',
+            'rsassa-pss-sha256',
+            'rsassa-pss-sha512'])
     args = parser.parse_args()
-    main(args.path)
+
+    main(args.type, args.port,
+         args.key_type, args.signature_scheme,
+         args.signature_encoding, args.compact, args.cjson)

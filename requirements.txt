@@ -4,28 +4,23 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-appdirs==1.4.3            # via setuptools
 asn1crypto==0.22.0        # via cryptography
 cffi==1.10.0              # via cryptography, pynacl
 click==6.7                # via flask
 cryptography==1.8.1       # via securesystemslib
 ed25519==1.4
 enum34==1.1.6             # via cryptography
-Flask==0.12.1
+flask==0.12.1
 idna==2.5                 # via cryptography
 ipaddress==1.0.18         # via cryptography
 itsdangerous==0.24        # via flask
-Jinja2==2.9.6             # via flask
-MarkupSafe==1.0           # via jinja2
-packaging==16.8           # via cryptography, setuptools
+jinja2==2.9.6             # via flask
+markupsafe==1.0           # via jinja2
+packaging==16.8           # via cryptography
 pycparser==2.17           # via cffi
 pycrypto==2.6.1
 pynacl==1.1.2             # via securesystemslib
 pyparsing==2.2.0          # via packaging
 securesystemslib==0.10.4
-six==1.10.0               # via cryptography, packaging, pynacl, securesystemslib, setuptools
-Werkzeug==0.12.1          # via flask
-
-# The following packages are commented out because they are
-# considered to be unsafe in a requirements file:
-# setuptools                # via cryptography
+six==1.10.0               # via cryptography, packaging, pynacl, securesystemslib
+werkzeug==0.12.1          # via flask

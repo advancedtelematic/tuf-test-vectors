@@ -6,78 +6,67 @@ targets.
 
 ## Vectors
 
-The vectors can be found in the `tuf` and `uptane` directories. There is
-metadata about the test vectors to allow for programatic testing. The file
-`vectors-meta.json` is a list of entries that map to a vector and the expected
-outcome.
+This repo contains `server.py` which provides an interactive API that directs
+clients on how to perform updates. A client should use the following steps to
+run through all the test vectors.
 
-For example:
+### List Vectors
 
-```json
-{
-  "repo": "002",
-  "is_success": false,
-  "error": "TargetHashMismatch",
-  "error_msg": "The target's calculated hash did not match the hash in the metadata.",
-  "root_keys": [
-    {
-      "path": "root-1.pub",
-      "type": "ed25519"
-    }
-  ]
-}
+Client does a `GET` on `/` to receive a JSON array of strings naming the rest of
+the vectors.
+
+```bash
+$ curl localhost:8080/
+["vector_1", "another_vector", ... ]
 ```
 
-The above shows that the test vector is in the directory `002` should not validate
-`file.txt` because the hash in the metadata does not match the  hash that is
-calculated. The field `error` will be machine
-parseable while the field `error_msg` is the answer to the question "Why didn't
-the file validate?" The field `root_keys` is used to allow you to pin the
-initial root keys for `1.root.json`.
+### Initialize the Vector
 
-Uptane errors are a little more specific:
+Because the vectors need to simulate time (via a "step"), each vector needs to
+be intialized with a `POST`.
 
-```json
+```bash
+$ curl -X POST localhost:8080/$vector_name/step
 {
-  "errors": {
-    "director": {
-      "error": "OversizedTarget",
-      "error_msg": "The target's size was greater than the size in the metadata."
-    },
-    "repo": {
-      "error": "OversizedTarget",
-      "error_msg": "The target's size was greater than the size in the metadata."
-    }
+  "update": {
+    "is_success": true
   },
-  "is_success": false,
-  "repo": "006",
-  "root_keys": {
-    "director": [
-      {
-        "path": "root-1.pub",
-        "type": "ed25519"
-      }
-    ],
-    "repo": [
-      {
-        "path": "root-1.pub",
-        "type": "ed25519"
-      }
-    ]
+  "targets": {
+    "file.txt": {
+        "is_success": true
+     }
   }
 }
 ```
 
-### Notes
+The response will tell you what the result of an update cycle should be as well
+as what targets to download and whether or not they should validate. If there
+are errors, both the `update` and `target` object will have `err` and `err_msg`
+along with `is_success`. `err` will be machine parseable and attempts to
+enumerate common types and `err_msg` is a plain English sentance.
 
-To ensure a test hits all its cases, you need to:
+### Update the Local Metadata
 
-1. Start at `1.root.json`
-2. Download the full metadata chain
-3. Verify `targets/file.txt`
+The client should attempt to do a full update of all metadata as defined in the
+spec, and the success of this update should match `update.is_success`.
 
-Failures may happen at any step in which case the test is over and the client
-should report the appropriate error.
+### Download and Verify Targets
+
+The client should download and verify the target. The success of this should
+match `targets.$target_name.is_success`.
+
+### Step
+
+The client should `POST` to the same endpoint `/$vector_name/step` and repeate.
+If the call to "step" returns `HTTP 204`, then the client is done.
+
+### Reset
+
+To reset the vector, the client may `POST` to `/$vector_name/reset`. The client
+may run tests in parallel, but the client may not run many tests against the
+same one vector in parallel.
+
+The client may `POST` to 
 
 ## License
 
