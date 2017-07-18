@@ -142,8 +142,8 @@ for _name in ['OversizedTarget', 'TargetHashMismatch']:
     cls = getattr(tuf, _name + 'Tuf')
 
     fields = {
-        'DIRECTOR_CLS': cls if uptane_role == 'Director' else tuf.SimpleTuf,
-        'IMAGE_REPO_CLS': cls if uptane_role == 'ImageRepo' else tuf.SimpleTuf,
+        'DIRECTOR_CLS': cls,
+        'IMAGE_REPO_CLS': cls,
     }
 
     name = uptane_role + _name + 'Uptane'
