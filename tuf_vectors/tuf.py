@@ -20,11 +20,17 @@ class Tuf(Generator):
             signature_encoding,
             compact,
             cjson_strategy,
+            include_custom,
+            ecu_identifier,
+            hardware_id,
             uptane_role=None):
         if uptane_role is None:
             self.output_dir = path.join(output_dir, self.name())
         else:
             self.output_dir = path.join(output_dir, uptane_role)
+
+        if include_custom and (not ecu_identifier or not hardware_id):
+            raise ValueError('include_custom requries an ecu_identifier and hardware_id')
 
         self.uptane_role = uptane_role
         self.key_type = key_type
@@ -32,13 +38,17 @@ class Tuf(Generator):
         self.signature_encoding = signature_encoding
         self.compact = compact
         self.cjson_strategy = cjson_strategy
+        self.include_custom = include_custom
+        self.ecu_identifier = ecu_identifier
+        self.hardware_id = hardware_id
         self.steps = []
 
         for idx, step in enumerate(self.STEPS):
             step = step(self.output_dir, step_index=idx,
                         key_type=key_type, signature_scheme=signature_scheme,
                         signature_encoding=signature_encoding, compact=compact,
-                        cjson_strategy=cjson_strategy)
+                        cjson_strategy=cjson_strategy, include_custom=include_custom,
+                        ecu_identifier=ecu_identifier, hardware_id=hardware_id)
             self.steps.append(step)
 
     def generate_meta(self) -> dict:

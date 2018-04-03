@@ -22,25 +22,40 @@ class Uptane(Generator):
             signature_scheme,
             signature_encoding,
             compact,
-            cjson_strategy):
+            cjson_strategy,
+            include_custom,
+            ecu_identifier,
+            hardware_id):
+        if include_custom and (not ecu_identifier or not hardware_id):
+            raise ValueError('include_custom requries an ecu_identifier and hardware_id')
+
         self.output_dir = path.join(output_dir, self.name())
         self.key_type = key_type
         self.signature_scheme = signature_scheme
         self.signature_encoding = signature_encoding
         self.compact = compact
         self.cjson_strategy = cjson_strategy
+        self.include_custom = include_custom
+        self.ecu_identifier = ecu_identifier
+        self.hardware_id = hardware_id
 
         self.director = self.DIRECTOR_CLS(output_dir=self.output_dir, key_type=key_type,
                                           signature_scheme=signature_scheme,
                                           uptane_role='director', compact=compact,
                                           signature_encoding=signature_encoding,
-                                          cjson_strategy=cjson_strategy)
+                                          cjson_strategy=cjson_strategy,
+                                          include_custom=include_custom,
+                                          ecu_identifier=ecu_identifier,
+                                          hardware_id=hardware_id)
 
         self.image_repo = self.IMAGE_REPO_CLS(output_dir=self.output_dir, key_type=key_type,
                                               signature_scheme=signature_scheme,
                                               uptane_role='image-repo', compact=compact,
                                               signature_encoding=signature_encoding,
-                                              cjson_strategy=cjson_strategy)
+                                              cjson_strategy=cjson_strategy,
+                                              include_custom=include_custom,
+                                              ecu_identifier=ecu_identifier,
+                                              hardware_id=hardware_id)
 
     def generate_meta(self) -> dict:
         director_meta = self.director.generate_meta()

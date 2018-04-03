@@ -56,7 +56,14 @@ class Step(Generator):
             signature_encoding,
             compact,
             cjson_strategy,
+            include_custom,
+            ecu_identifier,
+            hardware_id,
             uptane_role=None):
+
+        if include_custom and (not ecu_identifier or not hardware_id):
+            raise ValueError('include_custom requries an ecu_identifier and hardware_id')
+
         self.index = step_index
 
         p = path.join(output_dir, str(step_index))
@@ -69,6 +76,9 @@ class Step(Generator):
         self.compact = compact
         self.cjson_strategy = cjson_strategy
         self.uptane_role = uptane_role
+        self.include_custom = include_custom
+        self.ecu_identifier = ecu_identifier
+        self.hardware_id = hardware_id
 
         self.key_store = {}
 
@@ -319,14 +329,34 @@ class Step(Generator):
             else:  # pragma: no cover
                 raise Exception('Unknown alteration: {}'.format(alteration))
 
-            # TODO uptane custom
             meta = {
                 'length': len(content) - len_diff,
                 'hashes': {
                     'sha256': sha256(content, bad_hash=bad_hash),
                     'sha512': sha512(content, bad_hash=bad_hash),
-                }
+                },
+                'custom': {},
             }
+
+            if self.include_custom:
+                # TODO do we want to include custom metadata for image repo?
+                if self.uptane_role == 'director':
+                    meta['custom'] = {
+                        # this group is the legacy method
+                        'ecuIdentifier': self.ecu_identifier,
+                        'hardwareId': self.hardware_id,
+                        'uri': '',  # TODO?
+                        'diff': None,  # TODO?
+
+                        # this group is the current method
+                        'ecuIdentifiers': {
+                            self.ecu_identifier: {
+                                'hardwareId': self.hardware_id,
+                                'uri': '',  # TODO?
+                                'diff': None,  # TODO?
+                            },
+                        },
+                    }
 
             signed['targets'][target] = meta
 
