@@ -2,34 +2,37 @@
 # -*- coding: utf-8 -*-
 
 import json
+import sys
 
 from argparse import ArgumentParser
 from os import path
 from tuf_vectors.server import init_app
 
 
-def main(
-        repo_type,
-        port,
-        key_type,
-        signature_scheme,
-        signature_encoding,
-        compact,
-        cjson_strategy):
-    app = init_app(
-        repo_type,
-        key_type=key_type,
-        signature_scheme=signature_scheme,
-        signature_encoding=signature_encoding,
-        compact=compact,
-        cjson_strategy=cjson_strategy)
-    app.run(host='127.0.0.1', port=port, debug=True)
+def main():
+    args = arg_parser().parse_args()
 
-if __name__ == '__main__':
+    app = init_app(
+        args.type,
+        key_type=args.key_type,
+        signature_scheme=args.signature_scheme,
+        signature_encoding=args.signature_encoding,
+        compact=args.compact,
+        cjson_strategy=args.cjson,
+        include_custom=args.include_custom,
+        ecu_identifier=args.ecu_identifier,
+        hardware_id=args.hardware_id)
+    app.run(host=args.host, port=args.port, debug=True)
+
+
+def arg_parser():
     parser = ArgumentParser(path.basename(__file__),
                             description='Runs a TUF repo HTTP server')
+    parser.add_argument('-H', '--host', help='Interface to bind the app to',
+                        default='127.0.0.1')
     parser.add_argument('-P', '--port', help='The port to bind the app to',
                         type=int, default=8080)
+
     parser.add_argument('-t', '--type', help='The type of repo to serve',
                         default='tuf', choices=['tuf', 'uptane'])
     parser.add_argument('--signature-encoding', help='The encoding for cryptographic signatures',
@@ -47,8 +50,16 @@ if __name__ == '__main__':
             'ed25519',
             'rsassa-pss-sha256',
             'rsassa-pss-sha512'])
-    args = parser.parse_args()
+    parser.add_argument('--no-include-custom', action='store_false', dest='include_custom',
+                        help="Don't generate custom field in targets metadata")
+    parser.add_argument('--hardware-id', help="The ECU's hardware ID", required=True)
+    parser.add_argument('--ecu-identifier', help="The ECU's unique identifier", required=True)
 
-    main(args.type, args.port,
-         args.key_type, args.signature_scheme,
-         args.signature_encoding, args.compact, args.cjson)
+    return parser
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        print('')  # to get prompt on a newline
+        sys.exit(1)

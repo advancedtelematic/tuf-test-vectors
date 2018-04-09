@@ -25,7 +25,10 @@ def init_app(
         signature_scheme,
         signature_encoding,
         compact,
-        cjson_strategy):
+        cjson_strategy,
+        include_custom,
+        hardware_id,
+        ecu_identifier):
     app = Flask(__name__, static_folder=None, template_folder=None)
 
     repos = {}
@@ -34,7 +37,9 @@ def init_app(
     for repo in subclasses(Tuf if repo_type == 'tuf' else Uptane):
         repo = repo('/tmp/', key_type=key_type, signature_scheme=signature_scheme,
                     signature_encoding=signature_encoding,
-                    compact=compact, cjson_strategy=cjson_strategy)
+                    compact=compact, cjson_strategy=cjson_strategy,
+                    hardware_id=hardware_id, ecu_identifier=ecu_identifier,
+                    include_custom=include_custom)
         repos[repo.name()] = repo
 
     @app.route('/')

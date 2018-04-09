@@ -38,11 +38,6 @@ init-dev: init ## Initialize the dev environment
 	@. venv/bin/activate && \
 		pip install -Ur requirements-dev.txt
 
-.PHONY: run
-run: init ## Run the server
-	@. venv/bin/activate && \
-		./server.py -t tuf
-
 .PHONY: test
 test: init-dev ## Run the test suite
 	@. venv/bin/activate && \
