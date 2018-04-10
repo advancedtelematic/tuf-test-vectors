@@ -205,12 +205,18 @@ class Step(Generator):
             'targets': {},
         }
 
-        for meta_key, keys, bads in [
-                ('root', self.ROOT_KEYS_SIGN, self.ROOT_KEYS_BAD_SIGN),
-                ('targets', self.TARGETS_KEYS_SIGN, self.TARGETS_KEYS_BAD_SIGN),
-                ('timestamp', self.TIMESTAMP_KEYS_SIGN, self.TIMESTAMP_KEYS_BAD_SIGN),
-                ('snapshot', self.SNAPSHOT_KEYS_SIGN, self.SNAPSHOT_KEYS_BAD_SIGN)]:
+        key_tuples = [
+            ('root', self.ROOT_KEYS_SIGN, self.ROOT_KEYS_BAD_SIGN),
+            ('targets', self.TARGETS_KEYS_SIGN, self.TARGETS_KEYS_BAD_SIGN),
+        ]
 
+        if self.uptane_role != 'director':
+            key_tuples.extend([
+                ('timestamp', self.TIMESTAMP_KEYS_SIGN, self.TIMESTAMP_KEYS_BAD_SIGN),
+                ('snapshot', self.SNAPSHOT_KEYS_SIGN, self.SNAPSHOT_KEYS_BAD_SIGN),
+            ])
+
+        for meta_key, keys, bads in key_tuples:
             for key_idx in keys:
                 key_meta = {
                     'key_index': key_idx,
@@ -218,7 +224,12 @@ class Step(Generator):
                 }
                 meta['meta'][meta_key]['signatures'].append(key_meta)
 
-        for role in ['root', 'targets', 'timestamp', 'snapshot']:
+        if self.uptane_role == 'director':
+            roles = ['root', 'targets']
+        else:
+            roles = ['root', 'targets', 'snapshot', 'timestamp']
+
+        for role in roles:
             meta['meta'][role]['signed']['expired'] = \
                 bool(getattr(self, '{}_EXPIRED'.format(role.upper())))
 
@@ -343,7 +354,7 @@ class Step(Generator):
             else:  # pragma: no cover
                 raise Exception('Unknown alteration: {}'.format(alteration))
 
-            hardware_id = self.hardware_id + '_BAD' if alteration == 'bad-hardware-id' else ''
+            hardware_id = self.hardware_id + ('_BAD' if alteration == 'bad-hardware-id' else '')
 
             meta = {
                 'length': len(content) - len_diff,
@@ -458,6 +469,9 @@ class SimpleStep(Step):
         assert len(self.TARGETS) == 1
 
         for role in [r.lower() for r in ALL_ROLES]:
+            if self.uptane_role == 'director' and role in ('snapshot', 'timestamp'):
+                continue
+
             assert getattr(self, '{}_VERSION'.format(role.upper())) == 1
 
             assert len(getattr(self, '{}_KEYS'.format(role.upper()))) == 1

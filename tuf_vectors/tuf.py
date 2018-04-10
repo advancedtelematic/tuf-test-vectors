@@ -49,7 +49,8 @@ class Tuf(Generator):
                           key_type=key_type, signature_scheme=signature_scheme,
                           signature_encoding=signature_encoding, compact=compact,
                           cjson_strategy=cjson_strategy, include_custom=include_custom,
-                          ecu_identifier=ecu_identifier, hardware_id=hardware_id)
+                          ecu_identifier=ecu_identifier, hardware_id=hardware_id,
+                          uptane_role=uptane_role)
             self.steps.append(_step)
 
     def generate_meta(self) -> dict:

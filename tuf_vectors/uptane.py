@@ -71,9 +71,9 @@ class Uptane(Generator):
                 'image_repo': img_step,
             }
 
-            del meta['director']['meta']['timestamp']
-            del meta['director']['meta']['snapshot']
-            del meta['director']['targets']
+            meta['director']['meta'].pop('timestamp', None)
+            meta['director']['meta'].pop('snapshot', None)
+            meta['director'].pop('targets', None)
             # TODO ? merge dir/img targets into one
             steps.append(meta)
 
@@ -163,12 +163,18 @@ for _name in ['OversizedTarget', 'TargetHashMismatch']:
 
     name = uptane_role + _name + 'Uptane'
     setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))
-    
+
 
 for uptane_role in ALL_UPTANE_ROLES:
     fields = {
-        'DIRECTOR_CLS': cls if uptane_role == 'Director' else tuf.BadHardwareIdTuf,
-        'IMAGE_REPO_CLS': cls if uptane_role == 'ImageRepo' else tuf.BadHardwareIdTuf,
+        'DIRECTOR_CLS': tuf.SimpleTuf if uptane_role == 'Director' else tuf.BadHardwareIdTuf,
+        'IMAGE_REPO_CLS': tuf.SimpleTuf if uptane_role == 'ImageRepo' else tuf.BadHardwareIdTuf,
     }
     name = uptane_role + 'BadHardwareIdUptane'
     setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))
+
+
+class BadHardwareIdUptane(Uptane):
+
+    DIRECTOR_CLS = tuf.BadHardwareIdTuf
+    IMAGE_REPO_CLS = tuf.BadHardwareIdTuf
