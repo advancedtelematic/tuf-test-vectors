@@ -92,11 +92,11 @@ def human_message(err: str) -> str:
         elif err_base == 'UnmetThreshold':
             return "The {} metadata had an unmet threshold.".format(err_sub.lower())
         elif err_base == 'MetadataHashMismatch':
-            return  "The {} metadata's hash did not match the hash in the metadata." \
-                    .format(err_sub.lower())
+            return "The {} metadata's hash did not match the hash in the metadata." \
+                   .format(err_sub.lower())
         elif err_base == 'OversizedMetadata':
-            return  "The {} metadata's size was greater than the size in the metadata." \
-                    .format(err_sub.lower())
+            return "The {} metadata's size was greater than the size in the metadata." \
+                   .format(err_sub.lower())
         elif err_base == 'IllegalThreshold':
             return 'The role {} had an illegal signature threshold.'.format(err_sub.lower())
         elif err_base == 'NonUniqueSignatures':

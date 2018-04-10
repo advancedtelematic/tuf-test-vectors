@@ -51,3 +51,8 @@ update: ## Update the requirements and virtualenv
 
 venv: ## Create the virtualenv
 	@if [ ! -d venv ]; then virtualenv -p `which python3` venv; fi
+
+
+.PHONY: lint
+lint: init-dev ## Lint the python files
+	flake8

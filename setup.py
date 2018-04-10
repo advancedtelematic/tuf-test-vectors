@@ -13,6 +13,7 @@ class PyTest(TestCommand):
         self.pytest_args = [
             '--doctest-modules',
             '--strict',
+            '-v',
         ]
 
     def finalize_options(self):
@@ -25,6 +26,7 @@ class PyTest(TestCommand):
         import pytest
         errno = pytest.main(self.pytest_args)
         sys.exit(errno)
+
 
 setup(
     name="tuf_vectors",

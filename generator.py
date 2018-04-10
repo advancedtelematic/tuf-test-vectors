@@ -41,7 +41,8 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output-dir', help='The path to write the repos',
                         required=True)
     parser.add_argument('-r', '--repo', help='The repo to generate', default=None)
-    parser.add_argument('--include-custom', action='store_true', help="Include 'custom' field in Target metadata")
+    parser.add_argument('--include-custom', action='store_true',
+                        help="Include 'custom' field in Target metadata")
     parser.add_argument('--ecu-identifier', help='An ECU identifier for the update')
     parser.add_argument('--hardware-id', help='A hardware identifier for the update')
     parser.add_argument('--signature-encoding', help='The encoding for cryptographic signatures',

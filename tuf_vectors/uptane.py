@@ -97,9 +97,9 @@ class Uptane(Generator):
     def self_test(self) -> None:
         meta = self.generate_meta()
 
-        for step in meta['steps']:
+        for _step in meta['steps']:
             for r in ['timestamp', 'snapshot']:
-                assert not r in step['director']['meta']
+                assert r not in _step['director']['meta']
 
         self.director.self_test()
         self.image_repo.self_test()
@@ -119,7 +119,7 @@ for _name in [
     'NegativeThreshold',
     'BadKeyIds',
     'Unsigned',
-    ]:
+        ]:
     for uptane_role in ALL_UPTANE_ROLES:
         for role in ALL_ROLES:
             if uptane_role == 'Director' and role in ['Snapshot', 'Timestamp']:

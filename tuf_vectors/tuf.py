@@ -43,13 +43,13 @@ class Tuf(Generator):
         self.hardware_id = hardware_id
         self.steps = []
 
-        for idx, step in enumerate(self.STEPS):
-            step = step(self.output_dir, step_index=idx,
-                        key_type=key_type, signature_scheme=signature_scheme,
-                        signature_encoding=signature_encoding, compact=compact,
-                        cjson_strategy=cjson_strategy, include_custom=include_custom,
-                        ecu_identifier=ecu_identifier, hardware_id=hardware_id)
-            self.steps.append(step)
+        for idx, _step in enumerate(self.STEPS):
+            _step = _step(self.output_dir, step_index=idx,
+                          key_type=key_type, signature_scheme=signature_scheme,
+                          signature_encoding=signature_encoding, compact=compact,
+                          cjson_strategy=cjson_strategy, include_custom=include_custom,
+                          ecu_identifier=ecu_identifier, hardware_id=hardware_id)
+            self.steps.append(_step)
 
     def generate_meta(self) -> dict:
         meta = {
@@ -57,8 +57,8 @@ class Tuf(Generator):
             'steps': [],
         }
 
-        for step in self.steps:
-            meta['steps'].append(step.generate_meta())
+        for _step in self.steps:
+            meta['steps'].append(_step.generate_meta())
 
         return meta
 
@@ -69,12 +69,12 @@ class Tuf(Generator):
             f.write(json.dumps(self.generate_meta(), indent=2, sort_keys=True))
 
     def write_static(self) -> None:
-        for step in self.steps:
-            step.write_static()
+        for _step in self.steps:
+            _step.write_static()
 
     def self_test(self) -> None:
-        for step in self.steps:
-            step.self_test()
+        for _step in self.steps:
+            _step.self_test()
 
 
 class SimpleTuf(Tuf):
@@ -89,8 +89,8 @@ for _name in [
     'ZeroThreshold',
     'NegativeThreshold',
     'BadKeyIds',
-    'Unsigned', 
-    ]:
+    'Unsigned',
+        ]:
     for role in ALL_ROLES:
         fields = {
             'STEPS': [getattr(step, role + _name + 'Step')],
@@ -136,7 +136,7 @@ class RootRotationNoCrossSignTuf(Tuf):
 
         def self_test(self) -> None:
             meta = self.generate_meta()
-            assert meta['update']['is_success'] == False
+            assert meta['update']['is_success'] is False
             assert meta['update']['err'] == 'UnmetThreshold::Root'
 
             assert len(self.root['signatures']) == 1

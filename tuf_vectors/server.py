@@ -2,9 +2,8 @@
 
 import json
 
-from flask import Flask, Response, abort, make_response
+from flask import Flask, abort, make_response
 from functools import wraps
-from os import path
 from tuf_vectors import subclasses
 from tuf_vectors.tuf import Tuf
 from tuf_vectors.uptane import Uptane

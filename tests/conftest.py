@@ -2,8 +2,6 @@
 
 import pytest
 
-
-from os import path
 from tuf_vectors.server import init_app
 
 

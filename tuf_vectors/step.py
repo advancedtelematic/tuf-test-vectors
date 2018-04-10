@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import json
 import os
 import sys
 
@@ -205,10 +204,12 @@ class Step(Generator):
             'targets': {},
         }
 
-        for meta_key, keys, bads in [('root', self.ROOT_KEYS_SIGN, self.ROOT_KEYS_BAD_SIGN),
-                                     ('targets', self.TARGETS_KEYS_SIGN, self.TARGETS_KEYS_BAD_SIGN),
-                                     ('timestamp', self.TIMESTAMP_KEYS_SIGN, self.TIMESTAMP_KEYS_BAD_SIGN),
-                                     ('snapshot', self.SNAPSHOT_KEYS_SIGN, self.SNAPSHOT_KEYS_BAD_SIGN)]:
+        for meta_key, keys, bads in [
+                ('root', self.ROOT_KEYS_SIGN, self.ROOT_KEYS_BAD_SIGN),
+                ('targets', self.TARGETS_KEYS_SIGN, self.TARGETS_KEYS_BAD_SIGN),
+                ('timestamp', self.TIMESTAMP_KEYS_SIGN, self.TIMESTAMP_KEYS_BAD_SIGN),
+                ('snapshot', self.SNAPSHOT_KEYS_SIGN, self.SNAPSHOT_KEYS_BAD_SIGN)]:
+
             for key_idx in keys:
                 key_meta = {
                     'key_index': key_idx,
@@ -453,7 +454,7 @@ class SimpleStep(Step):
             assert len(meta['meta'][role]['signatures']) == 1
 
             assert getattr(self, role)['signed']['expires'].startswith('2038')
-            assert meta['meta'][role]['signed']['expired'] == False
+            assert meta['meta'][role]['signed']['expired'] is False
 
             assert len(meta['targets']) == 1
             assert list(meta['targets'].items())[0][1]['is_success'] is True
@@ -472,7 +473,7 @@ for _role in ALL_ROLES:
 
             err = 'ExpiredMetadata::{}'.format(role)
             assert self.UPDATE_ERROR == err
-            assert meta['update']['is_success'] == False
+            assert meta['update']['is_success'] is False
             assert meta['update']['err'] == err
         return self_test
 
@@ -529,7 +530,7 @@ for _role in ALL_ROLES:
 
             err = 'NonUniqueSignatures::{}'.format(role)
             assert self.UPDATE_ERROR == err
-            assert meta['update']['is_success'] == False
+            assert meta['update']['is_success'] is False
             assert meta['update']['err'] == err
         return self_test
 
@@ -559,14 +560,15 @@ for _role in ALL_ROLES:
 
             err = 'IllegalThreshold::{}'.format(role)
             assert self.UPDATE_ERROR == err
-            assert meta['update']['is_success'] == False
+            assert meta['update']['is_success'] is False
             assert meta['update']['err'] == err
         return self_test
 
     fields = {
         'self_test': gen_test(),
         'UPDATE_ERROR': 'IllegalThreshold::{}'.format(_role),
-        '{}_THRESHOLD_MOD'.format(_role.upper()): -1 * len(getattr(Step, '{}_KEYS'.format(_role.upper()))),
+        '{}_THRESHOLD_MOD'.format(_role.upper()): (
+            -1 * len(getattr(Step, '{}_KEYS'.format(_role.upper())))),
     }
 
     name = _role + 'ZeroThresholdStep'
@@ -589,14 +591,15 @@ for _role in ALL_ROLES:
 
             err = 'IllegalThreshold::{}'.format(role)
             assert self.UPDATE_ERROR == err
-            assert meta['update']['is_success'] == False
+            assert meta['update']['is_success'] is False
             assert meta['update']['err'] == err
         return self_test
 
     fields = {
         'self_test': gen_test(),
         'UPDATE_ERROR': 'IllegalThreshold::{}'.format(_role),
-        '{}_THRESHOLD_MOD'.format(_role.upper()): -1 - len(getattr(Step, '{}_KEYS'.format(_role.upper()))),
+        '{}_THRESHOLD_MOD'.format(_role.upper()): (
+            -1 - len(getattr(Step, '{}_KEYS'.format(_role.upper())))),
     }
 
     name = _role + 'NegativeThresholdStep'
@@ -609,7 +612,7 @@ class TargetHashMismatchStep(Step):
 
     def self_test(self) -> None:
         meta = self.generate_meta()
-        assert meta['targets']['file.txt']['is_success'] == False
+        assert meta['targets']['file.txt']['is_success'] is False
         assert meta['targets']['file.txt']['err'] == 'TargetHashMismatch'
         assert meta['meta']['targets']['signed']['targets']['file.txt']['bad_hash'] is True
 
@@ -620,7 +623,7 @@ class OversizedTargetStep(Step):
 
     def self_test(self) -> None:
         meta = self.generate_meta()
-        assert meta['targets']['file.txt']['is_success'] == False
+        assert meta['targets']['file.txt']['is_success'] is False
         assert meta['targets']['file.txt']['err'] == 'OversizedTarget'
         assert meta['meta']['targets']['signed']['targets'][
             'file.txt']['length_too_short'] is True
@@ -665,7 +668,7 @@ for _role in ALL_ROLES:
         def self_test(self) -> None:
             meta = self.generate_meta()
             assert len(meta['meta'][role.lower()]['signatures']) == 0
-            assert meta['update']['is_success'] == False
+            assert meta['update']['is_success'] is False
             assert len(getattr(self, role.lower())['signatures']) == 0
         return self_test
 

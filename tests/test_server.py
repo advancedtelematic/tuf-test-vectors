@@ -124,7 +124,8 @@ class TestUptaneServer:
         resp = uptane_app.post('/simple/step')
         assert resp.status_code == 204
 
-        for p in ['root.json', '1.root.json', 'targets/{}'.format(list(meta['image_repo']['targets'].keys())[0])]:
+        for p in ['root.json', '1.root.json', 'targets/{}'.format(
+                list(meta['image_repo']['targets'].keys())[0])]:
             resp = uptane_app.get('/simple/image_repo/{}'.format(p))
             assert resp.status_code == 400, p
 
@@ -138,7 +139,8 @@ class TestUptaneServer:
         resp = uptane_app.post('/simple/reset')
         assert resp.status_code == 204
 
-        for p in ['root.json', '1.root.json', 'targets/{}'.format(list(meta['image_repo']['targets'].keys())[0])]:
+        for p in ['root.json', '1.root.json', 'targets/{}'.format(
+                list(meta['image_repo']['targets'].keys())[0])]:
             resp = uptane_app.get('/simple/image_repo/{}'.format(p))
             assert resp.status_code == 400, p
 
@@ -149,7 +151,8 @@ class TestUptaneServer:
         resp = uptane_app.post('/simple/step')
         assert resp.status_code == 200
 
-        for p in ['root.json', '1.root.json', 'targets/{}'.format(list(meta['image_repo']['targets'].keys())[0])]:
+        for p in ['root.json', '1.root.json', 'targets/{}'.format(
+                list(meta['image_repo']['targets'].keys())[0])]:
             resp = uptane_app.get('/simple/image_repo/{}'.format(p))
             assert resp.status_code == 200, p
 
