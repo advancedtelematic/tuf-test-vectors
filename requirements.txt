@@ -4,23 +4,22 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-asn1crypto==0.22.0        # via cryptography
-cffi==1.10.0              # via cryptography, pynacl
+asn1crypto==0.24.0        # via cryptography
+cffi==1.11.5              # via cryptography, pynacl
 click==6.7                # via flask
-cryptography==1.8.1       # via securesystemslib
+colorama==0.3.9           # via securesystemslib
+cryptography==2.2.2       # via securesystemslib
 ed25519==1.4
 enum34==1.1.6             # via cryptography
-flask==0.12.1
-idna==2.5                 # via cryptography
-ipaddress==1.0.18         # via cryptography
+flask==0.12.2
+idna==2.6                 # via cryptography
+ipaddress==1.0.19         # via cryptography
 itsdangerous==0.24        # via flask
-jinja2==2.9.6             # via flask
+jinja2==2.10              # via flask
 markupsafe==1.0           # via jinja2
-packaging==16.8           # via cryptography
-pycparser==2.17           # via cffi
+pycparser==2.18           # via cffi
 pycrypto==2.6.1
-pynacl==1.1.2             # via securesystemslib
-pyparsing==2.2.0          # via packaging
-securesystemslib==0.10.4
-six==1.10.0               # via cryptography, packaging, pynacl, securesystemslib
-werkzeug==0.12.1          # via flask
+pynacl==1.2.1             # via securesystemslib
+securesystemslib==0.10.11
+six==1.11.0               # via cryptography, pynacl, securesystemslib
+werkzeug==0.14.1          # via flask
