@@ -15,7 +15,8 @@ for base_cls in [Tuf, Uptane]:
                 with TemporaryDirectory(prefix='tuf-test-vectors') as tempdir:
                     sub = self.CLS(tempdir, key_type='ed25519', signature_scheme='ed25519',
                                    signature_encoding='hex', compact=True,
-                                   cjson_strategy='olpc')
+                                   cjson_strategy='olpc', include_custom=True,
+                                   ecu_identifier='123', hardware_id='abc')
                     sub.generate_meta()
                     sub.write_static()
                     sub.write_meta()
@@ -46,7 +47,8 @@ for key_type, signature_scheme in [('ed25519', 'ed25519'),
                                           signature_scheme=signature_scheme,
                                           signature_encoding=signature_encoding,
                                           compact=compact,
-                                          cjson_strategy=cjson_strategy)
+                                          cjson_strategy=cjson_strategy, include_custom=True,
+                                          ecu_identifier='123', hardware_id='abc')
                             t.self_test()
                     return test_it
 
