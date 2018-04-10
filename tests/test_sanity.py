@@ -10,6 +10,9 @@ from tuf_vectors.uptane import Uptane
 
 for base_cls in [Tuf, Uptane]:
     for sub in subclasses(base_cls):
+        if base_cls == Tuf and sub.UPTANE_ONLY:
+            continue
+
         def gen_test():
             def test_it(self):
                 with TemporaryDirectory(prefix='tuf-test-vectors') as tempdir:

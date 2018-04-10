@@ -11,6 +11,7 @@ from tuf_vectors import step, Generator, TEST_META_VERSION, ALL_ROLES
 class Tuf(Generator):
 
     CLASS_SUFFIX = 'Tuf'
+    UPTANE_ONLY = False
 
     def __init__(
             self,
@@ -156,3 +157,9 @@ class TargetHashMismatchTuf(Tuf):
 class OversizedTargetTuf(Tuf):
 
     STEPS = [step.OversizedTargetStep]
+
+
+class BadHardwareIdTuf(Tuf):
+
+    UPTANE_ONLY = True
+    STEPS = [step.BadHardwareIdStep]

@@ -24,6 +24,9 @@ def main(
         raise ValueError('include_custom requries an ecu_identifier and hardware_id')
 
     for sub in subclasses(Tuf if repo_type == 'tuf' else Uptane):
+        if repo_type == 'tuf' and sub.UPTANE_ONLY:
+            continue
+
         if repo is None or sub.name == repo:
             sub = sub(output_dir, key_type=key_type, signature_scheme=signature_scheme,
                       signature_encoding=signature_encoding,

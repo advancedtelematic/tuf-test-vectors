@@ -21,7 +21,7 @@ generate-tuf: init ## Generate TUF test vectors
 .PHONY: generate-update
 generate-uptane: init ## Generate Uptane test vectors
 	@. venv/bin/activate && \
-		./generator.py -t uptane -o vectors/uptane
+		./generator.py -t uptane -o vectors/uptane --include-custom --ecu-identifier 123 --hardware-id abc
 
 .PHONY: help
 help: ## Show this message

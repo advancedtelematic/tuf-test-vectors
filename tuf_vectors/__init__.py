@@ -103,6 +103,9 @@ def human_message(err: str) -> str:
             return 'The role {} had non-unique signatures.'.format(err_sub.lower())
         else:  # pragma: no cover
             raise Exception('Unavailable err: {}'.format(err_base))
+    elif err == 'BadHardwareId':
+        return "The target had a hardware ID that did not match the client's configured " \
+               "hardware id."
     else:  # pragma: no cover
         raise Exception('Unavailable err: {}'.format(err))
 

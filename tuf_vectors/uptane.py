@@ -163,3 +163,12 @@ for _name in ['OversizedTarget', 'TargetHashMismatch']:
 
     name = uptane_role + _name + 'Uptane'
     setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))
+    
+
+for uptane_role in ALL_UPTANE_ROLES:
+    fields = {
+        'DIRECTOR_CLS': cls if uptane_role == 'Director' else tuf.BadHardwareIdTuf,
+        'IMAGE_REPO_CLS': cls if uptane_role == 'ImageRepo' else tuf.BadHardwareIdTuf,
+    }
+    name = uptane_role + 'BadHardwareIdUptane'
+    setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))

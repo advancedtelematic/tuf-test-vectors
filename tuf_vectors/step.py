@@ -10,6 +10,7 @@ from tuf_vectors import Generator, sha256, sha512, short_key_type, human_message
 class Step(Generator):
 
     CLASS_SUFFIX = 'Step'
+    UPTANE_ONLY = False
 
     ROOT_VERSION = 1
     ROOT_EXPIRED = False
@@ -231,7 +232,9 @@ class Step(Generator):
                 target_meta = {
                     'bad_hash': alteration == 'bad-hash',
                     'length_too_short': alteration == 'oversized',
+                    'bad_hardware_id': False,  # default
                 }
+
                 meta['meta']['targets']['signed']['targets'][target] = target_meta
 
                 # TODO need to handle delegation cases, like broken chains, etc.
@@ -244,6 +247,13 @@ class Step(Generator):
                         err = 'TargetHashMismatch'
                     elif alteration == 'oversized':
                         err = 'OversizedTarget'
+                    elif alteration == 'bad-hardware-id':
+                        if self.include_custom:
+                            meta['meta']['targets']['signed']['targets'][target][
+                                'bad_hardware_id'] = True
+                            err = 'BadHardwareId'
+                        else:  # pragma: no cover
+                            raise Exception('Attempted alteration that requires custom field')
                     else:  # pragma: no cover
                         raise Exception('Unknown alteration: {}'.format(alteration))
                     target_meta['err'] = err
@@ -327,8 +337,13 @@ class Step(Generator):
                 bad_hash = True
             elif alteration == 'oversized':
                 len_diff = 1
+            elif alteration == 'bad-hardware-id':
+                if not self.include_custom:  # pragma: no cover
+                    raise Exception('Alteration bad-hardware-id requires include_custom')
             else:  # pragma: no cover
                 raise Exception('Unknown alteration: {}'.format(alteration))
+
+            hardware_id = self.hardware_id + '_BAD' if alteration == 'bad-hardware-id' else ''
 
             meta = {
                 'length': len(content) - len_diff,
@@ -345,18 +360,24 @@ class Step(Generator):
                     meta['custom'] = {
                         # this group is the legacy method
                         'ecuIdentifier': self.ecu_identifier,
-                        'hardwareId': self.hardware_id,
+                        'hardwareId': hardware_id,
                         'uri': '',  # TODO?
                         'diff': None,  # TODO?
 
                         # this group is the current method
                         'ecuIdentifiers': {
                             self.ecu_identifier: {
-                                'hardwareId': self.hardware_id,
+                                'hardwareId': hardware_id,
                                 'uri': '',  # TODO?
                                 'diff': None,  # TODO?
                             },
                         },
+                    }
+                else:
+                    meta['custom'] = {
+                        'hardwareId': hardware_id,
+                        'uri': '',  # TODO?
+                        'diff': None,  # TODO?
                     }
 
             signed['targets'][target] = meta
@@ -680,3 +701,22 @@ for _role in ALL_ROLES:
 
     name = _role + 'UnsignedStep'
     setattr(sys.modules[__name__], name, type(name, (Step,), fields))
+
+
+class BadHardwareIdStep(Step):
+
+    UPTANE_ONLY = True
+    TARGETS = [('file.txt', b'wat wat wat', 'bad-hardware-id')]
+
+    def self_test(self) -> None:
+        self.generate_targets()
+        meta = self.generate_meta()
+        print(meta)
+        assert meta['targets']['file.txt']['is_success'] is False
+        assert meta['targets']['file.txt']['err'] == 'BadHardwareId'
+        assert meta['meta']['targets']['signed']['targets'][
+            'file.txt']['bad_hardware_id'] is True
+
+        assert self.include_custom  # guard for next assert
+        assert self.targets['signed']['targets']['file.txt']['custom'][
+            'hardwareId'] != self.hardware_id
