@@ -178,3 +178,9 @@ class BadHardwareIdUptane(Uptane):
 
     DIRECTOR_CLS = tuf.BadHardwareIdTuf
     IMAGE_REPO_CLS = tuf.BadHardwareIdTuf
+
+
+class BadEcuIdUptane(Uptane):
+
+    DIRECTOR_CLS = tuf.BadEcuIdTuf
+    IMAGE_REPO_CLS = tuf.SimpleTuf

@@ -106,6 +106,8 @@ def human_message(err: str) -> str:
     elif err == 'BadHardwareId':
         return "The target had a hardware ID that did not match the client's configured " \
                "hardware id."
+    elif err == 'BadEcuId':
+        return "The target had an ECU ID that did not match the client's configured ECU id."
     else:  # pragma: no cover
         raise Exception('Unavailable err: {}'.format(err))
 

@@ -264,7 +264,14 @@ class Step(Generator):
                                 'bad_hardware_id'] = True
                             err = 'BadHardwareId'
                         else:  # pragma: no cover
-                            raise Exception('Attempted alteration that requires custom field')
+                            raise Exception('Alteration bad-hardware-id requires custom field')
+                    elif alteration == 'bad-ecu-id':
+                        if self.include_custom:
+                            meta['meta']['targets']['signed']['targets'][target][
+                                'bad_ecu_id'] = True
+                            err = 'BadEcuId'
+                        else:  # pragma: no cover
+                            raise Exception('Alteration bad-ecu-id requires custom field')
                     else:  # pragma: no cover
                         raise Exception('Unknown alteration: {}'.format(alteration))
                     target_meta['err'] = err
@@ -351,10 +358,11 @@ class Step(Generator):
             elif alteration == 'bad-hardware-id':
                 if not self.include_custom:  # pragma: no cover
                     raise Exception('Alteration bad-hardware-id requires include_custom')
+            elif alteration == 'bad-ecu-id':
+                if not self.include_custom:  # pragma: no cover
+                    raise Exception('Alteration bad-ecu-id requires include_custom')
             else:  # pragma: no cover
                 raise Exception('Unknown alteration: {}'.format(alteration))
-
-            hardware_id = self.hardware_id + ('_BAD' if alteration == 'bad-hardware-id' else '')
 
             meta = {
                 'length': len(content) - len_diff,
@@ -366,18 +374,21 @@ class Step(Generator):
             }
 
             if self.include_custom:
+                ecu_id = self.ecu_identifier + ('_BAD' if alteration == 'bad-ecu-id' else '')
+                hardware_id = self.hardware_id + ('_BAD' if alteration == 'bad-hardware-id' else '')
+
                 # TODO do we want to include custom metadata for image repo?
                 if self.uptane_role == 'director':
                     meta['custom'] = {
                         # this group is the legacy method
-                        'ecuIdentifier': self.ecu_identifier,
+                        'ecuIdentifier': ecu_id,
                         'hardwareId': hardware_id,
                         'uri': '',  # TODO?
                         'diff': None,  # TODO?
 
                         # this group is the current method
                         'ecuIdentifiers': {
-                            self.ecu_identifier: {
+                            ecu_id: {
                                 'hardwareId': hardware_id,
                                 'uri': '',  # TODO?
                                 'diff': None,  # TODO?
@@ -725,7 +736,6 @@ class BadHardwareIdStep(Step):
     def self_test(self) -> None:
         self.generate_targets()
         meta = self.generate_meta()
-        print(meta)
         assert meta['targets']['file.txt']['is_success'] is False
         assert meta['targets']['file.txt']['err'] == 'BadHardwareId'
         assert meta['meta']['targets']['signed']['targets'][
@@ -734,3 +744,24 @@ class BadHardwareIdStep(Step):
         assert self.include_custom  # guard for next assert
         assert self.targets['signed']['targets']['file.txt']['custom'][
             'hardwareId'] != self.hardware_id
+
+
+class BadEcuIdStep(Step):
+
+    UPTANE_ONLY = True
+    TARGETS = [('file.txt', b'wat wat wat', 'bad-ecu-id')]
+
+    def self_test(self) -> None:
+        self.generate_targets()
+        meta = self.generate_meta()
+        assert meta['targets']['file.txt']['is_success'] is False
+        assert meta['targets']['file.txt']['err'] == 'BadEcuId'
+        assert meta['meta']['targets']['signed']['targets'][
+            'file.txt']['bad_ecu_id'] is True
+
+        assert self.include_custom  # guard for next assert
+        if self.uptane_role == 'director':
+            assert self.targets['signed']['targets']['file.txt']['custom'][
+                'ecuIdentifier'] != self.hardware_id
+            assert self.ecu_identifier not in (
+                self.targets['signed']['targets']['file.txt']['custom']['ecuIdentifiers'].keys())

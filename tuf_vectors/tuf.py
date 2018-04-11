@@ -164,3 +164,9 @@ class BadHardwareIdTuf(Tuf):
 
     UPTANE_ONLY = True
     STEPS = [step.BadHardwareIdStep]
+
+
+class BadEcuIdTuf(Tuf):
+
+    UPTANE_ONLY = True
+    STEPS = [step.BadEcuIdStep]
