@@ -66,8 +66,6 @@ To reset the vector, the client may `POST` to `/$vector_name/reset`. The client
 may run tests in parallel, but the client may not run many tests against the
 same one vector in parallel.
 
-The client may `POST` to 
-
 ## License
 
 This project is licensed under the MIT license. See [LICENSE](./LICENSE) for
