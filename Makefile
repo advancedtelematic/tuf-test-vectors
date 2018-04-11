@@ -34,19 +34,20 @@ init: venv ## Initialize the environment
 		mkdir -p metadata/tuf metadata/uptane vectors/tuf vectors/uptane
 
 .PHONY: init-dev
-init-dev: init ## Initialize the dev environment
+init-dev: venv ## Initialize the dev environment
 	@. venv/bin/activate && \
 		pip install -Ur requirements-dev.txt
 
+TEST ?= 'tests/'
 .PHONY: test
 test: init-dev ## Run the test suite
 	@. venv/bin/activate && \
-		./test.sh
+		python -m pytest -v --cov tuf_vectors --cov-report html --cov-report term $(TEST)
 
 .PHONY: update
 update: ## Update the requirements and virtualenv
-	@pip-compile requirements.in && \
-		pip-compile requirements-dev.in && \
+	@pip-compile requirements.in --output-file requirements.txt && \
+		pip-compile requirements-dev.in requirements.in --output-file requirements-dev.txt && \
 		$(MAKE) init
 
 venv: ## Create the virtualenv
