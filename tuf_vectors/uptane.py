@@ -73,8 +73,16 @@ class Uptane(Generator):
 
             meta['director']['meta'].pop('timestamp', None)
             meta['director']['meta'].pop('snapshot', None)
-            meta['director'].pop('targets', None)
-            # TODO ? merge dir/img targets into one
+
+            director_targets = meta['director'].pop('targets', {})
+            for k, v in director_targets.items():
+                if k in meta['image_repo']['targets']:
+                    img_meta = meta['image_repo']['targets'][k]
+                    if img_meta['is_success'] is True and v['is_success'] is False:
+                        meta['image_repo']['targets'][k] = v
+                else:
+                    meta['image_repo']['targets'][k] = v
+
             steps.append(meta)
 
         update_meta = {
@@ -103,6 +111,9 @@ class Uptane(Generator):
 
         self.director.self_test()
         self.image_repo.self_test()
+
+        if hasattr(self, 'extra_tests'):
+            self.extra_tests()
 
 
 class SimpleUptane(Uptane):
@@ -166,9 +177,16 @@ for _name in ['OversizedTarget', 'TargetHashMismatch']:
 
 
 for uptane_role in ALL_UPTANE_ROLES:
+    def gen_test():
+        def extra_tests(self):
+            meta = self.generate_meta()
+            assert meta['steps'][0]['image_repo']['targets']['file.txt']['is_success'] is False
+        return extra_tests
+
     fields = {
-        'DIRECTOR_CLS': tuf.SimpleTuf if uptane_role == 'Director' else tuf.BadHardwareIdTuf,
-        'IMAGE_REPO_CLS': tuf.SimpleTuf if uptane_role == 'ImageRepo' else tuf.BadHardwareIdTuf,
+        'DIRECTOR_CLS': tuf.BadHardwareIdTuf if uptane_role == 'Director' else tuf.SimpleTuf,
+        'IMAGE_REPO_CLS': tuf.BadHardwareIdTuf if uptane_role == 'ImageRepo' else tuf.SimpleTuf,
+        'extra_tests': gen_test(),
     }
     name = uptane_role + 'BadHardwareIdUptane'
     setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))
@@ -179,8 +197,16 @@ class BadHardwareIdUptane(Uptane):
     DIRECTOR_CLS = tuf.BadHardwareIdTuf
     IMAGE_REPO_CLS = tuf.BadHardwareIdTuf
 
+    def extra_tests(self):
+        meta = self.generate_meta()
+        assert meta['steps'][0]['image_repo']['targets']['file.txt']['is_success'] is False
+
 
 class BadEcuIdUptane(Uptane):
 
     DIRECTOR_CLS = tuf.BadEcuIdTuf
     IMAGE_REPO_CLS = tuf.SimpleTuf
+
+    def extra_tests(self):
+        meta = self.generate_meta()
+        assert meta['steps'][0]['image_repo']['targets']['file.txt']['is_success'] is False
