@@ -61,7 +61,7 @@ def init_app(
             current = counter.get(repo, 0)
             counter[repo] = current + 1
             try:
-                step_meta = repos[repo].steps[current].generate_meta()
+                step_meta = repos[repo].steps[current].generate_description()
             except KeyError:
                 abort(400)
             except IndexError:
@@ -134,7 +134,7 @@ def init_app(
             current = counter.get(repo, 0)
             counter[repo] = current + 1
             try:
-                step_meta = repos[repo].generate_meta()['steps'][current]
+                step_meta = repos[repo].generate_description()['steps'][current]
             except KeyError:
                 abort(400)
             except IndexError:

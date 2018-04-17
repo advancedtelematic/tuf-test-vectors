@@ -90,7 +90,7 @@ class Step(Generator):
 
         # TODO delegations
 
-    def generate_meta(self) -> dict:
+    def generate_description(self) -> dict:
         root_meta = {
             'signatures': [],
             'signed': {
@@ -474,7 +474,7 @@ class Step(Generator):
 class SimpleStep(Step):
 
     def self_test(self) -> None:
-        meta = self.generate_meta()
+        meta = self.generate_description()
 
         assert self.UPDATE_ERROR is None
         assert len(self.TARGETS) == 1
@@ -511,7 +511,7 @@ for _role in ALL_ROLES:
         role = _role
 
         def self_test(self) -> None:
-            meta = self.generate_meta()
+            meta = self.generate_description()
 
             assert getattr(self, '{}_EXPIRED'.format(role.upper()))
             assert getattr(self, role.lower())['signed']['expires'].startswith('2017')
@@ -538,7 +538,7 @@ for _role in ALL_ROLES:
         role = _role
 
         def self_test(self) -> None:
-            meta = self.generate_meta()
+            meta = self.generate_description()
 
             assert len(getattr(self, '{}_KEYS'.format(role.upper()))) == 2
             assert len(meta['meta'][role.lower()]['signatures']) == 1
@@ -566,7 +566,7 @@ for _role in ALL_ROLES:
         role = _role
 
         def self_test(self) -> None:
-            meta = self.generate_meta()
+            meta = self.generate_description()
 
             assert len(getattr(self, '{}_KEYS'.format(role.upper()))) == 1
             assert len(getattr(self, '{}_KEYS_SIGN'.format(role.upper()))) == 2
@@ -595,7 +595,7 @@ for _role in ALL_ROLES:
         role = _role
 
         def self_test(self) -> None:
-            meta = self.generate_meta()
+            meta = self.generate_description()
 
             assert getattr(self, '{}_THRESHOLD_MOD'.format(role.upper())) == -1
             assert self.root['signed']['roles'][role.lower()]['threshold'] == 0
@@ -626,7 +626,7 @@ for _role in ALL_ROLES:
         role = _role
 
         def self_test(self) -> None:
-            meta = self.generate_meta()
+            meta = self.generate_description()
 
             assert getattr(self, '{}_THRESHOLD_MOD'.format(role.upper())) == -2
             assert self.root['signed']['roles'][role.lower()]['threshold'] == -1
@@ -657,7 +657,7 @@ class TargetHashMismatchStep(Step):
     TARGETS = [('file.txt', b'wat wat wat', 'bad-hash')]
 
     def self_test(self) -> None:
-        meta = self.generate_meta()
+        meta = self.generate_description()
         assert meta['targets']['file.txt']['is_success'] is False
         assert meta['targets']['file.txt']['err'] == 'TargetHashMismatch'
         assert meta['meta']['targets']['signed']['targets']['file.txt']['bad_hash'] is True
@@ -668,7 +668,7 @@ class OversizedTargetStep(Step):
     TARGETS = [('file.txt', b'wat wat wat', 'oversized')]
 
     def self_test(self) -> None:
-        meta = self.generate_meta()
+        meta = self.generate_description()
         assert meta['targets']['file.txt']['is_success'] is False
         assert meta['targets']['file.txt']['err'] == 'OversizedTarget'
         assert meta['meta']['targets']['signed']['targets'][
@@ -680,7 +680,7 @@ for _role in ALL_ROLES:
         role = _role
 
         def self_test(self) -> None:
-            meta = self.generate_meta()
+            meta = self.generate_description()
             assert len(getattr(self, '{}_KEYS_BAD_IDS'.format(role.upper()))) == 1
 
             keys = getattr(self, '{}_KEYS'.format(role.upper()))
@@ -712,7 +712,7 @@ for _role in ALL_ROLES:
         role = _role
 
         def self_test(self) -> None:
-            meta = self.generate_meta()
+            meta = self.generate_description()
             assert len(meta['meta'][role.lower()]['signatures']) == 0
             assert meta['update']['is_success'] is False
             assert len(getattr(self, role.lower())['signatures']) == 0
@@ -735,7 +735,7 @@ class BadHardwareIdStep(Step):
 
     def self_test(self) -> None:
         self.generate_targets()
-        meta = self.generate_meta()
+        meta = self.generate_description()
         assert meta['targets']['file.txt']['is_success'] is False
         assert meta['targets']['file.txt']['err'] == 'BadHardwareId'
         assert meta['meta']['targets']['signed']['targets'][
@@ -753,7 +753,7 @@ class BadEcuIdStep(Step):
 
     def self_test(self) -> None:
         self.generate_targets()
-        meta = self.generate_meta()
+        meta = self.generate_description()
         assert meta['targets']['file.txt']['is_success'] is False
         assert meta['targets']['file.txt']['err'] == 'BadEcuId'
         assert meta['meta']['targets']['signed']['targets'][

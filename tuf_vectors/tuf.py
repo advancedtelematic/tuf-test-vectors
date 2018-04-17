@@ -53,14 +53,14 @@ class Tuf(Generator):
                           uptane_role=uptane_role)
             self.steps.append(_step)
 
-    def generate_meta(self) -> dict:
+    def generate_description(self) -> dict:
         meta = {
             'version': TEST_META_VERSION,
             'steps': [],
         }
 
         for _step in self.steps:
-            meta['steps'].append(_step.generate_meta())
+            meta['steps'].append(_step.generate_description())
 
         return meta
 
@@ -68,7 +68,7 @@ class Tuf(Generator):
         base_path = path.join(path.dirname(path.abspath(__file__)), '..', 'metadata', 'tuf')
         os.makedirs(base_path, exist_ok=True)
         with open(path.join(base_path, '{}.json'.format(self.name())), 'w') as f:
-            f.write(json.dumps(self.generate_meta(), indent=2, sort_keys=True))
+            f.write(json.dumps(self.generate_description(), indent=2, sort_keys=True))
 
     def write_static(self) -> None:
         for _step in self.steps:
@@ -112,7 +112,7 @@ class ValidRootRotationTuf(Tuf):
         ROOT_KEYS_SIGN = [0, 4]
 
         def self_test(self) -> None:
-            meta = self.generate_meta()
+            meta = self.generate_description()
             assert meta['update']['is_success'] is True
             assert meta['update'].get('err') is None
             assert self.UPDATE_ERROR is None
@@ -137,7 +137,7 @@ class RootRotationNoCrossSignTuf(Tuf):
         UPDATE_ERROR = 'UnmetThreshold::Root'
 
         def self_test(self) -> None:
-            meta = self.generate_meta()
+            meta = self.generate_description()
             assert meta['update']['is_success'] is False
             assert meta['update']['err'] == 'UnmetThreshold::Root'
 

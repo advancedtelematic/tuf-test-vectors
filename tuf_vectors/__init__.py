@@ -147,7 +147,7 @@ class Generator:
         else:  # pragma: no cover
             raise ValueError('Class name needs to end in "{}": {}'.format(cls.CLASS_SUFFIX, n))
 
-    def generate_meta(cls) -> None:  # pragma: no cover
+    def generate_description(cls) -> None:  # pragma: no cover
         '''Generate the static JSON metadata used to describe a test case.
         '''
         raise NotImplementedError

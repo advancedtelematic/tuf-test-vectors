@@ -57,9 +57,9 @@ class Uptane(Generator):
                                               ecu_identifier=ecu_identifier,
                                               hardware_id=hardware_id)
 
-    def generate_meta(self) -> dict:
-        director_meta = self.director.generate_meta()
-        image_repo_meta = self.image_repo.generate_meta()
+    def generate_description(self) -> dict:
+        director_meta = self.director.generate_description()
+        image_repo_meta = self.image_repo.generate_description()
 
         if len(director_meta['steps']) != len(image_repo_meta['steps']):  # pragma: no cover
             raise Exception('Director steps did not equal image repo steps')
@@ -96,14 +96,14 @@ class Uptane(Generator):
         base_path = path.join(path.dirname(path.abspath(__file__)), '..', 'metadata', 'uptane')
         os.makedirs(base_path, exist_ok=True)
         with open(path.join(base_path, '{}.json'.format(self.name())), 'w') as f:
-            f.write(json.dumps(self.generate_meta(), indent=2, sort_keys=True))
+            f.write(json.dumps(self.generate_description(), indent=2, sort_keys=True))
 
     def write_static(self) -> None:
         self.director.write_static()
         self.image_repo.write_static()
 
     def self_test(self) -> None:
-        meta = self.generate_meta()
+        meta = self.generate_description()
 
         for _step in meta['steps']:
             for r in ['timestamp', 'snapshot']:
@@ -179,7 +179,7 @@ for _name in ['OversizedTarget', 'TargetHashMismatch']:
 for uptane_role in ALL_UPTANE_ROLES:
     def gen_test():
         def extra_tests(self):
-            meta = self.generate_meta()
+            meta = self.generate_description()
             assert meta['steps'][0]['image_repo']['targets']['file.txt']['is_success'] is False
         return extra_tests
 
@@ -198,7 +198,7 @@ class BadHardwareIdUptane(Uptane):
     IMAGE_REPO_CLS = tuf.BadHardwareIdTuf
 
     def extra_tests(self):
-        meta = self.generate_meta()
+        meta = self.generate_description()
         assert meta['steps'][0]['image_repo']['targets']['file.txt']['is_success'] is False
 
 
@@ -208,5 +208,5 @@ class BadEcuIdUptane(Uptane):
     IMAGE_REPO_CLS = tuf.SimpleTuf
 
     def extra_tests(self):
-        meta = self.generate_meta()
+        meta = self.generate_description()
         assert meta['steps'][0]['image_repo']['targets']['file.txt']['is_success'] is False

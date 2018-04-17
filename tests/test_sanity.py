@@ -20,7 +20,7 @@ for base_cls in [Tuf, Uptane]:
                                    signature_encoding='hex', compact=True,
                                    cjson_strategy='olpc', include_custom=True,
                                    ecu_identifier='123', hardware_id='abc')
-                    sub.generate_meta()
+                    sub.generate_description()
                     sub.write_static()
                     sub.write_meta()
                     sub.self_test()
