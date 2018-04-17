@@ -11,6 +11,12 @@ from tuf_vectors.server import init_app
 def main():
     args = arg_parser().parse_args()
 
+    if args.include_custom:
+        if not args.ecu_identifier:
+            raise ValueError('ECU Identifier needed with custom')
+        if not args.hardware:
+            raise ValueError('Hardware ID needed with custom')
+
     app = init_app(
         args.type,
         key_type=args.key_type,
@@ -51,8 +57,8 @@ def arg_parser():
             'rsassa-pss-sha512'])
     parser.add_argument('--no-include-custom', action='store_false', dest='include_custom',
                         help="Don't generate custom field in targets metadata")
-    parser.add_argument('--hardware-id', help="The ECU's hardware ID", required=True)
-    parser.add_argument('--ecu-identifier', help="The ECU's unique identifier", required=True)
+    parser.add_argument('--hardware-id', help="The ECU's hardware ID")
+    parser.add_argument('--ecu-identifier', help="The ECU's unique identifier")
 
     return parser
 
