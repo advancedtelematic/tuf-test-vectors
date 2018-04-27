@@ -1,212 +1,102 @@
 # -*- coding: utf-8 -*-
 
-import json
-import os
-import sys
+import re
 
 from os import path
-from tuf_vectors import tuf, step, Generator, TEST_META_VERSION, ALL_ROLES, ALL_UPTANE_ROLES
+
+from tuf_vectors.step import Step
 
 
-class Uptane(Generator):
+class Uptane:
 
     CLASS_SUFFIX = 'Uptane'
 
-    DIRECTOR_CLS = None
-    IMAGE_REPO_CLS = None
+    '''2-tuple of (Director, Image Repo)'''
+    STEPS = []
 
-    def __init__(
-            self,
-            output_dir,
-            key_type,
-            signature_scheme,
-            signature_encoding,
-            compact,
-            cjson_strategy,
-            include_custom,
-            ecu_identifier,
-            hardware_id):
-        if include_custom and (not ecu_identifier or not hardware_id):
-            raise ValueError('include_custom requries an ecu_identifier and hardware_id')
+    def __init__(self, **kwargs) -> None:
+        output_dir = kwargs.get('output_dir', None)
+        if output_dir is None:
+            raise ValueError("Missing kwarg 'output_dir'")
+        output_dir = path.join(output_dir, self.name())
+        kwargs['output_dir'] = output_dir
 
-        self.output_dir = path.join(output_dir, self.name())
-        self.key_type = key_type
-        self.signature_scheme = signature_scheme
-        self.signature_encoding = signature_encoding
-        self.compact = compact
-        self.cjson_strategy = cjson_strategy
-        self.include_custom = include_custom
-        self.ecu_identifier = ecu_identifier
-        self.hardware_id = hardware_id
+        self.steps = []
+        for idx, (director_step, image_step) in enumerate(self.STEPS):
+            args = kwargs.copy()
+            args.update(step_index=idx)
+            image_step = image_step(uptane_role='image_repo', **args)
+            director_step = director_step(uptane_role='director', **args)
+            self.steps.append((director_step, image_step))
 
-        self.director = self.DIRECTOR_CLS(output_dir=self.output_dir, key_type=key_type,
-                                          signature_scheme=signature_scheme,
-                                          uptane_role='director', compact=compact,
-                                          signature_encoding=signature_encoding,
-                                          cjson_strategy=cjson_strategy,
-                                          include_custom=include_custom,
-                                          ecu_identifier=ecu_identifier,
-                                          hardware_id=hardware_id)
+    @classmethod
+    def name(cls) -> str:
+        n = cls.__name__
+        if n.endswith(cls.CLASS_SUFFIX):
+            n = n[:-len(cls.CLASS_SUFFIX)]
+            n = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', n)
+            return re.sub('([a-z0-9])([A-Z])', r'\1_\2', n).lower()
+        else:
+            raise ValueError('Class name needs to end in "{}": {}'.format(cls.CLASS_SUFFIX, n))
 
-        self.image_repo = self.IMAGE_REPO_CLS(output_dir=self.output_dir, key_type=key_type,
-                                              signature_scheme=signature_scheme,
-                                              uptane_role='image-repo', compact=compact,
-                                              signature_encoding=signature_encoding,
-                                              cjson_strategy=cjson_strategy,
-                                              include_custom=include_custom,
-                                              ecu_identifier=ecu_identifier,
-                                              hardware_id=hardware_id)
+    def persist(self) -> None:
+        for (director_step, image_step) in self.steps:
+            director_step.persist()
+            image_step.persist()
 
-    def generate_description(self) -> dict:
-        director_meta = self.director.generate_description()
-        image_repo_meta = self.image_repo.generate_description()
+    def meta(self) -> dict:
+        '''Used to indicate if this update should pass/fail'''
+        meta = {'steps': []}
 
-        if len(director_meta['steps']) != len(image_repo_meta['steps']):  # pragma: no cover
-            raise Exception('Director steps did not equal image repo steps')
+        for director_step, image_step in self.steps:
+            meta['steps'].append({
+                'director': director_step.meta(),
+                'image_repo': image_step.meta(),
+            })
 
-        steps = []
-        for dir_step, img_step in zip(director_meta['steps'], image_repo_meta['steps']):
-            meta = {
-                'director': dir_step,
-                'image_repo': img_step,
-            }
-
-            meta['director']['meta'].pop('timestamp', None)
-            meta['director']['meta'].pop('snapshot', None)
-
-            director_targets = meta['director'].pop('targets', {})
-            for k, v in director_targets.items():
-                if k in meta['image_repo']['targets']:
-                    img_meta = meta['image_repo']['targets'][k]
-                    if img_meta['is_success'] is True and v['is_success'] is False:
-                        meta['image_repo']['targets'][k] = v
-                else:
-                    meta['image_repo']['targets'][k] = v
-
-            steps.append(meta)
-
-        update_meta = {
-            'version': TEST_META_VERSION,
-            'steps': steps,
-        }
-
-        return update_meta
-
-    def write_meta(self) -> None:
-        base_path = path.join(path.dirname(path.abspath(__file__)), '..', 'metadata', 'uptane')
-        os.makedirs(base_path, exist_ok=True)
-        with open(path.join(base_path, '{}.json'.format(self.name())), 'w') as f:
-            f.write(json.dumps(self.generate_description(), indent=2, sort_keys=True))
-
-    def write_static(self) -> None:
-        self.director.write_static()
-        self.image_repo.write_static()
-
-    def self_test(self) -> None:
-        meta = self.generate_description()
-
-        for _step in meta['steps']:
-            for r in ['timestamp', 'snapshot']:
-                assert r not in _step['director']['meta']
-
-        self.director.self_test()
-        self.image_repo.self_test()
-
-        if hasattr(self, 'extra_tests'):
-            self.extra_tests()
+        return meta
 
 
 class SimpleUptane(Uptane):
 
-    DIRECTOR_CLS = tuf.SimpleTuf
-    IMAGE_REPO_CLS = tuf.SimpleTuf
+    class ImageStep(Step):
 
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
 
-for _name in [
-    'Expired',
-    'UnmetThreshold',
-    'NonUniqueSignatures',
-    'ZeroThreshold',
-    'NegativeThreshold',
-    'BadKeyIds',
-    'Unsigned',
-        ]:
-    for uptane_role in ALL_UPTANE_ROLES:
-        for role in ALL_ROLES:
-            if uptane_role == 'Director' and role in ['Snapshot', 'Timestamp']:
-                continue
-
-            cls = getattr(tuf, role + _name + 'Tuf')
-
-            fields = {
-                'DIRECTOR_CLS': cls if uptane_role == 'Director' else tuf.SimpleTuf,
-                'IMAGE_REPO_CLS': cls if uptane_role == 'ImageRepo' else tuf.SimpleTuf,
-            }
-
-            name = uptane_role + role + _name + 'Uptane'
-            setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))
-
-
-for _name in ['ValidRootRotation', 'RootRotationNoCrossSign']:
-    for uptane_role in ALL_UPTANE_ROLES:
-        cls = getattr(tuf, _name + 'Tuf')
-
-        class SimpleRepeatedTuf(tuf.Tuf):
-            IS_INNER = True
-            STEPS = [step.SimpleStep, step.SimpleStep]
-
-        fields = {
-            'DIRECTOR_CLS': cls if uptane_role == 'Director' else SimpleRepeatedTuf,
-            'IMAGE_REPO_CLS': cls if uptane_role == 'ImageRepo' else SimpleRepeatedTuf,
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        name = uptane_role + _name + 'Uptane'
-        setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
 
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
 
-for _name in ['OversizedTarget', 'TargetHashMismatch']:
-    cls = getattr(tuf, _name + 'Tuf')
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
 
-    fields = {
-        'DIRECTOR_CLS': cls,
-        'IMAGE_REPO_CLS': cls,
-    }
+    class DirectorStep(Step):
 
-    name = uptane_role + _name + 'Uptane'
-    setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))
+        TARGETS_KEYS_IDX = [5]
 
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
 
-for uptane_role in ALL_UPTANE_ROLES:
-    def gen_test():
-        def extra_tests(self):
-            meta = self.generate_description()
-            assert meta['steps'][0]['image_repo']['targets']['file.txt']['is_success'] is False
-        return extra_tests
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
 
-    fields = {
-        'DIRECTOR_CLS': tuf.BadHardwareIdTuf if uptane_role == 'Director' else tuf.SimpleTuf,
-        'IMAGE_REPO_CLS': tuf.BadHardwareIdTuf if uptane_role == 'ImageRepo' else tuf.SimpleTuf,
-        'extra_tests': gen_test(),
-    }
-    name = uptane_role + 'BadHardwareIdUptane'
-    setattr(sys.modules[__name__], name, type(name, (Uptane,), fields))
-
-
-class BadHardwareIdUptane(Uptane):
-
-    DIRECTOR_CLS = tuf.BadHardwareIdTuf
-    IMAGE_REPO_CLS = tuf.BadHardwareIdTuf
-
-    def extra_tests(self):
-        meta = self.generate_description()
-        assert meta['steps'][0]['image_repo']['targets']['file.txt']['is_success'] is False
-
-
-class BadEcuIdUptane(Uptane):
-
-    DIRECTOR_CLS = tuf.BadEcuIdTuf
-    IMAGE_REPO_CLS = tuf.SimpleTuf
-
-    def extra_tests(self):
-        meta = self.generate_description()
-        assert meta['steps'][0]['image_repo']['targets']['file.txt']['is_success'] is False
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
