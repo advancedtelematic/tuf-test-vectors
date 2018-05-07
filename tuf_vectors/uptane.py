@@ -59,6 +59,8 @@ class Uptane:
 
 class SimpleUptane(Uptane):
 
+    '''The most basic happy case for Uptane.'''
+
     class ImageStep(Step):
 
         TARGETS_KEYS_IDX = [1]
@@ -95,6 +97,405 @@ class SimpleUptane(Uptane):
 
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DirectorRootZeroThresholdUptane(Uptane):
+
+    '''The director has a threshold of zero for the root role.'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+        UPDATE_ERROR = 'IllegalThreshold::Root'
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'root_threshold': 0,
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DirectorTargetsZeroThresholdUptane(Uptane):
+
+    '''The director has a threshold of zero for the targets role.'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+        UPDATE_ERROR = 'IllegalThreshold::Root'
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_threshold': 0,
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class ImageRepoRootZeroThresholdUptane(Uptane):
+
+    '''The image repo has a threshold of zero for the root role.'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'IllegalThreshold::Root'
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+            'root_threshold': 0,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class ImageRepoTargetsZeroThresholdUptane(Uptane):
+
+    '''The image repo has a threshold of zero for the targets role.'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'IllegalThreshold::Targets'
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+            'targets_threshold': 0,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class ImageRepoSnapshotZeroThresholdUptane(Uptane):
+
+    '''The image repo has a threshold of zero for the snapshot role.'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'IllegalThreshold::Snapshot'
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+            'snapshot_threshold': 0,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class ImageRepoTimestampZeroThresholdUptane(Uptane):
+
+    '''The image repo has a threshold of zero for the timestamp role.'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'IllegalThreshold::Timestamp'
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+            'timestamp_threshold': 0,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+
+class DirectorRootExpiredUptane(Uptane):
+
+    '''The director has expired root metadata'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        UPDATE_ERROR = 'ExpiredMetadata::Root'
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'is_expired': True,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DirectorTargetsExpiredUptane(Uptane):
+
+    '''The director has expired root metadata'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        UPDATE_ERROR = 'ExpiredMetadata::Targets'
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'is_expired': True,
         }
 
     STEPS = [
