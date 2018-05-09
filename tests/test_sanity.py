@@ -24,23 +24,24 @@ def test_basic(cls):
 
 @pytest.mark.parametrize(
     "key_type,signature_scheme,signature_encoding,compact,cjson_strategy",
-    [(k, s, e, c, j) for (k, s) in (('ed25519', 'ed25519'),
-                                    ('rsa-2048', 'rsassa-pss-sha256'),
-                                    ('rsa-2048', 'rsassa-pss-sha512'),
-                                    ('rsa-4096', 'rsassa-pss-sha256'),
-                                    ('rsa-4096', 'rsassa-pss-sha512'),
-                                    ('rsa-8192', 'rsassa-pss-sha256'),
-                                    ('rsa-8192', 'rsassa-pss-sha512'))
-                  for e in ('hex', 'base64')
-                  for c in (True, False)
-                  for j in ('olpc', 'json-subset')])
+    [(k, s, e, c, j)
+     for (k, s) in (('ed25519', 'ed25519'),
+                    ('rsa-2048', 'rsassa-pss-sha256'),
+                    ('rsa-2048', 'rsassa-pss-sha512'),
+                    ('rsa-4096', 'rsassa-pss-sha256'),
+                    ('rsa-4096', 'rsassa-pss-sha512'),
+                    ('rsa-8192', 'rsassa-pss-sha256'),
+                    ('rsa-8192', 'rsassa-pss-sha512'))
+     for e in ('hex', 'base64')
+     for c in (True, False)
+     for j in ('olpc', 'json-subset')])
 def test_options(key_type, signature_scheme, signature_encoding, compact, cjson_strategy):
     with TemporaryDirectory(prefix='tuf-test-vectors') as tempdir:
-        sub = SimpleUptane(output_dir=tempdir,
-                           key_type=key_type,
-                           signature_scheme=signature_scheme,
-                           signature_encoding=signature_encoding,
-                           compact=compact,
-                           cjson_strategy=cjson_strategy,
-                           ecu_identifier='123',
-                           hardware_id='abc')
+        SimpleUptane(output_dir=tempdir,
+                     key_type=key_type,
+                     signature_scheme=signature_scheme,
+                     signature_encoding=signature_encoding,
+                     compact=compact,
+                     cjson_strategy=cjson_strategy,
+                     ecu_identifier='123',
+                     hardware_id='abc')

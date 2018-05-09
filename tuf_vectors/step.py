@@ -3,6 +3,9 @@
 from tuf_vectors import human_message
 from tuf_vectors.metadata import Root, Targets, Snapshot, Timestamp, Target
 
+DEFAULT_TARGET_NAME = 'file.txt'
+DEFAULT_TARGET_CONTENT = b'wat wat wat'
+
 
 class Step:
 
@@ -33,7 +36,7 @@ class Step:
     __TARGETS_DEFAULT = {
         'version': 1,
         'is_expired': False,
-        'targets': [Target('file.txt', b'wat wat wat')]
+        'targets': [Target(DEFAULT_TARGET_NAME, DEFAULT_TARGET_CONTENT)]
     }
     TARGETS_KWARGS = {}
 
@@ -105,19 +108,18 @@ class Step:
             meta['update']['err'] = self.UPDATE_ERROR
             meta['update']['err_msg'] = human_message(self.UPDATE_ERROR)
 
-        if self.uptane_role == 'image_repo':
-            targets = {}
-            for target in self.targets.targets:
-                target_error = self.TARGET_ERRORS.get(target.name, None)
-                if target_error is None:
-                    info = {'is_success': True}
-                else:
-                    info = {
-                        'is_success': False,
-                        'err': target_error,
-                        'err_msg': human_message(target_error),
-                    }
-                targets[target.name] = info
-            meta['targets'] = targets
+        targets = {}
+        for target in self.targets.targets:
+            target_error = self.TARGET_ERRORS.get(target.name, None)
+            if target_error is None:
+                info = {'is_success': True}
+            else:
+                info = {
+                    'is_success': False,
+                    'err': target_error,
+                    'err_msg': human_message(target_error),
+                }
+            targets[target.name] = info
+        meta['targets'] = targets
 
         return meta

@@ -27,11 +27,20 @@ class Target:
         self.name = name
         self.content = content
         self.do_write = do_write
+
+        bad_hash = False
+        if alteration is None:
+            pass
+        elif alteration == 'bad-hash':
+            bad_hash = True
+        else:
+            raise ValueError('Unknown alteration: {}'.format(alteration))
+
         self.meta = {
             'length': len(content),
             'hashes': {
-                'sha256': sha256(content, bad_hash=False),
-                'sha512': sha512(content, bad_hash=False),
+                'sha256': sha256(content, bad_hash=bad_hash),
+                'sha512': sha512(content, bad_hash=bad_hash),
             },
         }
 
@@ -174,7 +183,8 @@ class Root(Metadata):
             version: int,
             is_expired: bool,
             root_keys_idx: list,
-            targets_keys_idx: list,
+            root_sign_keys_idx: list=None,
+            targets_keys_idx: list=None,
             snapshot_keys_idx: list=None,
             timestamp_keys_idx: list=None,
             root_threshold: int=None,
@@ -184,6 +194,9 @@ class Root(Metadata):
             **kwargs) -> None:
         self.role_name = 'root'
         super().__init__(**kwargs)
+
+        if root_sign_keys_idx is None:
+            root_sign_keys_idx = root_keys_idx
 
         if root_threshold is None:
             root_threshold = len(root_keys_idx)
@@ -249,7 +262,7 @@ class Root(Metadata):
                 },
             }
 
-        sig_directives = [(self.get_key(i), False) for i in root_keys_idx]
+        sig_directives = [(self.get_key(i), False) for i in root_sign_keys_idx]
 
         self.value = {'signed': signed, 'signatures': self.sign(sig_directives, signed)}
 
