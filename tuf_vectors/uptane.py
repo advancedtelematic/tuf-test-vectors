@@ -745,10 +745,17 @@ class DirectorTargetHashMismatchUptane(Uptane):
             'targets_keys_idx': TARGETS_KEYS_IDX,
         }
 
+        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+            return [Target(name=DEFAULT_TARGET_NAME,
+                           content=DEFAULT_TARGET_CONTENT,
+                           hardware_id=hardware_id,
+                           ecu_identifier=ecu_identifier,
+                           alteration='bad-hash')]
+
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'is_expired': True,
-            'targets': [Target(DEFAULT_TARGET_NAME, DEFAULT_TARGET_CONTENT, alteration='bad-hash')],
+            'targets': __targets,
         }
 
     STEPS = [
@@ -777,9 +784,16 @@ class ImageRepoTargetHashMismatchUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
+        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+            return [Target(name=DEFAULT_TARGET_NAME,
+                           content=DEFAULT_TARGET_CONTENT,
+                           hardware_id=hardware_id,
+                           ecu_identifier=ecu_identifier,
+                           alteration='bad-hash')]
+
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
-            'targets': [Target(DEFAULT_TARGET_NAME, DEFAULT_TARGET_CONTENT, alteration='bad-hash')],
+            'targets': __targets,
         }
 
         SNAPSHOT_KWARGS = {

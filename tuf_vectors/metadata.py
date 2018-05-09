@@ -5,6 +5,7 @@ import binascii
 import ed25519
 import json
 import os
+import types
 
 from Crypto.Hash import SHA256, SHA512
 from Crypto.PublicKey import RSA
@@ -21,8 +22,10 @@ class Target:
             self,
             name: str,
             content: bytes,
+            hardware_id: str,
             do_write: bool=True,
             alteration: str=None,
+            ecu_identifier: str=None,
             ) -> None:
         self.name = name
         self.content = content
@@ -42,7 +45,18 @@ class Target:
                 'sha256': sha256(content, bad_hash=bad_hash),
                 'sha512': sha512(content, bad_hash=bad_hash),
             },
+            'custom': {
+                'hardwareId': hardware_id,
+            },
         }
+
+        if ecu_identifier is not None:
+            self.meta['custom']['ecuIdentifier'] = ecu_identifier
+            self.meta['custom']['ecuIdentifiers'] = {
+                ecu_identifier: {
+                    'hardwareId': hardware_id,
+                },
+            }
 
     def persist(self, output_dir: str) -> None:
         if self.do_write:
@@ -363,12 +377,17 @@ class Targets(Metadata):
             version: int,
             is_expired: bool,
             targets_keys_idx: list,
-            targets: list,
+            targets: types.FunctionType,
+            hardware_id: str,
             role_name: str='targets',
+            ecu_identifier: str=None,
             **kwargs) -> None:
+        # add these back in for Metadata
+        kwargs.update(hardware_id=hardware_id, ecu_identifier=ecu_identifier)
         super().__init__(**kwargs)
+
         self.role_name = role_name
-        self.targets = targets
+        self.targets = targets(hardware_id, ecu_identifier)
         self.__uptane_role = kwargs['uptane_role']
 
         signed = {
@@ -378,7 +397,7 @@ class Targets(Metadata):
             'targets': {},
         }
 
-        for target in targets:
+        for target in self.targets:
             signed['targets'][target.name] = target.meta
 
         sig_directives = [(self.get_key(i), False) for i in targets_keys_idx]

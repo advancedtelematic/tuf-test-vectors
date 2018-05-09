@@ -33,10 +33,16 @@ class Step:
     }
     SNAPSHOT_KWARGS = {}
 
+    def __default_targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        return [Target(name=DEFAULT_TARGET_NAME,
+                       content=DEFAULT_TARGET_CONTENT,
+                       hardware_id=hardware_id,
+                       ecu_identifier=ecu_identifier)]
+
     __TARGETS_DEFAULT = {
         'version': 1,
         'is_expired': False,
-        'targets': [Target(DEFAULT_TARGET_NAME, DEFAULT_TARGET_CONTENT)]
+        'targets': __default_targets
     }
     TARGETS_KWARGS = {}
 
@@ -61,6 +67,8 @@ class Step:
         targets_args = self.__TARGETS_DEFAULT.copy()
         targets_args.update(**self.TARGETS_KWARGS)
         targets_args.update(**kwargs)
+        if uptane_role == 'image_repo':
+            targets_args.pop('ecu_identifier', None)
         self.targets = Targets(**targets_args)
 
         if self.uptane_role == 'image_repo':
