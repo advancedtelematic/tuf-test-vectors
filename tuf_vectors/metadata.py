@@ -291,9 +291,13 @@ class Timestamp(Metadata):
             timestamp_version: int,
             is_expired: bool,
             snapshot_version: int,
+            timestamp_sign_keys_idx: list=None,
             **kwargs) -> None:
         super().__init__(**kwargs)
         self.role_name = 'timestamp'
+
+        if timestamp_sign_keys_idx is None:
+            timestamp_sign_keys_idx = timestamp_keys_idx
 
         if snapshot_version is None:
             snapshot_version = snapshot['signed']['version']
@@ -317,7 +321,7 @@ class Timestamp(Metadata):
         }
 
         sig_directives = [(self.get_key(i), i in timestamp_keys_bad_sign_idx)
-                          for i in timestamp_keys_idx]
+                          for i in timestamp_sign_keys_idx]
         self.value = {'signed': signed, 'signatures': self.sign(sig_directives, signed)}
 
 
@@ -330,9 +334,13 @@ class Snapshot(Metadata):
             snapshot_keys_idx: list,
             targets: dict,
             delegations: dict,
+            snapshot_sign_keys_idx: list=None,
             **kwargs) -> None:
         super().__init__(**kwargs)
         self.role_name = 'snapshot'
+
+        if snapshot_sign_keys_idx is None:
+            snapshot_sign_keys_idx = snapshot_keys_idx
 
         # TODO manipulate version
         targets_version = targets['signed']['version']
@@ -365,7 +373,7 @@ class Snapshot(Metadata):
                 'version': meta['signed']['version'],  # TODO manipulate version
              }
 
-        sig_directives = [(self.get_key(i), False) for i in snapshot_keys_idx]
+        sig_directives = [(self.get_key(i), False) for i in snapshot_sign_keys_idx]
 
         self.value = {'signed': signed, 'signatures': self.sign(sig_directives, signed)}
 
@@ -379,12 +387,16 @@ class Targets(Metadata):
             targets_keys_idx: list,
             targets: types.FunctionType,
             hardware_id: str,
+            targets_sign_keys_idx: list=None,
             role_name: str='targets',
             ecu_identifier: str=None,
             **kwargs) -> None:
         # add these back in for Metadata
         kwargs.update(hardware_id=hardware_id, ecu_identifier=ecu_identifier)
         super().__init__(**kwargs)
+
+        if targets_sign_keys_idx is None:
+            targets_sign_keys_idx = targets_keys_idx
 
         self.role_name = role_name
         self.targets = targets(hardware_id, ecu_identifier)
@@ -400,7 +412,7 @@ class Targets(Metadata):
         for target in self.targets:
             signed['targets'][target.name] = target.meta
 
-        sig_directives = [(self.get_key(i), False) for i in targets_keys_idx]
+        sig_directives = [(self.get_key(i), False) for i in targets_sign_keys_idx]
 
         self.value = {'signed': signed, 'signatures': self.sign(sig_directives, signed)}
 
