@@ -245,7 +245,7 @@ class Root(Metadata):
             signed['keys'][self.key_id(pub, bad_id=False)] = {
                 'keytype': short_key_type(self.key_type),
                 'keyval': {
-                    'pub': pub,
+                    'public': pub,
                 },
             }
 
