@@ -232,7 +232,7 @@ class Root(Metadata):
                 'keyids': [self.key_id(self.get_key(i)[1], bad_id=False)
                            for i in root_keys_idx],
                 'threshold': root_threshold,
-            },
+            }
             signed['roles']['timestamp'] = {
                 'keyids': [self.key_id(self.get_key(i)[1], bad_id=False)
                            for i in timestamp_keys_idx],
