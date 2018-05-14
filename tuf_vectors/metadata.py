@@ -205,6 +205,10 @@ class Root(Metadata):
             targets_threshold: int=None,
             snapshot_threshold: int=None,
             timestamp_threshold: int=None,
+            root_bad_key_ids: list=None,
+            targets_bad_key_ids: list=None,
+            snapshot_bad_key_ids: list=None,
+            timestamp_bad_key_ids: list=None,
             **kwargs) -> None:
         self.role_name = 'root'
         super().__init__(**kwargs)
@@ -254,7 +258,6 @@ class Root(Metadata):
         all_keys = root_keys_idx + targets_keys_idx
 
         if self.uptane_role == 'image_repo':
-            # TODO
             signed['roles']['snapshot'] = {
                 'keyids': [self.key_id(self.get_key(i)[1], bad_id=False)
                            for i in snapshot_keys_idx],
@@ -267,9 +270,15 @@ class Root(Metadata):
             }
             all_keys.extend(snapshot_keys_idx + timestamp_keys_idx)
 
+        bad_key_ids = ((root_bad_key_ids or []) +
+                       (targets_bad_key_ids or []) +
+                       (snapshot_bad_key_ids or []) +
+                       (timestamp_bad_key_ids or []))
+
         for key_idx in all_keys:
             _, pub = self.get_key(key_idx)
-            signed['keys'][self.key_id(pub, bad_id=False)] = {
+            bad_id = key_idx in bad_key_ids
+            signed['keys'][self.key_id(pub, bad_id=bad_id)] = {
                 'keytype': short_key_type(self.key_type),
                 'keyval': {
                     'public': pub,

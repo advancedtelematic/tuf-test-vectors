@@ -1718,3 +1718,299 @@ class ImageRepoTimestampUnsignedUptane(Uptane):
     STEPS = [
         (DirectorStep, ImageStep),
     ]
+
+
+class DirectorRootBadKeyIdsUptane(Uptane):
+
+    '''The director root metadata has bad key IDs for the root role'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        UPDATE_ERROR = 'BadKeyId'
+        ROOT_KEYS_IDX = [4]
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': ROOT_KEYS_IDX,
+            'root_bad_key_ids': ROOT_KEYS_IDX,
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DirectorTargetsBadKeyIdsUptane(Uptane):
+
+    '''The director root metadata has bad key IDs for the targets role'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        UPDATE_ERROR = 'BadKeyId'
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets_bad_key_ids': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class ImageRepoRootBadKeyIdsUptane(Uptane):
+
+    '''The image repo root metadata has bad key IDs for the root role'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'BadKeyId'
+        ROOT_KEYS_IDX = [0]
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': ROOT_KEYS_IDX,
+            'root_bad_key_ids': ROOT_KEYS_IDX,
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class ImageRepoTargetsBadKeyIdsUptane(Uptane):
+
+    '''The image repo root metadata has bad key IDs for the targets role'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'BadKeyId'
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets_bad_key_ids': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class ImageRepoSnapshotBadKeyIdsUptane(Uptane):
+
+    '''The image repo root metadata has bad key IDs for the snapshot role'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'BadKeyId'
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'snapshot_bad_key_ids': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class ImageRepoTimestampBadKeyIdsUptane(Uptane):
+
+    '''The image repo root metadata has bad key IDs for the timestamp role'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'BadKeyId'
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+            'timestamp_bad_key_ids': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
