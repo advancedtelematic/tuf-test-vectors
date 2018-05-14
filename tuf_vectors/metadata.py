@@ -32,15 +32,18 @@ class Target:
         self.do_write = do_write
 
         bad_hash = False
+        size_mod = 0
         if alteration is None:
             pass
         elif alteration == 'bad-hash':
             bad_hash = True
+        elif alteration == 'oversized':
+            size_mod = -1
         else:
             raise ValueError('Unknown alteration: {}'.format(alteration))
 
         self.meta = {
-            'length': len(content),
+            'length': len(content) + size_mod,
             'hashes': {
                 'sha256': sha256(content, bad_hash=bad_hash),
                 'sha512': sha512(content, bad_hash=bad_hash),
