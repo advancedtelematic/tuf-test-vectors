@@ -312,6 +312,7 @@ class Snapshot(Metadata):
         targets_json = self.jsonify(targets)
 
         signed = {
+            '_type': 'Snapshot',
             'version': version,
             'expires': '2017-01-01T00:00:00Z' if is_expired else '2038-01-19T03:14:06Z',
             'meta': {
