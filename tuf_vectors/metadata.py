@@ -28,7 +28,7 @@ class Target:
         self.content = content
         self.do_write = do_write
         self.meta = {
-            'size': len(content),
+            'length': len(content),
             'hashes': {
                 'sha256': sha256(content, bad_hash=False),
                 'sha512': sha512(content, bad_hash=False),
