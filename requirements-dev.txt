@@ -5,7 +5,7 @@
 #    pip-compile --output-file requirements-dev.txt requirements-dev.in requirements.in
 #
 asn1crypto==0.24.0        # via cryptography
-attrs==17.4.0             # via pytest
+attrs==18.1.0             # via pytest
 cffi==1.11.5              # via cryptography, pynacl
 click==6.7                # via flask
 colorama==0.3.9           # via securesystemslib
@@ -15,10 +15,10 @@ cryptography==2.2.2       # via securesystemslib
 ed25519==1.4
 enum34==1.1.6             # via cryptography, flake8
 flake8==3.5.0
-flask==0.12.2
+flask==1.0.2
 funcsigs==1.0.2           # via pytest
 idna==2.6                 # via cryptography
-ipaddress==1.0.19         # via cryptography
+ipaddress==1.0.22         # via cryptography
 itsdangerous==0.24        # via flask
 jinja2==2.10              # via flask
 markupsafe==1.0           # via jinja2
@@ -32,7 +32,7 @@ pycrypto==2.6.1
 pyflakes==1.6.0           # via flake8
 pynacl==1.2.1             # via securesystemslib
 pytest-cov==2.5.1
-pytest==3.5.0
-securesystemslib==0.10.11
+pytest==3.5.1
+securesystemslib==0.11.1
 six==1.11.0               # via cryptography, more-itertools, pynacl, pytest, securesystemslib
 werkzeug==0.14.1          # via flask

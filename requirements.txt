@@ -11,15 +11,15 @@ colorama==0.3.9           # via securesystemslib
 cryptography==2.2.2       # via securesystemslib
 ed25519==1.4
 enum34==1.1.6             # via cryptography
-flask==0.12.2
+flask==1.0.2
 idna==2.6                 # via cryptography
-ipaddress==1.0.19         # via cryptography
+ipaddress==1.0.22         # via cryptography
 itsdangerous==0.24        # via flask
 jinja2==2.10              # via flask
 markupsafe==1.0           # via jinja2
 pycparser==2.18           # via cffi
 pycrypto==2.6.1
 pynacl==1.2.1             # via securesystemslib
-securesystemslib==0.10.11
+securesystemslib==0.11.1
 six==1.11.0               # via cryptography, pynacl, securesystemslib
 werkzeug==0.14.1          # via flask
