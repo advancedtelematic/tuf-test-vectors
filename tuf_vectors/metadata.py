@@ -230,7 +230,7 @@ class Root(Metadata):
             # TODO
             signed['roles']['snapshot'] = {
                 'keyids': [self.key_id(self.get_key(i)[1], bad_id=False)
-                           for i in root_keys_idx],
+                           for i in snapshot_keys_idx],
                 'threshold': root_threshold,
             }
             signed['roles']['timestamp'] = {
