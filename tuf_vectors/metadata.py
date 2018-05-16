@@ -33,12 +33,21 @@ class Target:
 
         bad_hash = False
         size_mod = 0
+        bad_ecu_id = False
+        bad_hw_id = False
+
         if alteration is None:
             pass
         elif alteration == 'bad-hash':
             bad_hash = True
         elif alteration == 'oversized':
             size_mod = -1
+        elif alteration == 'bad-ecu-id':
+            if ecu_identifier is None:
+                raise ValueError('Tried to modify ECU ID with no ECU ID')
+            bad_ecu_id = True
+        elif alteration == 'bad-hw-id':
+            bad_hw_id = True
         else:
             raise ValueError('Unknown alteration: {}'.format(alteration))
 
@@ -54,10 +63,11 @@ class Target:
         }
 
         if ecu_identifier is not None:
+            ecu_identifier = ecu_identifier + ('-XXX' if bad_ecu_id else '')
             self.meta['custom']['ecuIdentifier'] = ecu_identifier
             self.meta['custom']['ecuIdentifiers'] = {
                 ecu_identifier: {
-                    'hardwareId': hardware_id,
+                    'hardwareId': hardware_id + ('-XXX' if bad_hw_id else ''),
                 },
             }
 
