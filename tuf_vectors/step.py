@@ -77,7 +77,7 @@ class Step:
                 args = self.__TARGETS_DEFAULT.copy()
                 args.update(**delegation_args)
                 args.update(**kwargs)
-                args['delegation'] = name
+                args['role_name'] = name
                 self.delegations[name] = Targets(**args)
 
             snapshot_args = self.__SNAPSHOT_DEFAULT.copy()

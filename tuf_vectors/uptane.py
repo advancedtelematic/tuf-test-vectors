@@ -4,7 +4,7 @@ import re
 
 from os import path
 
-from tuf_vectors.metadata import Target
+from tuf_vectors.metadata import Target, Delegation, Role
 from tuf_vectors.step import Step, DEFAULT_TARGET_NAME, DEFAULT_TARGET_CONTENT
 
 
@@ -2697,6 +2697,81 @@ class DirectorBadEcuIdUptane(Uptane):
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'targets': __targets,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class SimpleDelegationUptane(Uptane):
+
+    '''The most basic delegation happy case where targets points at one delegation'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            'foo': {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        def __delegations(**kwargs) -> list:
+            return [
+                Delegation(
+                    name='foo',
+                    paths=[DEFAULT_TARGET_NAME],
+                    roles=[
+                        Role(
+                            name='role1',
+                            keys_idx=[6],
+                            **kwargs
+                        ),
+                    ],
+                    agreement_threshold=1,
+                    terminating=False,
+                    **kwargs
+                ),
+            ]
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': __delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
         }
 
     STEPS = [
