@@ -44,7 +44,7 @@ def init_app(
     @app.route('/')
     @json_response
     def index():
-        return json.dumps(list(repos.keys()))
+        return json.dumps(sorted(list(repos.keys())))
 
     @app.route('/<string:repo>/reset', methods=['POST'])
     def reset(repo):

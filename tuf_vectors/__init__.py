@@ -93,6 +93,8 @@ def human_message(err: str) -> str:
             return 'The role {} had non-unique signatures.'.format(err_sub.lower())
         else:
             raise Exception('Unavailable err: {}'.format(err_base))
+    elif err == 'BadKeyId':
+        return 'A key has an incorrect associated key ID'
     elif err == 'BadHardwareId':
         return "The target had a hardware ID that did not match the client's configured " \
                "hardware id."

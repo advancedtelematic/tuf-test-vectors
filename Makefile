@@ -17,13 +17,13 @@ clean: ## Remove temp resources
 .PHONY: generate
 generate: init ## Generate Uptane test vectors
 	@. venv/bin/activate && \
-		./generator.py -o vectors/uptane --ecu-identifier 123 --hardware-id abc
+		./generator.py -o vectors --ecu-identifier 123 --hardware-id abc
 
 .PHONY: init
 init: venv ## Initialize the environment
 	@. venv/bin/activate && \
 		pip install -Ur requirements.txt && \
-		mkdir -p metadata/tuf metadata/uptane vectors/tuf vectors/uptane
+		mkdir -p vectors
 
 .PHONY: init-dev
 init-dev: venv ## Initialize the dev environment

@@ -5,6 +5,7 @@ import binascii
 import ed25519
 import json
 import os
+import types
 
 from Crypto.Hash import SHA256, SHA512
 from Crypto.PublicKey import RSA
@@ -21,19 +22,54 @@ class Target:
             self,
             name: str,
             content: bytes,
+            hardware_id: str,
             do_write: bool=True,
             alteration: str=None,
+            ecu_identifier: str=None,
             ) -> None:
         self.name = name
         self.content = content
         self.do_write = do_write
+
+        bad_hash = False
+        size_mod = 0
+        bad_ecu_id = False
+        bad_hw_id = False
+
+        if alteration is None:
+            pass
+        elif alteration == 'bad-hash':
+            bad_hash = True
+        elif alteration == 'oversized':
+            size_mod = -1
+        elif alteration == 'bad-ecu-id':
+            if ecu_identifier is None:
+                raise ValueError('Tried to modify ECU ID with no ECU ID')
+            bad_ecu_id = True
+        elif alteration == 'bad-hw-id':
+            bad_hw_id = True
+        else:
+            raise ValueError('Unknown alteration: {}'.format(alteration))
+
         self.meta = {
-            'length': len(content),
+            'length': len(content) + size_mod,
             'hashes': {
-                'sha256': sha256(content, bad_hash=False),
-                'sha512': sha512(content, bad_hash=False),
+                'sha256': sha256(content, bad_hash=bad_hash),
+                'sha512': sha512(content, bad_hash=bad_hash),
+            },
+            'custom': {
+                'hardwareId': hardware_id,
             },
         }
+
+        if ecu_identifier is not None:
+            ecu_identifier = ecu_identifier + ('-XXX' if bad_ecu_id else '')
+            self.meta['custom']['ecuIdentifier'] = ecu_identifier
+            self.meta['custom']['ecuIdentifiers'] = {
+                ecu_identifier: {
+                    'hardwareId': hardware_id + ('-XXX' if bad_hw_id else ''),
+                },
+            }
 
     def persist(self, output_dir: str) -> None:
         if self.do_write:
@@ -174,16 +210,24 @@ class Root(Metadata):
             version: int,
             is_expired: bool,
             root_keys_idx: list,
-            targets_keys_idx: list,
+            root_sign_keys_idx: list=None,
+            targets_keys_idx: list=None,
             snapshot_keys_idx: list=None,
             timestamp_keys_idx: list=None,
             root_threshold: int=None,
             targets_threshold: int=None,
             snapshot_threshold: int=None,
             timestamp_threshold: int=None,
+            root_bad_key_ids: list=None,
+            targets_bad_key_ids: list=None,
+            snapshot_bad_key_ids: list=None,
+            timestamp_bad_key_ids: list=None,
             **kwargs) -> None:
         self.role_name = 'root'
         super().__init__(**kwargs)
+
+        if root_sign_keys_idx is None:
+            root_sign_keys_idx = root_keys_idx
 
         if root_threshold is None:
             root_threshold = len(root_keys_idx)
@@ -227,7 +271,6 @@ class Root(Metadata):
         all_keys = root_keys_idx + targets_keys_idx
 
         if self.uptane_role == 'image_repo':
-            # TODO
             signed['roles']['snapshot'] = {
                 'keyids': [self.key_id(self.get_key(i)[1], bad_id=False)
                            for i in snapshot_keys_idx],
@@ -240,16 +283,22 @@ class Root(Metadata):
             }
             all_keys.extend(snapshot_keys_idx + timestamp_keys_idx)
 
+        bad_key_ids = ((root_bad_key_ids or []) +
+                       (targets_bad_key_ids or []) +
+                       (snapshot_bad_key_ids or []) +
+                       (timestamp_bad_key_ids or []))
+
         for key_idx in all_keys:
             _, pub = self.get_key(key_idx)
-            signed['keys'][self.key_id(pub, bad_id=False)] = {
+            bad_id = key_idx in bad_key_ids
+            signed['keys'][self.key_id(pub, bad_id=bad_id)] = {
                 'keytype': short_key_type(self.key_type),
                 'keyval': {
                     'public': pub,
                 },
             }
 
-        sig_directives = [(self.get_key(i), False) for i in root_keys_idx]
+        sig_directives = [(self.get_key(i), False) for i in root_sign_keys_idx]
 
         self.value = {'signed': signed, 'signatures': self.sign(sig_directives, signed)}
 
@@ -264,9 +313,13 @@ class Timestamp(Metadata):
             timestamp_version: int,
             is_expired: bool,
             snapshot_version: int,
+            timestamp_sign_keys_idx: list=None,
             **kwargs) -> None:
         super().__init__(**kwargs)
         self.role_name = 'timestamp'
+
+        if timestamp_sign_keys_idx is None:
+            timestamp_sign_keys_idx = timestamp_keys_idx
 
         if snapshot_version is None:
             snapshot_version = snapshot['signed']['version']
@@ -290,7 +343,7 @@ class Timestamp(Metadata):
         }
 
         sig_directives = [(self.get_key(i), i in timestamp_keys_bad_sign_idx)
-                          for i in timestamp_keys_idx]
+                          for i in timestamp_sign_keys_idx]
         self.value = {'signed': signed, 'signatures': self.sign(sig_directives, signed)}
 
 
@@ -303,9 +356,13 @@ class Snapshot(Metadata):
             snapshot_keys_idx: list,
             targets: dict,
             delegations: dict,
+            snapshot_sign_keys_idx: list=None,
             **kwargs) -> None:
         super().__init__(**kwargs)
         self.role_name = 'snapshot'
+
+        if snapshot_sign_keys_idx is None:
+            snapshot_sign_keys_idx = snapshot_keys_idx
 
         # TODO manipulate version
         targets_version = targets['signed']['version']
@@ -338,7 +395,7 @@ class Snapshot(Metadata):
                 'version': meta['signed']['version'],  # TODO manipulate version
              }
 
-        sig_directives = [(self.get_key(i), False) for i in snapshot_keys_idx]
+        sig_directives = [(self.get_key(i), False) for i in snapshot_sign_keys_idx]
 
         self.value = {'signed': signed, 'signatures': self.sign(sig_directives, signed)}
 
@@ -350,12 +407,21 @@ class Targets(Metadata):
             version: int,
             is_expired: bool,
             targets_keys_idx: list,
-            targets: list,
+            targets: types.FunctionType,
+            hardware_id: str,
+            targets_sign_keys_idx: list=None,
             role_name: str='targets',
+            ecu_identifier: str=None,
             **kwargs) -> None:
+        # add these back in for Metadata
+        kwargs.update(hardware_id=hardware_id, ecu_identifier=ecu_identifier)
         super().__init__(**kwargs)
+
+        if targets_sign_keys_idx is None:
+            targets_sign_keys_idx = targets_keys_idx
+
         self.role_name = role_name
-        self.targets = targets
+        self.targets = targets(hardware_id, ecu_identifier)
         self.__uptane_role = kwargs['uptane_role']
 
         signed = {
@@ -365,10 +431,10 @@ class Targets(Metadata):
             'targets': {},
         }
 
-        for target in targets:
+        for target in self.targets:
             signed['targets'][target.name] = target.meta
 
-        sig_directives = [(self.get_key(i), False) for i in targets_keys_idx]
+        sig_directives = [(self.get_key(i), False) for i in targets_sign_keys_idx]
 
         self.value = {'signed': signed, 'signatures': self.sign(sig_directives, signed)}
 
