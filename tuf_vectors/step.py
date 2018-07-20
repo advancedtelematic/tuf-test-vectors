@@ -325,6 +325,13 @@ class Step(Generator):
                 'hashes': {
                     'sha256': sha256(content, bad_hash=bad_hash),
                     'sha512': sha512(content, bad_hash=bad_hash),
+                },
+                'custom' : {
+                    'ecuIdentifiers' : {
+                        'test_primary_ecu_serial' : {
+                            'hardwareId' : 'test_primary_hardware_id',
+                        }
+                    }
                 }
             }
 
