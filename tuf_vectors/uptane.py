@@ -186,7 +186,7 @@ class DirectorTargetsZeroThresholdUptane(Uptane):
     class DirectorStep(Step):
 
         TARGETS_KEYS_IDX = [5]
-        UPDATE_ERROR = 'IllegalThreshold::Root'
+        UPDATE_ERROR = 'IllegalThreshold::Targets'
 
         ROOT_KWARGS = {
             'root_keys_idx': [4],
