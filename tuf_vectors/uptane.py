@@ -2013,12 +2013,17 @@ class ImageRepoTimestampBadKeyIdsUptane(Uptane):
         (DirectorStep, ImageStep),
     ]
 
+class TargetOversizedUptane(Uptane):
 
-class DirectorTargetOversizedUptane(Uptane):
-
-    '''The director's metadata states that a target is smaller than it actually is.'''
+    '''The both the director's and image repo's metadata states that a target is smaller than it
+       actually is.
+    '''
 
     class ImageStep(Step):
+
+        TARGET_ERRORS = {
+            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+        }
 
         TARGETS_KEYS_IDX = [1]
         SNAPSHOT_KEYS_IDX = [2]
@@ -2031,8 +2036,16 @@ class DirectorTargetOversizedUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
+        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+            return [Target(name=DEFAULT_TARGET_NAME,
+                           content=DEFAULT_TARGET_CONTENT,
+                           hardware_id=hardware_id,
+                           ecu_identifier=ecu_identifier,
+                           alteration='oversized')]
+
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': __targets,
         }
 
         SNAPSHOT_KWARGS = {
@@ -2066,135 +2079,6 @@ class DirectorTargetOversizedUptane(Uptane):
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'targets': __targets,
-        }
-
-    STEPS = [
-        (DirectorStep, ImageStep),
-    ]
-
-
-class ImageRepoTargetOversizedUptane(Uptane):
-
-    '''The image repo's metadata states that a target is smaller than it actually is.'''
-
-    class ImageStep(Step):
-
-        TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'OversizedTarget',
-        }
-
-        TARGETS_KEYS_IDX = [1]
-        SNAPSHOT_KEYS_IDX = [2]
-        TIMESTAMP_KEYS_IDX = [3]
-
-        ROOT_KWARGS = {
-            'root_keys_idx': [0],
-            'targets_keys_idx': TARGETS_KEYS_IDX,
-            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
-            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
-        }
-
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
-            return [Target(name=DEFAULT_TARGET_NAME,
-                           content=DEFAULT_TARGET_CONTENT,
-                           hardware_id=hardware_id,
-                           ecu_identifier=ecu_identifier,
-                           alteration='oversized')]
-
-        TARGETS_KWARGS = {
-            'targets_keys_idx': TARGETS_KEYS_IDX,
-        }
-
-        SNAPSHOT_KWARGS = {
-            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
-        }
-
-        TIMESTAMP_KWARGS = {
-            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
-        }
-
-    class DirectorStep(Step):
-
-        TARGETS_KEYS_IDX = [5]
-
-        ROOT_KWARGS = {
-            'root_keys_idx': [4],
-            'targets_keys_idx': TARGETS_KEYS_IDX,
-        }
-
-        TARGETS_KWARGS = {
-            'targets_keys_idx': TARGETS_KEYS_IDX,
-        }
-
-    STEPS = [
-        (DirectorStep, ImageStep),
-    ]
-
-
-class TargetOversizedUptane(Uptane):
-
-    '''The both the director's and image repo's metadata states that a target is smaller than it
-       actually is.
-    '''
-
-    class ImageStep(Step):
-
-        TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
-        }
-
-        TARGETS_KEYS_IDX = [1]
-        SNAPSHOT_KEYS_IDX = [2]
-        TIMESTAMP_KEYS_IDX = [3]
-
-        ROOT_KWARGS = {
-            'root_keys_idx': [0],
-            'targets_keys_idx': TARGETS_KEYS_IDX,
-            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
-            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
-        }
-
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
-            return [Target(name=DEFAULT_TARGET_NAME,
-                           content=DEFAULT_TARGET_CONTENT,
-                           hardware_id=hardware_id,
-                           ecu_identifier=ecu_identifier,
-                           alteration='oversized')]
-
-        TARGETS_KWARGS = {
-            'targets_keys_idx': TARGETS_KEYS_IDX,
-        }
-
-        SNAPSHOT_KWARGS = {
-            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
-        }
-
-        TIMESTAMP_KWARGS = {
-            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
-        }
-
-    class DirectorStep(Step):
-
-        TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'OversizedTarget',
-        }
-
-        TARGETS_KEYS_IDX = [5]
-
-        ROOT_KWARGS = {
-            'root_keys_idx': [4],
-            'targets_keys_idx': TARGETS_KEYS_IDX,
-        }
-
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
-            return [Target(name=DEFAULT_TARGET_NAME,
-                           content=DEFAULT_TARGET_CONTENT,
-                           hardware_id=hardware_id,
-                           ecu_identifier=ecu_identifier,
-                           alteration='oversized')]
-
-        TARGETS_KWARGS = {
-            'targets_keys_idx': TARGETS_KEYS_IDX,
         }
 
     STEPS = [
@@ -2689,66 +2573,6 @@ class DirectorBadHwIdUptane(Uptane):
     STEPS = [
         (DirectorStep, ImageStep),
     ]
-
-
-class ImageRepoBadHwIdUptane(Uptane):
-
-    '''The image repo targets metadata has a bad hardware ID'''
-
-    class ImageStep(Step):
-
-        TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'BadHardwareId',
-        }
-
-        TARGETS_KEYS_IDX = [1]
-        SNAPSHOT_KEYS_IDX = [2]
-        TIMESTAMP_KEYS_IDX = [3]
-
-        ROOT_KWARGS = {
-            'root_keys_idx': [0],
-            'targets_keys_idx': TARGETS_KEYS_IDX,
-            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
-            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
-        }
-
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
-            return [Target(name=DEFAULT_TARGET_NAME,
-                           content=DEFAULT_TARGET_CONTENT,
-                           hardware_id=hardware_id,
-                           ecu_identifier=ecu_identifier,
-                           alteration='bad-hw-id')]
-
-        TARGETS_KWARGS = {
-            'targets_keys_idx': TARGETS_KEYS_IDX,
-            'targets': __targets,
-        }
-
-        SNAPSHOT_KWARGS = {
-            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
-        }
-
-        TIMESTAMP_KWARGS = {
-            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
-        }
-
-    class DirectorStep(Step):
-
-        TARGETS_KEYS_IDX = [5]
-
-        ROOT_KWARGS = {
-            'root_keys_idx': [4],
-            'targets_keys_idx': TARGETS_KEYS_IDX,
-        }
-
-        TARGETS_KWARGS = {
-            'targets_keys_idx': TARGETS_KEYS_IDX,
-        }
-
-    STEPS = [
-        (DirectorStep, ImageStep),
-    ]
-
 
 class BadHwIdUptane(Uptane):
 

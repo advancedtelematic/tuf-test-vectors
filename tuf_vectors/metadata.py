@@ -274,7 +274,7 @@ class Root(Metadata):
             signed['roles']['snapshot'] = {
                 'keyids': [self.key_id(self.get_key(i)[1], bad_id=False)
                            for i in snapshot_keys_idx],
-                'threshold': root_threshold,
+                'threshold': snapshot_threshold,
             }
             signed['roles']['timestamp'] = {
                 'keyids': [self.key_id(self.get_key(i)[1], bad_id=False)
