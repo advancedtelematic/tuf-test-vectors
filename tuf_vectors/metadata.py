@@ -324,7 +324,7 @@ class Timestamp(Metadata):
         if snapshot_version is None:
             snapshot_version = snapshot['signed']['version']
 
-        snapshot_json = self.jsonify(snapshot)
+        snapshot_json = self.cjson(snapshot)
 
         signed = {
             '_type': 'Timestamp',
@@ -333,7 +333,7 @@ class Timestamp(Metadata):
             'meta': {
                 'snapshot.json': {
                     'version': snapshot_version,
-                    'length': len(snapshot_json),
+                    'length': len(self.jsonify(snapshot)), # Server returns snapshot.json with self.jsonify
                     'hashes': {
                         'sha256': sha256(snapshot_json, bad_hash=False),
                         'sha512': sha512(snapshot_json, bad_hash=False),
@@ -366,7 +366,7 @@ class Snapshot(Metadata):
 
         # TODO manipulate version
         targets_version = targets['signed']['version']
-        targets_json = self.jsonify(targets)
+        targets_json = self.cjson(targets)
 
         signed = {
             '_type': 'Snapshot',
@@ -378,7 +378,7 @@ class Snapshot(Metadata):
                         'sha256': sha256(targets_json, bad_hash=False),
                         'sha512': sha512(targets_json, bad_hash=False),
                     },
-                    'length': len(targets_json),
+                    'length': len(self.jsonify(targets)), # Server returns targets.json with self.jsonify
                     'version': targets_version,
                 },
             },
