@@ -104,6 +104,7 @@ def init_app(
             return abort(404)
 
     @app.route('/<string:repo>/<string:uptane>/<string:metadata>.json')
+    @app.route('/<string:repo>/<string:uptane>/delegations/<string:metadata>.json')
     @json_response
     def meta(repo, uptane, metadata):
         current = counter.get(repo)

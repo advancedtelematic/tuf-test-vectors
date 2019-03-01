@@ -57,30 +57,34 @@ class Delegation(Helper):
 
     def __init__(
             self,
-            name: str,
-            paths: list,
-            roles: list,
-            agreement_threshold: int=None,
-            terminating: bool=False,
+            delegations_keys_idx: list=None,
+            role: types.FunctionType=None,
             **kwargs) -> None:
         super().__init__(**kwargs)
         self.value = {
-            'name': name,
-            'paths': paths,
-            'roles': [role.value for role in roles],
-            'agreement_threshold': agreement_threshold,
-            'terminating': terminating,
+            'keys': delegations_keys_idx,
+            'role': role,
         }
 
 
 class Role(Helper):
+    # Delegated role as specified in Targets metadata.
 
-    def __init__(self, name: str, keys_idx: list, threshold: int=None, **kwargs) -> None:
+    def __init__(
+            self,
+            keys_idx: list,
+            name: str,
+            paths: list,
+            terminating: bool=False,
+            threshold: int=None,
+            **kwargs) -> None:
         super().__init__(**kwargs)
         self.name = name
         self.value = {
-            'name': name,
             'keyids': [self.key_id(self.get_key(i)[1], bad_id=False) for i in keys_idx],
+            'name': name,
+            'paths': paths,
+            'terminating': terminating,
             'threshold': threshold if threshold is not None else len(keys_idx),
         }
 
@@ -159,6 +163,7 @@ class Metadata(Helper):
             uptane_role: str,
             ecu_identifier: str,
             hardware_id: str,
+            is_delegation: bool=False,
             **kwargs
             ) -> None:
         super().__init__(**kwargs)
@@ -174,6 +179,7 @@ class Metadata(Helper):
         self.uptane_role = uptane_role
         self.ecu_identifier = ecu_identifier
         self.hardware_id = hardware_id
+        self.is_delegation = is_delegation
 
     def jsonify(self, jsn) -> str:
         kwargs = {'sort_keys': True, }
@@ -233,7 +239,10 @@ class Metadata(Helper):
             raise ValueError('Invalid signature encoding: {}'.format(self.signature_encoding))
 
     def persist(self) -> None:
-        full_path = path.join(self.output_dir, self.uptane_role, self.role_name + '.json')
+        if self.is_delegation:
+            full_path = path.join(self.output_dir, self.uptane_role, 'delegations', self.role_name + '.json')
+        else:
+            full_path = path.join(self.output_dir, self.uptane_role, self.role_name + '.json')
         os.makedirs(path.dirname(full_path), exist_ok=True)
         with open(full_path, 'w') as f:
             f.write(self.jsonify(self.value))
@@ -260,7 +269,7 @@ class Root(Metadata):
             timestamp_bad_key_ids: list=None,
             **kwargs) -> None:
         self.role_name = 'root'
-        super().__init__(**kwargs)
+        super().__init__(is_delegation=False, **kwargs)
 
         if root_sign_keys_idx is None:
             root_sign_keys_idx = root_keys_idx
@@ -351,7 +360,7 @@ class Timestamp(Metadata):
             snapshot_version: int,
             timestamp_sign_keys_idx: list=None,
             **kwargs) -> None:
-        super().__init__(**kwargs)
+        super().__init__(is_delegation=False, **kwargs)
         self.role_name = 'timestamp'
 
         if timestamp_sign_keys_idx is None:
@@ -394,7 +403,7 @@ class Snapshot(Metadata):
             delegations: dict,  # role_name -> contents_dict
             snapshot_sign_keys_idx: list=None,
             **kwargs) -> None:
-        super().__init__(**kwargs)
+        super().__init__(is_delegation=False, **kwargs)
         self.role_name = 'snapshot'
 
         if snapshot_sign_keys_idx is None:
@@ -448,11 +457,11 @@ class Targets(Metadata):
             targets_sign_keys_idx: list=None,
             role_name: str='targets',
             ecu_identifier: str=None,
-            delegations_keys_idx: list=None,
             delegations: types.FunctionType=None,  # -> list
+            is_delegation: bool=False,
             **kwargs) -> None:
         # add these back in for Metadata
-        kwargs.update(hardware_id=hardware_id, ecu_identifier=ecu_identifier)
+        kwargs.update(hardware_id=hardware_id, ecu_identifier=ecu_identifier, is_delegation=is_delegation)
         super().__init__(**kwargs)
 
         if delegations is not None:
@@ -478,19 +487,20 @@ class Targets(Metadata):
             signed['targets'][target.name] = target.meta
 
         if delegations:
-            signed['delegations'] = []
-            signed['keys'] = {} 
+            signed['delegations'] = {}
+            signed['delegations']['keys'] = {}
+            signed['delegations']['roles'] = []
             for delegation in delegations:
-                signed['delegations'].append(delegation.value)
+                signed['delegations']['roles'].append(delegation.value['role'].value)
 
-            for key_idx in delegations_keys_idx:
-                _, pub = self.get_key(key_idx)
-                signed['keys'][self.key_id(pub, bad_id=False)] = {
-                    'keytype': short_key_type(self.key_type),
-                    'keyval': {
-                        'public': pub,
-                    },
-                }
+                for key_idx in delegation.value['keys']:
+                    _, pub = self.get_key(key_idx)
+                    signed['delegations']['keys'][self.key_id(pub, bad_id=False)] = {
+                        'keytype': short_key_type(self.key_type),
+                        'keyval': {
+                            'public': pub,
+                        },
+                    }
 
         sig_directives = [(self.get_key(i), False) for i in targets_sign_keys_idx]
 

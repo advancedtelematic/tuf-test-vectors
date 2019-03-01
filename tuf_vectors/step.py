@@ -78,6 +78,7 @@ class Step:
                 args.update(**delegation_args)
                 args.update(**kwargs)
                 args['role_name'] = name
+                args['is_delegation'] = True
                 self.delegations[name] = Targets(**args)
 
             snapshot_args = self.__SNAPSHOT_DEFAULT.copy()

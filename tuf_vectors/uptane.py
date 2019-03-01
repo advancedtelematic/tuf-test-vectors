@@ -2731,17 +2731,14 @@ class SimpleDelegationUptane(Uptane):
         def __delegations(**kwargs) -> list:
             return [
                 Delegation(
-                    name='foo',
-                    paths=[DEFAULT_TARGET_NAME],
-                    roles=[
-                        Role(
-                            name='role1',
-                            keys_idx=[6],
-                            **kwargs
-                        ),
-                    ],
-                    agreement_threshold=1,
-                    terminating=False,
+                    role=Role(
+                        keys_idx=[6],
+                        name='foo',
+                        paths=[DEFAULT_TARGET_NAME],
+                        terminating=False,
+                        threshold=1,
+                        **kwargs
+                    ),
                     **kwargs
                 ),
             ]
