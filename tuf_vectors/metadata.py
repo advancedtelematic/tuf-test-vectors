@@ -430,8 +430,8 @@ class Snapshot(Metadata):
         }
 
         for (name, meta) in delegations.items():
-            delegation_json = self.jsonify(meta.value)
-            signed['meta'][name] = {
+            delegation_json = self.cjson(meta.value)
+            signed['meta'][name + '.json'] = {
                 'hashes': {
                     'sha256': sha256(delegation_json, bad_hash=False),
                     'sha512': sha512(delegation_json, bad_hash=False),
