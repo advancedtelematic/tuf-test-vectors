@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import fnmatch
+
 from flask import Flask, abort, make_response
 from functools import wraps
 from tuf_vectors import subclasses
@@ -146,9 +148,20 @@ def init_app(
             app.logger.warn(e)
             abort(400)
 
+        # Check top-level targets
         for target in repo.targets.targets:
             if target.name == content_path:
                 return target.content
+
+        # Check first-order delegations.
+        # TODO: does not work for nested delegations yet.
+        for delegation in repo.targets.value['signed']['delegations']['roles']:
+            for path in delegation['paths']:
+                if fnmatch.fnmatch(content_path, path):
+                    role_name = delegation['name']
+                    for target in repo.delegations[role_name].targets:
+                        if target.name == content_path:
+                            return target.content
 
         abort(404)
 
