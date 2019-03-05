@@ -64,8 +64,7 @@ def human_message(err: str) -> str:
         return "The target's calculated hash did not match the hash in the metadata."
     elif err == 'OversizedTarget':
         return "The target's size was greater than the size in the metadata."
-    elif err == 'IllegalRsaKeySize':
-        return 'The RSA key had an illegal size.'
+    # Not used at present:
     elif err == 'UnavailableTarget':
         return 'The target either does not exist or was not in the chain of trusted metadata.'
     elif '::' in err:
