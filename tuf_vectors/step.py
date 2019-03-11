@@ -49,6 +49,8 @@ class Step:
     TARGET_ERRORS = {}
 
     # delegation name -> kwargs
+    # This is for the delegation's metadata provided to a Targets object's
+    # constructor.
     DELEGATIONS = {}
 
     def __init__(self, **kwargs) -> None:

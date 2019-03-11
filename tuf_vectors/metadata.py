@@ -54,15 +54,19 @@ class Helper:
 
 
 class Delegation(Helper):
+    # Delegatation metadata as specified in the delegation's parent Targets
+    # object.
 
     def __init__(
             self,
-            delegations_keys_idx: list=None,
-            role: types.FunctionType=None,
+            keys_idx: list=None,
+            bad_key_ids: list=None,
+            role: list=None,
             **kwargs) -> None:
         super().__init__(**kwargs)
         self.value = {
-            'keys': delegations_keys_idx,
+            'keys': keys_idx,
+            'bad_key_ids': bad_key_ids,
             'role': role,
         }
 
@@ -493,14 +497,16 @@ class Targets(Metadata):
             for delegation in delegations:
                 signed['delegations']['roles'].append(delegation.value['role'].value)
 
-                for key_idx in delegation.value['keys']:
-                    _, pub = self.get_key(key_idx)
-                    signed['delegations']['keys'][self.key_id(pub, bad_id=False)] = {
-                        'keytype': short_key_type(self.key_type),
-                        'keyval': {
-                            'public': pub,
-                        },
-                    }
+                if delegation.value['keys']:
+                    for key_idx in delegation.value['keys']:
+                        _, pub = self.get_key(key_idx)
+                        bad_id = delegation.value['bad_key_ids'] and key_idx in delegation.value['bad_key_ids']
+                        signed['delegations']['keys'][self.key_id(pub, bad_id=bad_id)] = {
+                            'keytype': short_key_type(self.key_type),
+                            'keyval': {
+                                'public': pub,
+                            },
+                        }
 
         sig_directives = [(self.get_key(i), False) for i in targets_sign_keys_idx]
 

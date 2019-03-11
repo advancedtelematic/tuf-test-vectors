@@ -2731,6 +2731,7 @@ class DelegationSimpleUptane(Uptane):
         def __delegations(**kwargs) -> list:
             return [
                 Delegation(
+                    keys_idx=[6],
                     role=Role(
                         keys_idx=[6],
                         name='foo',
@@ -2746,7 +2747,6 @@ class DelegationSimpleUptane(Uptane):
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'targets': lambda ecu_id, hw_id: [],
-            'delegations_keys_idx': DELEGATION_KEYS_IDX,
             'delegations': __delegations,
         }
 
@@ -2803,6 +2803,7 @@ class DelegationPathMismatchUptane(Uptane):
         def __delegations(**kwargs) -> list:
             return [
                 Delegation(
+                    keys_idx=[6],
                     role=Role(
                         keys_idx=[6],
                         name='foo',
@@ -2818,7 +2819,6 @@ class DelegationPathMismatchUptane(Uptane):
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'targets': lambda ecu_id, hw_id: [],
-            'delegations_keys_idx': DELEGATION_KEYS_IDX,
             'delegations': __delegations,
         }
 
@@ -2850,3 +2850,154 @@ class DelegationPathMismatchUptane(Uptane):
     STEPS = [
         (DirectorStep, ImageStep),
     ]
+
+
+class DelegationKeyMissingUptane(Uptane):
+
+    '''Simple delegation but delegation's key is missing'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'BadKeyId'
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            'foo': {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        def __delegations(**kwargs) -> list:
+            return [
+                Delegation(
+                    # Note that keys_idx is empty!
+                    role=Role(
+                        keys_idx=[6],
+                        name='foo',
+                        paths=[DEFAULT_TARGET_NAME],
+                        terminating=False,
+                        threshold=1,
+                        **kwargs
+                    ),
+                    **kwargs
+                ),
+            ]
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations': __delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationBadKeyIdsUptane(Uptane):
+
+    '''The most basic delegation happy case where targets points at one delegation'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'BadKeyId'
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            'foo': {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        def __delegations(**kwargs) -> list:
+            return [
+                Delegation(
+                    keys_idx=[6],
+                    bad_key_ids=[6],
+                    role=Role(
+                        keys_idx=[6],
+                        name='foo',
+                        paths=[DEFAULT_TARGET_NAME],
+                        terminating=False,
+                        threshold=1,
+                        **kwargs
+                    ),
+                    **kwargs
+                ),
+            ]
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations': __delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
