@@ -705,7 +705,7 @@ class ImageRepoTimestampExpiredUptane(Uptane):
 
 class DirectorTargetHashMismatchUptane(Uptane):
 
-    '''The director has lists a target with bad hashes'''
+    '''The director has a target with bad hashes'''
 
     class ImageStep(Step):
 
@@ -764,7 +764,7 @@ class DirectorTargetHashMismatchUptane(Uptane):
 
 class ImageRepoTargetHashMismatchUptane(Uptane):
 
-    '''The image repo has lists a target with bad hashes'''
+    '''The image repo has a target with bad hashes'''
 
     class ImageStep(Step):
 
@@ -3060,6 +3060,92 @@ class DelegationEmptyUptane(Uptane):
 
         # Should perhaps be a failure in the images repo, since that is where
         # the target is missing, but that doesn't work.
+        TARGET_ERRORS = {
+            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+        }
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationHashMismatchUptane(Uptane):
+
+    '''The delegation has a target with bad hashes'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+            return [Target(name=DEFAULT_TARGET_NAME,
+                           content=DEFAULT_TARGET_CONTENT,
+                           hardware_id=hardware_id,
+                           ecu_identifier=ecu_identifier,
+                           alteration='bad-hash')]
+
+        DELEGATIONS = {
+            'foo': {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'targets': __targets,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        def __delegations(**kwargs) -> list:
+            return [
+                Delegation(
+                    keys_idx=[6],
+                    role=Role(
+                        keys_idx=[6],
+                        name='foo',
+                        paths=[DEFAULT_TARGET_NAME],
+                        terminating=False,
+                        threshold=1,
+                        **kwargs
+                    ),
+                    **kwargs
+                ),
+            ]
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations': __delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        # Should be a failure in the images repo, since that is where the
+        # target is missing, but that doesn't work.
         TARGET_ERRORS = {
             DEFAULT_TARGET_NAME: 'TargetHashMismatch',
         }
