@@ -2778,7 +2778,7 @@ class DelegationSimpleUptane(Uptane):
 
 class DelegationPathMismatchUptane(Uptane):
 
-    '''Simple delegation but target name does not match path'''
+    '''The target name does not match the delegated role's path'''
 
     class ImageStep(Step):
 
@@ -2854,7 +2854,7 @@ class DelegationPathMismatchUptane(Uptane):
 
 class DelegationKeyMissingUptane(Uptane):
 
-    '''Simple delegation but delegation's key is missing'''
+    '''The top-level targets metadata is missing a key ID for a delegated role'''
 
     class ImageStep(Step):
 
@@ -2928,7 +2928,7 @@ class DelegationKeyMissingUptane(Uptane):
 
 class DelegationBadKeyIdsUptane(Uptane):
 
-    '''The most basic delegation happy case where targets points at one delegation'''
+    '''The top-level targets metadata has bad key IDs for a delegated role'''
 
     class ImageStep(Step):
 
@@ -2984,6 +2984,85 @@ class DelegationBadKeyIdsUptane(Uptane):
         }
 
     class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationEmptyUptane(Uptane):
+
+    '''The target is not present in the delegated role'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            'foo': {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'targets': lambda ecu_id, hw_id: [],
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        def __delegations(**kwargs) -> list:
+            return [
+                Delegation(
+                    keys_idx=[6],
+                    role=Role(
+                        keys_idx=[6],
+                        name='foo',
+                        paths=[DEFAULT_TARGET_NAME],
+                        terminating=False,
+                        threshold=1,
+                        **kwargs
+                    ),
+                    **kwargs
+                ),
+            ]
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations': __delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        # Should perhaps be a failure in the images repo, since that is where
+        # the target is missing, but that doesn't work.
+        TARGET_ERRORS = {
+            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+        }
 
         TARGETS_KEYS_IDX = [5]
 
