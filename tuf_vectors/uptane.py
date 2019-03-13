@@ -5,7 +5,7 @@ import re
 from os import path
 
 from tuf_vectors.metadata import Target, Delegation, Role
-from tuf_vectors.step import Step, DEFAULT_TARGET_NAME, DEFAULT_TARGET_CONTENT
+from tuf_vectors.step import Step, DEFAULT_TARGET_NAME, DEFAULT_TARGET_CONTENT, DEFAULT_DELEGATION_NAME
 
 
 class Uptane:
@@ -2716,7 +2716,7 @@ class DelegationSimpleUptane(Uptane):
         DELEGATION_KEYS_IDX = [6]
 
         DELEGATIONS = {
-            'foo': {
+            DEFAULT_DELEGATION_NAME: {
                 'targets_keys_idx': DELEGATION_KEYS_IDX,
             },
         }
@@ -2734,7 +2734,7 @@ class DelegationSimpleUptane(Uptane):
                     keys_idx=[6],
                     role=Role(
                         keys_idx=[6],
-                        name='foo',
+                        name=DEFAULT_DELEGATION_NAME,
                         paths=[DEFAULT_TARGET_NAME],
                         terminating=False,
                         threshold=1,
@@ -2788,7 +2788,7 @@ class DelegationPathMismatchUptane(Uptane):
         DELEGATION_KEYS_IDX = [6]
 
         DELEGATIONS = {
-            'foo': {
+            DEFAULT_DELEGATION_NAME: {
                 'targets_keys_idx': DELEGATION_KEYS_IDX,
             },
         }
@@ -2806,7 +2806,7 @@ class DelegationPathMismatchUptane(Uptane):
                     keys_idx=[6],
                     role=Role(
                         keys_idx=[6],
-                        name='foo',
+                        name=DEFAULT_DELEGATION_NAME,
                         paths=['does-not-match'],
                         terminating=False,
                         threshold=1,
@@ -2866,7 +2866,7 @@ class DelegationKeyMissingUptane(Uptane):
         DELEGATION_KEYS_IDX = [6]
 
         DELEGATIONS = {
-            'foo': {
+            DEFAULT_DELEGATION_NAME: {
                 'targets_keys_idx': DELEGATION_KEYS_IDX,
             },
         }
@@ -2884,7 +2884,7 @@ class DelegationKeyMissingUptane(Uptane):
                     # Note that keys_idx is empty!
                     role=Role(
                         keys_idx=[6],
-                        name='foo',
+                        name=DEFAULT_DELEGATION_NAME,
                         paths=[DEFAULT_TARGET_NAME],
                         terminating=False,
                         threshold=1,
@@ -2940,7 +2940,7 @@ class DelegationBadKeyIdsUptane(Uptane):
         DELEGATION_KEYS_IDX = [6]
 
         DELEGATIONS = {
-            'foo': {
+            DEFAULT_DELEGATION_NAME: {
                 'targets_keys_idx': DELEGATION_KEYS_IDX,
             },
         }
@@ -2959,7 +2959,7 @@ class DelegationBadKeyIdsUptane(Uptane):
                     bad_key_ids=[6],
                     role=Role(
                         keys_idx=[6],
-                        name='foo',
+                        name=DEFAULT_DELEGATION_NAME,
                         paths=[DEFAULT_TARGET_NAME],
                         terminating=False,
                         threshold=1,
@@ -3013,7 +3013,7 @@ class DelegationEmptyUptane(Uptane):
         DELEGATION_KEYS_IDX = [6]
 
         DELEGATIONS = {
-            'foo': {
+            DEFAULT_DELEGATION_NAME: {
                 'targets_keys_idx': DELEGATION_KEYS_IDX,
                 'targets': lambda ecu_id, hw_id: [],
             },
@@ -3032,7 +3032,7 @@ class DelegationEmptyUptane(Uptane):
                     keys_idx=[6],
                     role=Role(
                         keys_idx=[6],
-                        name='foo',
+                        name=DEFAULT_DELEGATION_NAME,
                         paths=[DEFAULT_TARGET_NAME],
                         terminating=False,
                         threshold=1,
@@ -3099,7 +3099,7 @@ class DelegationHashMismatchUptane(Uptane):
                            alteration='bad-hash')]
 
         DELEGATIONS = {
-            'foo': {
+            DEFAULT_DELEGATION_NAME: {
                 'targets_keys_idx': DELEGATION_KEYS_IDX,
                 'targets': __targets,
             },
@@ -3118,7 +3118,7 @@ class DelegationHashMismatchUptane(Uptane):
                     keys_idx=[6],
                     role=Role(
                         keys_idx=[6],
-                        name='foo',
+                        name=DEFAULT_DELEGATION_NAME,
                         paths=[DEFAULT_TARGET_NAME],
                         terminating=False,
                         threshold=1,

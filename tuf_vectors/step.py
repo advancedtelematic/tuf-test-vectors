@@ -5,6 +5,7 @@ from tuf_vectors.metadata import Root, Targets, Snapshot, Timestamp, Target
 
 DEFAULT_TARGET_NAME = 'file.txt'
 DEFAULT_TARGET_CONTENT = b'wat wat wat'
+DEFAULT_DELEGATION_NAME = 'foo'
 
 
 class Step:
