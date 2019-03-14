@@ -2728,26 +2728,11 @@ class DelegationSimpleUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __delegations(**kwargs) -> list:
-            return [
-                Delegation(
-                    keys_idx=[6],
-                    role=Role(
-                        keys_idx=[6],
-                        name=DEFAULT_DELEGATION_NAME,
-                        paths=[DEFAULT_TARGET_NAME],
-                        terminating=False,
-                        threshold=1,
-                        **kwargs
-                    ),
-                    **kwargs
-                ),
-            ]
-
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'targets': lambda ecu_id, hw_id: [],
-            'delegations': __delegations,
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
         }
 
         SNAPSHOT_KWARGS = {
@@ -2800,12 +2785,12 @@ class DelegationPathMismatchUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __delegations(**kwargs) -> list:
+        def __delegations(delegations_keys_idx: list=None, **kwargs) -> list:
             return [
                 Delegation(
-                    keys_idx=[6],
+                    keys_idx=delegations_keys_idx,
                     role=Role(
-                        keys_idx=[6],
+                        keys_idx=delegations_keys_idx,
                         name=DEFAULT_DELEGATION_NAME,
                         paths=['does-not-match'],
                         terminating=False,
@@ -2819,6 +2804,7 @@ class DelegationPathMismatchUptane(Uptane):
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
             'delegations': __delegations,
         }
 
@@ -2878,12 +2864,12 @@ class DelegationKeyMissingUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __delegations(**kwargs) -> list:
+        def __delegations(delegations_keys_idx: list=None, **kwargs) -> list:
             return [
                 Delegation(
                     # Note that keys_idx is empty!
                     role=Role(
-                        keys_idx=[6],
+                        keys_idx=delegations_keys_idx,
                         name=DEFAULT_DELEGATION_NAME,
                         paths=[DEFAULT_TARGET_NAME],
                         terminating=False,
@@ -2897,6 +2883,7 @@ class DelegationKeyMissingUptane(Uptane):
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
             'delegations': __delegations,
         }
 
@@ -2952,27 +2939,12 @@ class DelegationBadKeyIdsUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __delegations(**kwargs) -> list:
-            return [
-                Delegation(
-                    keys_idx=[6],
-                    bad_key_ids=[6],
-                    role=Role(
-                        keys_idx=[6],
-                        name=DEFAULT_DELEGATION_NAME,
-                        paths=[DEFAULT_TARGET_NAME],
-                        terminating=False,
-                        threshold=1,
-                        **kwargs
-                    ),
-                    **kwargs
-                ),
-            ]
-
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'targets': lambda ecu_id, hw_id: [],
-            'delegations': __delegations,
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations_bad_key_ids': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
         }
 
         SNAPSHOT_KWARGS = {
@@ -3026,26 +2998,11 @@ class DelegationEmptyUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __delegations(**kwargs) -> list:
-            return [
-                Delegation(
-                    keys_idx=[6],
-                    role=Role(
-                        keys_idx=[6],
-                        name=DEFAULT_DELEGATION_NAME,
-                        paths=[DEFAULT_TARGET_NAME],
-                        terminating=False,
-                        threshold=1,
-                        **kwargs
-                    ),
-                    **kwargs
-                ),
-            ]
-
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'targets': lambda ecu_id, hw_id: [],
-            'delegations': __delegations,
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
         }
 
         SNAPSHOT_KWARGS = {
@@ -3112,26 +3069,11 @@ class DelegationHashMismatchUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __delegations(**kwargs) -> list:
-            return [
-                Delegation(
-                    keys_idx=[6],
-                    role=Role(
-                        keys_idx=[6],
-                        name=DEFAULT_DELEGATION_NAME,
-                        paths=[DEFAULT_TARGET_NAME],
-                        terminating=False,
-                        threshold=1,
-                        **kwargs
-                    ),
-                    **kwargs
-                ),
-            ]
-
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'targets': lambda ecu_id, hw_id: [],
-            'delegations': __delegations,
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
         }
 
         SNAPSHOT_KWARGS = {

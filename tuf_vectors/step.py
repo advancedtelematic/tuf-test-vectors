@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from tuf_vectors import human_message
-from tuf_vectors.metadata import Root, Targets, Snapshot, Timestamp, Target
+from tuf_vectors.metadata import Root, Targets, Snapshot, Timestamp, Target, Delegation, Role
 
 DEFAULT_TARGET_NAME = 'file.txt'
 DEFAULT_TARGET_CONTENT = b'wat wat wat'
@@ -53,6 +53,25 @@ class Step:
     # This is for the delegation's metadata provided to a Targets object's
     # constructor.
     DELEGATIONS = {}
+
+    def default_delegations(delegations_keys_idx: list=None,
+                            delegations_bad_key_ids: list=None,
+                            **kwargs) -> list:
+        return [
+            Delegation(
+                keys_idx=delegations_keys_idx,
+                bad_key_ids=delegations_bad_key_ids,
+                role=Role(
+                    keys_idx=delegations_keys_idx,
+                    name=DEFAULT_DELEGATION_NAME,
+                    paths=[DEFAULT_TARGET_NAME],
+                    terminating=False,
+                    threshold=1,
+                    **kwargs
+                ),
+                **kwargs
+            ),
+        ]
 
     def __init__(self, **kwargs) -> None:
         uptane_role = kwargs.get('uptane_role', None)
