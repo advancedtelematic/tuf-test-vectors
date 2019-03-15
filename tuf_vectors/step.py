@@ -6,6 +6,7 @@ from tuf_vectors.metadata import Root, Targets, Snapshot, Timestamp, Target, Del
 DEFAULT_TARGET_NAME = 'file.txt'
 DEFAULT_TARGET_CONTENT = b'wat wat wat'
 DEFAULT_DELEGATION_NAME = 'foo'
+MISSING_DELEGATION_NAME = 'missing'
 
 
 class Step:
@@ -54,7 +55,8 @@ class Step:
     # constructor.
     DELEGATIONS = {}
 
-    def default_delegations(delegations_keys_idx: list=None,
+    def default_delegations(delegation_name: str=DEFAULT_DELEGATION_NAME,
+                            delegations_keys_idx: list=None,
                             delegations_bad_key_ids: list=None,
                             **kwargs) -> list:
         return [
@@ -63,7 +65,7 @@ class Step:
                 bad_key_ids=delegations_bad_key_ids,
                 role=Role(
                     keys_idx=delegations_keys_idx,
-                    name=DEFAULT_DELEGATION_NAME,
+                    name=delegation_name,
                     paths=[DEFAULT_TARGET_NAME],
                     terminating=False,
                     threshold=1,
@@ -115,6 +117,9 @@ class Step:
             timestamp_args.update(**kwargs)
             self.timestamp = Timestamp(snapshot=self.snapshot.value,
                                        **timestamp_args)
+
+            if MISSING_DELEGATION_NAME in self.delegations:
+                del self.delegations[MISSING_DELEGATION_NAME]
 
     def persist(self) -> None:
         self.root.persist()

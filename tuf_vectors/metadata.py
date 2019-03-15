@@ -15,6 +15,8 @@ from securesystemslib.formats import encode_canonical as olpc_cjson
 
 from tuf_vectors import sha256, sha512, _cjson_subset_check, short_key_type
 
+SKIPPED_DELEGATION_NAME = 'skipped'
+
 
 class Helper:
 
@@ -434,6 +436,8 @@ class Snapshot(Metadata):
         }
 
         for (name, meta) in delegations.items():
+            if name == SKIPPED_DELEGATION_NAME:
+                continue
             delegation_json = self.cjson(meta.value)
             signed['meta'][name + '.json'] = {
                 'hashes': {

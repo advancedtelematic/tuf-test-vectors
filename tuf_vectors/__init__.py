@@ -73,6 +73,11 @@ def human_message(err: str) -> str:
         if err_base == 'MissingRepo':
             assert err_sub in ['Director', 'Repo'], err_sub
             return 'The {} repo is missing.'.format(err_sub.lower())
+        if err_base == 'DelegationHashMismatch':
+            return "The calculated hash of delegated role {} did not match the hash in the metadata.". \
+                    format(err_sub.lower())
+        if err_base == 'DelegationMissing':
+            return "The delegated role {} is missing.".format(err_sub.lower())
 
         assert err_sub in ['Root', 'Targets', 'Timestamp', 'Snapshot', 'Delegation'], err_sub
 
