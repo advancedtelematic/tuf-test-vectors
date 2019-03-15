@@ -3016,7 +3016,8 @@ class DelegationEmptyUptane(Uptane):
     class DirectorStep(Step):
 
         # Should perhaps be a failure in the images repo, since that is where
-        # the target is missing, but that doesn't work.
+        # the target is missing, but that doesn't work. The error could also be
+        # more accurate.
         TARGET_ERRORS = {
             DEFAULT_TARGET_NAME: 'TargetHashMismatch',
         }
@@ -3088,6 +3089,71 @@ class DelegationHashMismatchUptane(Uptane):
 
         # Should be a failure in the images repo, since that is where the
         # target is missing, but that doesn't work.
+        TARGET_ERRORS = {
+            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+        }
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationExpiredUptane(Uptane):
+
+    '''The delegation metadata has expired'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'is_expired': True,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        # Should be a failure in the images repo, since that is where the
+        # target is missing, but that doesn't work. The error could also be
+        # more accurate.
         TARGET_ERRORS = {
             DEFAULT_TARGET_NAME: 'TargetHashMismatch',
         }
