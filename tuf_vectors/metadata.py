@@ -408,6 +408,7 @@ class Snapshot(Metadata):
             targets: dict,
             delegations: dict,  # role_name -> contents_dict
             snapshot_sign_keys_idx: list=None,
+            targets_version: int=None,
             **kwargs) -> None:
         super().__init__(is_delegation=False, **kwargs)
         self.role_name = 'snapshot'
@@ -415,8 +416,10 @@ class Snapshot(Metadata):
         if snapshot_sign_keys_idx is None:
             snapshot_sign_keys_idx = snapshot_keys_idx
 
-        # TODO manipulate version
-        targets_version = targets['signed']['version']
+        if targets_version:
+            targets_version = targets_version
+        else:
+            targets_version = targets['signed']['version']
         targets_json = self.cjson(targets)
 
         signed = {
@@ -471,7 +474,7 @@ class Targets(Metadata):
             ecu_identifier: str=None,
             delegations: types.FunctionType=None,  # -> list
             is_delegation: bool=False,
-            snapshot_version: int=None,
+            snapshot_version: int=None,  # only works for delegations
             **kwargs) -> None:
         # add these back in for Metadata
         kwargs.update(hardware_id=hardware_id, ecu_identifier=ecu_identifier, is_delegation=is_delegation)

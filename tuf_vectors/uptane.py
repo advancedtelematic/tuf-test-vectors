@@ -2015,7 +2015,7 @@ class ImageRepoTimestampBadKeyIdsUptane(Uptane):
 
 class TargetOversizedUptane(Uptane):
 
-    '''The both the director's and image repo's metadata states that a target is smaller than it
+    '''Both the director's and image repo's metadata states that a target is smaller than it
        actually is.
     '''
 
@@ -2576,7 +2576,7 @@ class DirectorBadHwIdUptane(Uptane):
 
 class BadHwIdUptane(Uptane):
 
-    '''The both targets metadata have a bad hardware ID'''
+    '''Both targets metadata have a bad hardware ID'''
 
     class ImageStep(Step):
 
@@ -2697,6 +2697,56 @@ class DirectorBadEcuIdUptane(Uptane):
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
             'targets': __targets,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class ImageRepoSnapshotTargetsVersionMismatchUptane(Uptane):
+
+    '''The images repo snapshot metadata expects a newer version of the targets metadata'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'VersionMismatch::targets'
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'targets_version': 2,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
         }
 
     STEPS = [
