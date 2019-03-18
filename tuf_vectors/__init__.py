@@ -78,6 +78,8 @@ def human_message(err: str) -> str:
                     format(err_sub.lower())
         if err_base == 'DelegationMissing':
             return "The delegated role {} is missing.".format(err_sub.lower())
+        if err_base == 'VersionMismatch':
+            return 'The version of role {} does not match the entry in Snapshot metadata.'.format(err_sub.lower())
 
         assert err_sub in ['Root', 'Targets', 'Timestamp', 'Snapshot', 'Delegation'], err_sub
 

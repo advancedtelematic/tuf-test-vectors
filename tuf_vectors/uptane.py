@@ -3294,3 +3294,63 @@ class DelegationSnapshotMissingUptane(Uptane):
     ]
 
 
+class DelegationSnapshotVersionMismatchUptane(Uptane):
+
+    '''The snapshot metadata expects a newer version of a delegation'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'VersionMismatch::' + DEFAULT_DELEGATION_NAME
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'snapshot_version': 2,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+

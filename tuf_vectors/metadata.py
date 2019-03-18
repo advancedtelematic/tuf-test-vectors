@@ -438,6 +438,10 @@ class Snapshot(Metadata):
         for (name, meta) in delegations.items():
             if name == SKIPPED_DELEGATION_NAME:
                 continue
+            if meta.snapshot_version:
+                delegation_version = meta.snapshot_version
+            else:
+                delegation_version = meta.value['signed']['version']
             delegation_json = self.cjson(meta.value)
             signed['meta'][name + '.json'] = {
                 'hashes': {
@@ -445,7 +449,7 @@ class Snapshot(Metadata):
                     'sha512': sha512(delegation_json, bad_hash=False),
                 },
                 'length': len(delegation_json),
-                'version': meta.value['signed']['version'],  # TODO manipulate version
+                'version': delegation_version,
              }
 
         sig_directives = [(self.get_key(i), False) for i in snapshot_sign_keys_idx]
@@ -467,6 +471,7 @@ class Targets(Metadata):
             ecu_identifier: str=None,
             delegations: types.FunctionType=None,  # -> list
             is_delegation: bool=False,
+            snapshot_version: int=None,
             **kwargs) -> None:
         # add these back in for Metadata
         kwargs.update(hardware_id=hardware_id, ecu_identifier=ecu_identifier, is_delegation=is_delegation)
@@ -483,6 +488,7 @@ class Targets(Metadata):
         self.role_name = role_name
         self.targets = targets(hardware_id, ecu_identifier)
         self.__uptane_role = kwargs['uptane_role']
+        self.snapshot_version = snapshot_version
 
         signed = {
             '_type': 'Targets',
