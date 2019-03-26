@@ -58,7 +58,10 @@ class Step:
     def default_delegations(delegation_name: str=DEFAULT_DELEGATION_NAME,
                             delegations_keys_idx: list=None,
                             delegations_bad_key_ids: list=None,
+                            delegation_threshold: int=None,
                             **kwargs) -> list:
+
+        delegation_threshold = delegation_threshold if delegation_threshold is not None else len(delegations_keys_idx)
         return [
             Delegation(
                 keys_idx=delegations_keys_idx,
@@ -68,7 +71,7 @@ class Step:
                     name=delegation_name,
                     paths=[DEFAULT_TARGET_NAME],
                     terminating=False,
-                    threshold=1,
+                    threshold=delegation_threshold,
                     **kwargs
                 ),
                 **kwargs

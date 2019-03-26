@@ -82,6 +82,10 @@ def human_message(err: str) -> str:
             return 'The version of role {} does not match the entry in Snapshot metadata.'.format(err_sub.lower())
         if err_base == 'UnmetThreshold':
             return "The {} metadata had an unmet threshold.".format(err_sub.lower())
+        elif err_base == 'IllegalThreshold':
+            return 'The role {} had an illegal signature threshold.'.format(err_sub.lower())
+        elif err_base == 'NonUniqueSignatures':
+            return 'The role {} had non-unique signatures.'.format(err_sub.lower())
 
         assert err_sub in ['Root', 'Targets', 'Timestamp', 'Snapshot', 'Delegation'], err_sub
 
@@ -93,10 +97,6 @@ def human_message(err: str) -> str:
         elif err_base == 'OversizedMetadata':
             return "The {} metadata's size was greater than the size in the metadata." \
                    .format(err_sub.lower())
-        elif err_base == 'IllegalThreshold':
-            return 'The role {} had an illegal signature threshold.'.format(err_sub.lower())
-        elif err_base == 'NonUniqueSignatures':
-            return 'The role {} had non-unique signatures.'.format(err_sub.lower())
         else:
             raise Exception('Unavailable err: {}'.format(err_base))
     elif err == 'BadKeyId':
