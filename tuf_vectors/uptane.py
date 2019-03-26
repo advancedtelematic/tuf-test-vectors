@@ -2811,6 +2811,68 @@ class DelegationSimpleUptane(Uptane):
     ]
 
 
+class DelegationRedundantUptane(Uptane):
+
+    '''A target is listed in both the top-level targets and a delegation'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                # Leave the delegation unsigned to create an obvious error so
+                # that if the delegation were verified, it would fail. However,
+                # it shouldn't even be downloaded, since the target should be
+                # found in the top-level Targets.
+                'targets_sign_keys_idx': [],
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            # Leave the default Target in the Targets metadata.
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
 class DelegationPathMismatchUptane(Uptane):
 
     '''The target name does not match the delegated role's path'''
