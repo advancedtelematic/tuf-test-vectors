@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import json
+import fnmatch
 
 from flask import Flask, abort, make_response
 from functools import wraps
@@ -44,7 +44,9 @@ def init_app(
     @app.route('/')
     @json_response
     def index():
-        return json.dumps(sorted(list(repos.keys())))
+        # hack to get jsonify function
+        jsonify = list(repos.values())[0].steps[0][0].root.jsonify
+        return jsonify(sorted(list(repos.keys())))
 
     @app.route('/<string:repo>/reset', methods=['POST'])
     def reset(repo):
@@ -66,8 +68,11 @@ def init_app(
         except IndexError:
             return '', 204
 
+        # hack to get jsonify function
+        jsonify = repos[repo].steps[0][0].root.jsonify
+
         # TODO if current step == 0, include root keys for pinning
-        return json.dumps(step_meta)
+        return jsonify(step_meta)
 
     @app.route('/<string:repo>/<string:uptane>/<int:root_version>.root.json')
     @json_response
@@ -101,6 +106,7 @@ def init_app(
             return abort(404)
 
     @app.route('/<string:repo>/<string:uptane>/<string:metadata>.json')
+    @app.route('/<string:repo>/<string:uptane>/delegations/<string:metadata>.json')
     @json_response
     def meta(repo, uptane, metadata):
         current = counter.get(repo)
@@ -109,9 +115,6 @@ def init_app(
 
         if uptane == 'director':
             if metadata not in ['root', 'targets']:
-                abort(404)
-        else:
-            if metadata not in ['root', 'targets', 'timestamp', 'snapshot']:
                 abort(404)
 
         repo = repos.get(repo, None)
@@ -130,7 +133,9 @@ def init_app(
 
         data = getattr(repo, metadata, None)
         if data is None:
-            abort(400)
+            data = repo.delegations.get(metadata, None)
+            if data is None:
+                abort(400)
 
         return jsonify(data.value)
 
@@ -143,9 +148,20 @@ def init_app(
             app.logger.warn(e)
             abort(400)
 
+        # Check top-level targets
         for target in repo.targets.targets:
             if target.name == content_path:
                 return target.content
+
+        # Check first-order delegations.
+        # TODO: does not work for nested delegations yet.
+        for delegation in repo.targets.value['signed']['delegations']['roles']:
+            for path in delegation['paths']:
+                if fnmatch.fnmatch(content_path, path):
+                    role_name = delegation['name']
+                    for target in repo.delegations[role_name].targets:
+                        if target.name == content_path:
+                            return target.content
 
         abort(404)
 

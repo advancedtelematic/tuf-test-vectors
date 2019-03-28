@@ -4,8 +4,8 @@ import re
 
 from os import path
 
-from tuf_vectors.metadata import Target
-from tuf_vectors.step import Step, DEFAULT_TARGET_NAME, DEFAULT_TARGET_CONTENT
+from tuf_vectors.metadata import Target, Delegation, Role, SKIPPED_DELEGATION_NAME
+from tuf_vectors.step import Step, DEFAULT_TARGET_NAME, DEFAULT_TARGET_CONTENT, DEFAULT_DELEGATION_NAME, MISSING_DELEGATION_NAME
 
 
 class Uptane:
@@ -705,7 +705,7 @@ class ImageRepoTimestampExpiredUptane(Uptane):
 
 class DirectorTargetHashMismatchUptane(Uptane):
 
-    '''The director has lists a target with bad hashes'''
+    '''The director has a target with bad hashes'''
 
     class ImageStep(Step):
 
@@ -764,7 +764,7 @@ class DirectorTargetHashMismatchUptane(Uptane):
 
 class ImageRepoTargetHashMismatchUptane(Uptane):
 
-    '''The image repo has lists a target with bad hashes'''
+    '''The image repo has a target with bad hashes'''
 
     class ImageStep(Step):
 
@@ -2015,7 +2015,7 @@ class ImageRepoTimestampBadKeyIdsUptane(Uptane):
 
 class TargetOversizedUptane(Uptane):
 
-    '''The both the director's and image repo's metadata states that a target is smaller than it
+    '''Both the director's and image repo's metadata states that a target is smaller than it
        actually is.
     '''
 
@@ -2576,7 +2576,7 @@ class DirectorBadHwIdUptane(Uptane):
 
 class BadHwIdUptane(Uptane):
 
-    '''The both targets metadata have a bad hardware ID'''
+    '''Both targets metadata have a bad hardware ID'''
 
     class ImageStep(Step):
 
@@ -2702,3 +2702,1068 @@ class DirectorBadEcuIdUptane(Uptane):
     STEPS = [
         (DirectorStep, ImageStep),
     ]
+
+
+class ImageRepoSnapshotTargetsVersionMismatchUptane(Uptane):
+
+    '''The images repo snapshot metadata expects a newer version of the targets metadata'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'VersionMismatch::targets'
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'targets_version': 2,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationSimpleUptane(Uptane):
+
+    '''The most basic delegation happy case where targets points at one delegation'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationRedundantUptane(Uptane):
+
+    '''A target is listed in both the top-level targets and a delegation'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                # Leave the delegation unsigned to create an obvious error so
+                # that if the delegation were verified, it would fail. However,
+                # it shouldn't even be downloaded, since the target should be
+                # found in the top-level Targets.
+                'targets_sign_keys_idx': [],
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            # Leave the default Target in the Targets metadata.
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationPathMismatchUptane(Uptane):
+
+    '''The target name does not match the delegated role's path'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        def __delegations(delegations_keys_idx: list=None, **kwargs) -> list:
+            return [
+                Delegation(
+                    keys_idx=delegations_keys_idx,
+                    role=Role(
+                        keys_idx=delegations_keys_idx,
+                        name=DEFAULT_DELEGATION_NAME,
+                        paths=['does-not-match'],
+                        terminating=False,
+                        threshold=1,
+                        **kwargs
+                    ),
+                    **kwargs
+                ),
+            ]
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': __delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGET_ERRORS = {
+            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+        }
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationKeyMissingUptane(Uptane):
+
+    '''The top-level targets metadata is missing a key ID for a delegated role'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'BadKeyId'
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        def __delegations(delegations_keys_idx: list=None, **kwargs) -> list:
+            return [
+                Delegation(
+                    # Note that keys_idx is empty!
+                    role=Role(
+                        keys_idx=delegations_keys_idx,
+                        name=DEFAULT_DELEGATION_NAME,
+                        paths=[DEFAULT_TARGET_NAME],
+                        terminating=False,
+                        threshold=1,
+                        **kwargs
+                    ),
+                    **kwargs
+                ),
+            ]
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': __delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationUnsignedUptane(Uptane):
+
+    '''The delegated metadata has no signatures'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'UnmetThreshold::' + DEFAULT_DELEGATION_NAME
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'targets_sign_keys_idx': [],
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationBadKeyIdsUptane(Uptane):
+
+    '''The top-level targets metadata has bad key IDs for a delegated role'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'BadKeyId'
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations_bad_key_ids': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationMissingUptane(Uptane):
+
+    '''A delegation's metadata is unavailable'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'DelegationMissing::' + MISSING_DELEGATION_NAME
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            MISSING_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegation_name': MISSING_DELEGATION_NAME,
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationEmptyUptane(Uptane):
+
+    '''The target is not present in the delegated role'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'targets': lambda ecu_id, hw_id: [],
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        # Should perhaps be a failure in the images repo, since that is where
+        # the target is missing, but that doesn't work. The error could also be
+        # more accurate.
+        TARGET_ERRORS = {
+            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+        }
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationHashMismatchUptane(Uptane):
+
+    '''The delegation has a target with bad hashes'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+            return [Target(name=DEFAULT_TARGET_NAME,
+                           content=DEFAULT_TARGET_CONTENT,
+                           hardware_id=hardware_id,
+                           ecu_identifier=ecu_identifier,
+                           alteration='bad-hash')]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'targets': __targets,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        # Should be a failure in the images repo, since that is where the
+        # target is missing, but that doesn't work.
+        TARGET_ERRORS = {
+            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+        }
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationExpiredUptane(Uptane):
+
+    '''The delegated metadata has expired'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'is_expired': True,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        # Should be a failure in the images repo, since that is where the
+        # target is missing, but that doesn't work. The error could also be
+        # more accurate.
+        TARGET_ERRORS = {
+            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+        }
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationSnapshotMissingUptane(Uptane):
+
+    '''The snapshot metadata does not list a delegation'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'DelegationHashMismatch::' + SKIPPED_DELEGATION_NAME
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            SKIPPED_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegation_name': SKIPPED_DELEGATION_NAME,
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationSnapshotVersionMismatchUptane(Uptane):
+
+    '''The snapshot metadata expects a newer version of a delegation'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'VersionMismatch::' + DEFAULT_DELEGATION_NAME
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'snapshot_version': 2,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationZeroThresholdUptane(Uptane):
+
+    '''A delegation has a threshold of zero.'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'IllegalThreshold::' + DEFAULT_DELEGATION_NAME
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegation_threshold': 0,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationUnmetThresholdUptane(Uptane):
+
+    '''A delegation has an unmet threshold'''
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'UnmetThreshold::' + DEFAULT_DELEGATION_NAME
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6, 7]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'targets_sign_keys_idx': DELEGATION_KEYS_IDX[0:-1],
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationTwoSignaturesUptane(Uptane):
+
+    '''Simple delegation case with two signatures required'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6, 7]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'targets_sign_keys_idx': DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DelegationNonUniqueSignaturesUptane(Uptane):
+
+    '''A delegation has duplicate signatures'''
+    # Note that at present, the threshold is only set to 1, so one could argue
+    # this should not be an error, just a warning. (This also affects the other
+    # non-unique signature tests.)
+
+    class ImageStep(Step):
+
+        UPDATE_ERROR = 'NonUniqueSignatures::' + DEFAULT_DELEGATION_NAME
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+        DELEGATION_KEYS_IDX = [6]
+
+        DELEGATIONS = {
+            DEFAULT_DELEGATION_NAME: {
+                'targets_keys_idx': DELEGATION_KEYS_IDX,
+                'targets_sign_keys_idx': DELEGATION_KEYS_IDX + DELEGATION_KEYS_IDX,
+            },
+        }
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda ecu_id, hw_id: [],
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+

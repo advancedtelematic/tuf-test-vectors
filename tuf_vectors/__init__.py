@@ -64,8 +64,7 @@ def human_message(err: str) -> str:
         return "The target's calculated hash did not match the hash in the metadata."
     elif err == 'OversizedTarget':
         return "The target's size was greater than the size in the metadata."
-    elif err == 'IllegalRsaKeySize':
-        return 'The RSA key had an illegal size.'
+    # Not used at present:
     elif err == 'UnavailableTarget':
         return 'The target either does not exist or was not in the chain of trusted metadata.'
     elif '::' in err:
@@ -74,23 +73,30 @@ def human_message(err: str) -> str:
         if err_base == 'MissingRepo':
             assert err_sub in ['Director', 'Repo'], err_sub
             return 'The {} repo is missing.'.format(err_sub.lower())
+        if err_base == 'DelegationHashMismatch':
+            return "The calculated hash of delegated role {} did not match the hash in the metadata.". \
+                    format(err_sub.lower())
+        if err_base == 'DelegationMissing':
+            return "The delegated role {} is missing.".format(err_sub.lower())
+        if err_base == 'VersionMismatch':
+            return 'The version of role {} does not match the entry in Snapshot metadata.'.format(err_sub.lower())
+        if err_base == 'UnmetThreshold':
+            return "The {} metadata had an unmet threshold.".format(err_sub.lower())
+        elif err_base == 'IllegalThreshold':
+            return 'The role {} had an illegal signature threshold.'.format(err_sub.lower())
+        elif err_base == 'NonUniqueSignatures':
+            return 'The role {} had non-unique signatures.'.format(err_sub.lower())
 
         assert err_sub in ['Root', 'Targets', 'Timestamp', 'Snapshot', 'Delegation'], err_sub
 
         if err_base == 'ExpiredMetadata':
             return "The {} metadata was expired.".format(err_sub.lower())
-        elif err_base == 'UnmetThreshold':
-            return "The {} metadata had an unmet threshold.".format(err_sub.lower())
         elif err_base == 'MetadataHashMismatch':
             return "The {} metadata's hash did not match the hash in the metadata." \
                    .format(err_sub.lower())
         elif err_base == 'OversizedMetadata':
             return "The {} metadata's size was greater than the size in the metadata." \
                    .format(err_sub.lower())
-        elif err_base == 'IllegalThreshold':
-            return 'The role {} had an illegal signature threshold.'.format(err_sub.lower())
-        elif err_base == 'NonUniqueSignatures':
-            return 'The role {} had non-unique signatures.'.format(err_sub.lower())
         else:
             raise Exception('Unavailable err: {}'.format(err_base))
     elif err == 'BadKeyId':

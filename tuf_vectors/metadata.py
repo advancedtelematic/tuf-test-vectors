@@ -15,6 +15,85 @@ from securesystemslib.formats import encode_canonical as olpc_cjson
 
 from tuf_vectors import sha256, sha512, _cjson_subset_check, short_key_type
 
+SKIPPED_DELEGATION_NAME = 'skipped'
+
+
+class Helper:
+
+    def __init__(self, key_type: str, cjson_strategy: str, **kwargs) -> None:
+        self.key_type = key_type
+        self.cjson_strategy = cjson_strategy
+        self.key_store = {}
+
+    def get_key(self, key_idx) -> (str, str):
+        '''Returns 2-tuple of priv/pub key'''
+        try:
+            (priv, pub) = self.key_store[key_idx]
+        except KeyError:
+            path_base = path.join(path.dirname(__file__), os.pardir, 'keys',
+                                  '{}-{}.'.format(self.key_type, key_idx))
+            with open('{}priv'.format(path_base)) as f:
+                priv = f.read()
+
+            with open('{}pub'.format(path_base)) as f:
+                pub = f.read()
+
+            self.key_store[key_idx] = (priv, pub)
+
+        return (priv, pub)
+
+    def key_id(self, pub: str, bad_id: bool) -> str:
+        return sha256(self.cjson(pub).encode('utf-8'), bad_id)
+
+    def cjson(self, jsn) -> str:
+        if self.cjson_strategy == 'olpc':
+            return olpc_cjson(jsn)
+        elif self.cjson_strategy == 'json-subset':
+            _cjson_subset_check(jsn)
+            return json.dumps(jsn, sort_keys=True, separators=(',', ':'))
+        else:
+            raise ValueError('{} is not a valid CJSON strategy'.format(self.cjson_strategy))
+
+
+class Delegation(Helper):
+    # Delegatation metadata as specified in the delegation's parent Targets
+    # object.
+
+    def __init__(
+            self,
+            keys_idx: list=None,
+            bad_key_ids: list=None,
+            role: list=None,
+            **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.value = {
+            'keys': keys_idx,
+            'bad_key_ids': bad_key_ids,
+            'role': role,
+        }
+
+
+class Role(Helper):
+    # Delegated role as specified in Targets metadata.
+
+    def __init__(
+            self,
+            keys_idx: list,
+            name: str,
+            paths: list,
+            terminating: bool=False,
+            threshold: int=None,
+            **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.name = name
+        self.value = {
+            'keyids': [self.key_id(self.get_key(i)[1], bad_id=False) for i in keys_idx],
+            'name': name,
+            'paths': paths,
+            'terminating': terminating,
+            'threshold': threshold if threshold is not None else len(keys_idx),
+        }
+
 
 class Target:
 
@@ -78,68 +157,37 @@ class Target:
                 f.write(self.content)
 
 
-class Metadata:
+class Metadata(Helper):
 
     def __init__(
             self,
-            step_index,
-            output_dir,
-            key_type,
-            signature_scheme,
-            signature_encoding,
-            compact,
-            cjson_strategy,
-            uptane_role,
-            ecu_identifier,
-            hardware_id) -> None:
-
+            step_index: int,
+            output_dir: str,
+            signature_scheme: str,
+            signature_encoding: str,
+            compact: bool,
+            uptane_role: str,
+            ecu_identifier: str,
+            hardware_id: str,
+            is_delegation: bool=False,
+            **kwargs
+            ) -> None:
+        super().__init__(**kwargs)
         self.step_index = step_index
 
         p = path.join(output_dir, str(step_index))
         os.makedirs(p, exist_ok=True)
         self.output_dir = p
 
-        self.key_type = key_type
         self.signature_scheme = signature_scheme
         self.signature_encoding = signature_encoding
         self.compact = compact
-        self.cjson_strategy = cjson_strategy
         self.uptane_role = uptane_role
         self.ecu_identifier = ecu_identifier
         self.hardware_id = hardware_id
+        self.is_delegation = is_delegation
 
-        self.key_store = {}
-
-    def get_key(self, key_idx) -> (str, str):
-        '''Returns 2-tuple of priv/pub key'''
-        try:
-            (priv, pub) = self.key_store[key_idx]
-        except KeyError:
-            path_base = path.join(path.dirname(__file__), os.pardir, 'keys',
-                                  '{}-{}.'.format(self.key_type, key_idx))
-            with open('{}priv'.format(path_base)) as f:
-                priv = f.read()
-
-            with open('{}pub'.format(path_base)) as f:
-                pub = f.read()
-
-            self.key_store[key_idx] = (priv, pub)
-
-        return (priv, pub)
-
-    def key_id(self, pub: str, bad_id: bool) -> str:
-        return sha256(self.cjson(pub).encode('utf-8'), bad_id)
-
-    def cjson(self, jsn) -> str:
-        if self.cjson_strategy == 'olpc':
-            return olpc_cjson(jsn)
-        elif self.cjson_strategy == 'json-subset':
-            _cjson_subset_check(jsn)
-            return json.dumps(jsn, sort_keys=True, separators=(',', ':'))
-        else:
-            raise ValueError('{} is not a valid CJSON strategy'.format(self.cjson_strategy))
-
-    def jsonify(self, jsn):
+    def jsonify(self, jsn) -> str:
         kwargs = {'sort_keys': True, }
 
         if not self.compact:
@@ -197,7 +245,10 @@ class Metadata:
             raise ValueError('Invalid signature encoding: {}'.format(self.signature_encoding))
 
     def persist(self) -> None:
-        full_path = path.join(self.output_dir, self.uptane_role, self.role_name + '.json')
+        if self.is_delegation:
+            full_path = path.join(self.output_dir, self.uptane_role, 'delegations', self.role_name + '.json')
+        else:
+            full_path = path.join(self.output_dir, self.uptane_role, self.role_name + '.json')
         os.makedirs(path.dirname(full_path), exist_ok=True)
         with open(full_path, 'w') as f:
             f.write(self.jsonify(self.value))
@@ -224,7 +275,7 @@ class Root(Metadata):
             timestamp_bad_key_ids: list=None,
             **kwargs) -> None:
         self.role_name = 'root'
-        super().__init__(**kwargs)
+        super().__init__(is_delegation=False, **kwargs)
 
         if root_sign_keys_idx is None:
             root_sign_keys_idx = root_keys_idx
@@ -315,7 +366,7 @@ class Timestamp(Metadata):
             snapshot_version: int,
             timestamp_sign_keys_idx: list=None,
             **kwargs) -> None:
-        super().__init__(**kwargs)
+        super().__init__(is_delegation=False, **kwargs)
         self.role_name = 'timestamp'
 
         if timestamp_sign_keys_idx is None:
@@ -355,17 +406,20 @@ class Snapshot(Metadata):
             is_expired: bool,
             snapshot_keys_idx: list,
             targets: dict,
-            delegations: dict,
+            delegations: dict,  # role_name -> contents_dict
             snapshot_sign_keys_idx: list=None,
+            targets_version: int=None,
             **kwargs) -> None:
-        super().__init__(**kwargs)
+        super().__init__(is_delegation=False, **kwargs)
         self.role_name = 'snapshot'
 
         if snapshot_sign_keys_idx is None:
             snapshot_sign_keys_idx = snapshot_keys_idx
 
-        # TODO manipulate version
-        targets_version = targets['signed']['version']
+        if targets_version:
+            targets_version = targets_version
+        else:
+            targets_version = targets['signed']['version']
         targets_json = self.cjson(targets)
 
         signed = {
@@ -385,14 +439,20 @@ class Snapshot(Metadata):
         }
 
         for (name, meta) in delegations.items():
-            delegation_json = self.jsonify(meta)
-            signed['meta'][name] = {
+            if name == SKIPPED_DELEGATION_NAME:
+                continue
+            if meta.snapshot_version:
+                delegation_version = meta.snapshot_version
+            else:
+                delegation_version = meta.value['signed']['version']
+            delegation_json = self.cjson(meta.value)
+            signed['meta'][name + '.json'] = {
                 'hashes': {
                     'sha256': sha256(delegation_json, bad_hash=False),
                     'sha512': sha512(delegation_json, bad_hash=False),
                 },
                 'length': len(delegation_json),
-                'version': meta['signed']['version'],  # TODO manipulate version
+                'version': delegation_version,
              }
 
         sig_directives = [(self.get_key(i), False) for i in snapshot_sign_keys_idx]
@@ -412,10 +472,18 @@ class Targets(Metadata):
             targets_sign_keys_idx: list=None,
             role_name: str='targets',
             ecu_identifier: str=None,
+            delegations: types.FunctionType=None,  # -> list
+            is_delegation: bool=False,
+            snapshot_version: int=None,  # only works for delegations
             **kwargs) -> None:
         # add these back in for Metadata
-        kwargs.update(hardware_id=hardware_id, ecu_identifier=ecu_identifier)
+        kwargs.update(hardware_id=hardware_id, ecu_identifier=ecu_identifier, is_delegation=is_delegation)
         super().__init__(**kwargs)
+
+        if delegations is not None:
+            delegations = delegations(**kwargs)
+        else:
+            delegations = []
 
         if targets_sign_keys_idx is None:
             targets_sign_keys_idx = targets_keys_idx
@@ -423,6 +491,7 @@ class Targets(Metadata):
         self.role_name = role_name
         self.targets = targets(hardware_id, ecu_identifier)
         self.__uptane_role = kwargs['uptane_role']
+        self.snapshot_version = snapshot_version
 
         signed = {
             '_type': 'Targets',
@@ -433,6 +502,24 @@ class Targets(Metadata):
 
         for target in self.targets:
             signed['targets'][target.name] = target.meta
+
+        if delegations:
+            signed['delegations'] = {}
+            signed['delegations']['keys'] = {}
+            signed['delegations']['roles'] = []
+            for delegation in delegations:
+                signed['delegations']['roles'].append(delegation.value['role'].value)
+
+                if delegation.value['keys']:
+                    for key_idx in delegation.value['keys']:
+                        _, pub = self.get_key(key_idx)
+                        bad_id = delegation.value['bad_key_ids'] and key_idx in delegation.value['bad_key_ids']
+                        signed['delegations']['keys'][self.key_id(pub, bad_id=bad_id)] = {
+                            'keytype': short_key_type(self.key_type),
+                            'keyval': {
+                                'public': pub,
+                            },
+                        }
 
         sig_directives = [(self.get_key(i), False) for i in targets_sign_keys_idx]
 

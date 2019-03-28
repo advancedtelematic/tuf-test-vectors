@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from tuf_vectors import human_message
-from tuf_vectors.metadata import Root, Targets, Snapshot, Timestamp, Target
+from tuf_vectors.metadata import Root, Targets, Snapshot, Timestamp, Target, Delegation, Role
 
 DEFAULT_TARGET_NAME = 'file.txt'
 DEFAULT_TARGET_CONTENT = b'wat wat wat'
+DEFAULT_DELEGATION_NAME = 'foo'
+MISSING_DELEGATION_NAME = 'missing'
 
 
 class Step:
@@ -49,7 +51,32 @@ class Step:
     TARGET_ERRORS = {}
 
     # delegation name -> kwargs
+    # This is for the delegation's metadata provided to a Targets object's
+    # constructor.
     DELEGATIONS = {}
+
+    def default_delegations(delegation_name: str=DEFAULT_DELEGATION_NAME,
+                            delegations_keys_idx: list=None,
+                            delegations_bad_key_ids: list=None,
+                            delegation_threshold: int=None,
+                            **kwargs) -> list:
+
+        delegation_threshold = delegation_threshold if delegation_threshold is not None else len(delegations_keys_idx)
+        return [
+            Delegation(
+                keys_idx=delegations_keys_idx,
+                bad_key_ids=delegations_bad_key_ids,
+                role=Role(
+                    keys_idx=delegations_keys_idx,
+                    name=delegation_name,
+                    paths=[DEFAULT_TARGET_NAME],
+                    terminating=False,
+                    threshold=delegation_threshold,
+                    **kwargs
+                ),
+                **kwargs
+            ),
+        ]
 
     def __init__(self, **kwargs) -> None:
         uptane_role = kwargs.get('uptane_role', None)
@@ -77,7 +104,8 @@ class Step:
                 args = self.__TARGETS_DEFAULT.copy()
                 args.update(**delegation_args)
                 args.update(**kwargs)
-                args['delegation'] = name
+                args['role_name'] = name
+                args['is_delegation'] = True
                 self.delegations[name] = Targets(**args)
 
             snapshot_args = self.__SNAPSHOT_DEFAULT.copy()
@@ -92,6 +120,9 @@ class Step:
             timestamp_args.update(**kwargs)
             self.timestamp = Timestamp(snapshot=self.snapshot.value,
                                        **timestamp_args)
+
+            if MISSING_DELEGATION_NAME in self.delegations:
+                del self.delegations[MISSING_DELEGATION_NAME]
 
     def persist(self) -> None:
         self.root.persist()
@@ -117,6 +148,8 @@ class Step:
             meta['update']['err_msg'] = human_message(self.UPDATE_ERROR)
 
         targets = {}
+        # Note this won't work at present for delegated targets in the images
+        # repo! (It will still work if used for the director repo, though.)
         for target in self.targets.targets:
             target_error = self.TARGET_ERRORS.get(target.name, None)
             if target_error is None:
