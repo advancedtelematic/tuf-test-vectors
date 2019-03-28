@@ -3027,7 +3027,7 @@ class DelegationKeyMissingUptane(Uptane):
 
 class DelegationUnsignedUptane(Uptane):
 
-    '''The delegation metadata has no signatures'''
+    '''The delegated metadata has no signatures'''
 
     class ImageStep(Step):
 
@@ -3343,7 +3343,7 @@ class DelegationHashMismatchUptane(Uptane):
 
 class DelegationExpiredUptane(Uptane):
 
-    '''The delegation metadata has expired'''
+    '''The delegated metadata has expired'''
 
     class ImageStep(Step):
 
@@ -3707,6 +3707,9 @@ class DelegationTwoSignaturesUptane(Uptane):
 class DelegationNonUniqueSignaturesUptane(Uptane):
 
     '''A delegation has duplicate signatures'''
+    # Note that at present, the threshold is only set to 1, so one could argue
+    # this should not be an error, just a warning. (This also affects the other
+    # non-unique signature tests.)
 
     class ImageStep(Step):
 
