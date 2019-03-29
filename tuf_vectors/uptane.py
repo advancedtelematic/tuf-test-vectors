@@ -3412,7 +3412,7 @@ class DelegationSnapshotMissingUptane(Uptane):
 
     class ImageStep(Step):
 
-        UPDATE_ERROR = 'DelegationHashMismatch::' + SKIPPED_DELEGATION_NAME
+        UPDATE_ERROR = 'VersionMismatch::' + SKIPPED_DELEGATION_NAME
 
         TARGETS_KEYS_IDX = [1]
         SNAPSHOT_KEYS_IDX = [2]

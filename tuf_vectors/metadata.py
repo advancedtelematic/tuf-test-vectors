@@ -428,11 +428,6 @@ class Snapshot(Metadata):
             'expires': '2017-01-01T00:00:00Z' if is_expired else '2038-01-19T03:14:06Z',
             'meta': {
                 'targets.json': {
-                    'hashes': {
-                        'sha256': sha256(targets_json, bad_hash=False),
-                        'sha512': sha512(targets_json, bad_hash=False),
-                    },
-                    'length': len(self.jsonify(targets)), # Server returns targets.json with self.jsonify
                     'version': targets_version,
                 },
             },
@@ -447,13 +442,8 @@ class Snapshot(Metadata):
                 delegation_version = meta.value['signed']['version']
             delegation_json = self.cjson(meta.value)
             signed['meta'][name + '.json'] = {
-                'hashes': {
-                    'sha256': sha256(delegation_json, bad_hash=False),
-                    'sha512': sha512(delegation_json, bad_hash=False),
-                },
-                'length': len(delegation_json),
                 'version': delegation_version,
-             }
+            }
 
         sig_directives = [(self.get_key(i), False) for i in snapshot_sign_keys_idx]
 
