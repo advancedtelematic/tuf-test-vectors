@@ -9,4 +9,7 @@ setup(
     author="heartsucker",
     author_email="heartsucker@autistici.org",
     description="Generates TUF/Uptane test vectors",
+    install_requires=[
+        'Jinja2>=2.10.1',
+    ],
 )
