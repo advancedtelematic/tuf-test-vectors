@@ -8,7 +8,7 @@ click==7.0                # via flask
 ed25519==1.4
 flask==1.0.2
 itsdangerous==1.1.0       # via flask
-jinja2==2.10              # via flask
+jinja2==2.10.1            # via flask
 markupsafe==1.1.0         # via jinja2
 pycrypto==2.6.1
 securesystemslib==0.11.3
