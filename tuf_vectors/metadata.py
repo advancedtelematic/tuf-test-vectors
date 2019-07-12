@@ -136,14 +136,17 @@ class Target:
                 'sha256': sha256(content, bad_hash=bad_hash),
                 'sha512': sha512(content, bad_hash=bad_hash),
             },
-            'custom': {
-                'hardwareId': hardware_id,
-            },
+            'custom': {},
         }
 
-        if ecu_identifier is not None:
+        if ecu_identifier is None:
+            # Only used by Image repo metadata.
+            self.meta['custom'] = {
+                'hardwareIds': [ hardware_id + ('-XXX' if bad_hw_id else ''), ],
+            }
+        else:
+            # Only used by Director metadata.
             ecu_identifier = ecu_identifier + ('-XXX' if bad_ecu_id else '')
-            self.meta['custom']['ecuIdentifier'] = ecu_identifier
             self.meta['custom']['ecuIdentifiers'] = {
                 ecu_identifier: {
                     'hardwareId': hardware_id + ('-XXX' if bad_hw_id else ''),

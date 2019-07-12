@@ -735,7 +735,7 @@ class DirectorTargetHashMismatchUptane(Uptane):
     class DirectorStep(Step):
 
         TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+            DEFAULT_TARGET_NAME: 'TargetMismatch',
         }
 
         TARGETS_KEYS_IDX = [5]
@@ -769,7 +769,7 @@ class ImageRepoTargetHashMismatchUptane(Uptane):
     class ImageStep(Step):
 
         TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+            DEFAULT_TARGET_NAME: 'TargetMismatch',
         }
 
         TARGETS_KEYS_IDX = [1]
@@ -2574,6 +2574,66 @@ class DirectorBadHwIdUptane(Uptane):
         (DirectorStep, ImageStep),
     ]
 
+
+class ImageRepoBadHwIdUptane(Uptane):
+
+    '''The image repo targets metadata has a bad hardware ID'''
+
+    class ImageStep(Step):
+
+        TARGET_ERRORS = {
+            DEFAULT_TARGET_NAME: 'TargetMismatch',
+        }
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+            return [Target(name=DEFAULT_TARGET_NAME,
+                           content=DEFAULT_TARGET_CONTENT,
+                           hardware_id=hardware_id,
+                           ecu_identifier=ecu_identifier,
+                           alteration='bad-hw-id')]
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': __targets,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
 class BadHwIdUptane(Uptane):
 
     '''Both targets metadata have a bad hardware ID'''
@@ -2931,7 +2991,7 @@ class DelegationPathMismatchUptane(Uptane):
     class DirectorStep(Step):
 
         TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+            DEFAULT_TARGET_NAME: 'TargetMismatch',
         }
 
         TARGETS_KEYS_IDX = [5]
@@ -3251,7 +3311,7 @@ class DelegationEmptyUptane(Uptane):
         # the target is missing, but that doesn't work. The error could also be
         # more accurate.
         TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+            DEFAULT_TARGET_NAME: 'TargetMismatch',
         }
 
         TARGETS_KEYS_IDX = [5]
@@ -3322,7 +3382,7 @@ class DelegationHashMismatchUptane(Uptane):
         # Should be a failure in the images repo, since that is where the
         # target is missing, but that doesn't work.
         TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+            DEFAULT_TARGET_NAME: 'TargetMismatch',
         }
 
         TARGETS_KEYS_IDX = [5]
@@ -3387,7 +3447,7 @@ class DelegationExpiredUptane(Uptane):
         # target is missing, but that doesn't work. The error could also be
         # more accurate.
         TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'TargetHashMismatch',
+            DEFAULT_TARGET_NAME: 'TargetMismatch',
         }
 
         TARGETS_KEYS_IDX = [5]
