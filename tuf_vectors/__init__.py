@@ -86,6 +86,10 @@ def human_message(err: str) -> str:
             return 'The role {} had an illegal signature threshold.'.format(err_sub.lower())
         elif err_base == 'NonUniqueSignatures':
             return 'The role {} had non-unique signatures.'.format(err_sub.lower())
+        elif err_base == 'SecurityException':
+            return 'Metadata type invalidrole does not match expected role {}'.format(err_sub.lower())
+        elif err_base == 'InvalidMetadata':
+            return 'The targets metadata failed to parse:invalid {}.json'.format(err_sub.lower())
 
         assert err_sub in ['Root', 'Targets', 'Timestamp', 'Snapshot', 'Delegation'], err_sub
 

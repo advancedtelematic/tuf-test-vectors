@@ -303,7 +303,7 @@ class Root(Metadata):
                 raise ValueError('image_repo needs timestamp keys')
 
         signed = {
-            '_type': 'Root',
+            '_type': kwargs.get('_type', 'Root'),
             'version': version,
             'expires': '2017-01-01T00:00:00Z' if is_expired else '2038-01-19T03:14:06Z',
             'consistent_snapshot': False,
@@ -381,7 +381,7 @@ class Timestamp(Metadata):
         snapshot_json = self.cjson(snapshot)
 
         signed = {
-            '_type': 'Timestamp',
+            '_type': kwargs.get('_type', 'Timestamp'),
             'version': 1,  # TODO
             'expires': '2017-01-01T00:00:00Z' if is_expired else '2038-01-19T03:14:06Z',
             'meta': {
@@ -426,7 +426,7 @@ class Snapshot(Metadata):
         targets_json = self.cjson(targets)
 
         signed = {
-            '_type': 'Snapshot',
+            '_type': kwargs.get('_type', 'Snapshot'),
             'version': version,
             'expires': '2017-01-01T00:00:00Z' if is_expired else '2038-01-19T03:14:06Z',
             'meta': {
@@ -487,7 +487,7 @@ class Targets(Metadata):
         self.snapshot_version = snapshot_version
 
         signed = {
-            '_type': 'Targets',
+            '_type': kwargs.get('_type', 'Targets'),
             'expires': '2017-01-01T00:00:00Z' if is_expired else '2038-01-19T03:14:06Z',
             'version': version,
             'targets': {},
