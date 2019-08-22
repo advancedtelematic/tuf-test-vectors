@@ -38,8 +38,8 @@ test: init-dev ## Run the test suite
 
 .PHONY: update
 update: ## Update the requirements and virtualenv
-	@pip-compile requirements.in --output-file requirements.txt && \
-		pip-compile requirements-dev.in requirements.in --output-file requirements-dev.txt && \
+	@pip-compile -U requirements.in --output-file requirements.txt && \
+		pip-compile -U requirements-dev.in requirements.in --output-file requirements-dev.txt && \
 		$(MAKE) init
 
 venv: ## Create the virtualenv
