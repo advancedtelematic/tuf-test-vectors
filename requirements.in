@@ -1,4 +1,4 @@
 ed25519
 Flask
-pycrypto
+pycryptodome
 securesystemslib
