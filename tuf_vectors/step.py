@@ -35,7 +35,7 @@ class Step:
     }
     SNAPSHOT_KWARGS = {}
 
-    def __default_targets(hardware_id: str, ecu_identifier: str=None) -> list:
+    def __default_targets(hardware_id: str, ecu_identifier: str = None) -> list:
         return [Target(name=DEFAULT_TARGET_NAME,
                        content=DEFAULT_TARGET_CONTENT,
                        hardware_id=hardware_id,
@@ -55,10 +55,10 @@ class Step:
     # constructor.
     DELEGATIONS = {}
 
-    def default_delegations(delegation_name: str=DEFAULT_DELEGATION_NAME,
-                            delegations_keys_idx: list=None,
-                            delegations_bad_key_ids: list=None,
-                            delegation_threshold: int=None,
+    def default_delegations(delegation_name: str = DEFAULT_DELEGATION_NAME,
+                            delegations_keys_idx: list = None,
+                            delegations_bad_key_ids: list = None,
+                            delegation_threshold: int = None,
                             **kwargs) -> list:
 
         delegation_threshold = delegation_threshold if delegation_threshold is not None else len(delegations_keys_idx)

@@ -61,9 +61,9 @@ class Delegation(Helper):
 
     def __init__(
             self,
-            keys_idx: list=None,
-            bad_key_ids: list=None,
-            role: list=None,
+            keys_idx: list = None,
+            bad_key_ids: list = None,
+            role: list = None,
             **kwargs) -> None:
         super().__init__(**kwargs)
         self.value = {
@@ -81,8 +81,8 @@ class Role(Helper):
             keys_idx: list,
             name: str,
             paths: list,
-            terminating: bool=False,
-            threshold: int=None,
+            terminating: bool = False,
+            threshold: int = None,
             **kwargs) -> None:
         super().__init__(**kwargs)
         self.name = name
@@ -102,9 +102,9 @@ class Target:
             name: str,
             content: bytes,
             hardware_id: str,
-            do_write: bool=True,
-            alteration: str=None,
-            ecu_identifier: str=None,
+            do_write: bool = True,
+            alteration: str = None,
+            ecu_identifier: str = None,
             ) -> None:
         self.name = name
         self.content = content
@@ -142,7 +142,7 @@ class Target:
         if ecu_identifier is None:
             # Only used by Image repo metadata.
             self.meta['custom'] = {
-                'hardwareIds': [ hardware_id + ('-XXX' if bad_hw_id else ''), ],
+                'hardwareIds': [hardware_id + ('-XXX' if bad_hw_id else ''), ],
             }
         else:
             # Only used by Director metadata.
@@ -172,7 +172,7 @@ class Metadata(Helper):
             uptane_role: str,
             ecu_identifier: str,
             hardware_id: str,
-            is_delegation: bool=False,
+            is_delegation: bool = False,
             **kwargs
             ) -> None:
         super().__init__(**kwargs)
@@ -264,18 +264,18 @@ class Root(Metadata):
             version: int,
             is_expired: bool,
             root_keys_idx: list,
-            root_sign_keys_idx: list=None,
-            targets_keys_idx: list=None,
-            snapshot_keys_idx: list=None,
-            timestamp_keys_idx: list=None,
-            root_threshold: int=None,
-            targets_threshold: int=None,
-            snapshot_threshold: int=None,
-            timestamp_threshold: int=None,
-            root_bad_key_ids: list=None,
-            targets_bad_key_ids: list=None,
-            snapshot_bad_key_ids: list=None,
-            timestamp_bad_key_ids: list=None,
+            root_sign_keys_idx: list = None,
+            targets_keys_idx: list = None,
+            snapshot_keys_idx: list = None,
+            timestamp_keys_idx: list = None,
+            root_threshold: int = None,
+            targets_threshold: int = None,
+            snapshot_threshold: int = None,
+            timestamp_threshold: int = None,
+            root_bad_key_ids: list = None,
+            targets_bad_key_ids: list = None,
+            snapshot_bad_key_ids: list = None,
+            timestamp_bad_key_ids: list = None,
             **kwargs) -> None:
         self.role_name = 'root'
         super().__init__(is_delegation=False, **kwargs)
@@ -367,7 +367,7 @@ class Timestamp(Metadata):
             timestamp_version: int,
             is_expired: bool,
             snapshot_version: int,
-            timestamp_sign_keys_idx: list=None,
+            timestamp_sign_keys_idx: list = None,
             **kwargs) -> None:
         super().__init__(is_delegation=False, **kwargs)
         self.role_name = 'timestamp'
@@ -387,7 +387,7 @@ class Timestamp(Metadata):
             'meta': {
                 'snapshot.json': {
                     'version': snapshot_version,
-                    'length': len(self.jsonify(snapshot)), # Server returns snapshot.json with self.jsonify
+                    'length': len(self.jsonify(snapshot)),  # Server returns snapshot.json with self.jsonify
                     'hashes': {
                         'sha256': sha256(snapshot_json, bad_hash=False),
                         'sha512': sha512(snapshot_json, bad_hash=False),
@@ -410,8 +410,8 @@ class Snapshot(Metadata):
             snapshot_keys_idx: list,
             targets: dict,
             delegations: dict,  # role_name -> contents_dict
-            snapshot_sign_keys_idx: list=None,
-            targets_version: int=None,
+            snapshot_sign_keys_idx: list = None,
+            targets_version: int = None,
             **kwargs) -> None:
         super().__init__(is_delegation=False, **kwargs)
         self.role_name = 'snapshot'
@@ -423,7 +423,6 @@ class Snapshot(Metadata):
             targets_version = targets_version
         else:
             targets_version = targets['signed']['version']
-        targets_json = self.cjson(targets)
 
         signed = {
             '_type': kwargs.get('_type', 'Snapshot'),
@@ -439,11 +438,12 @@ class Snapshot(Metadata):
         for (name, meta) in delegations.items():
             if name == SKIPPED_DELEGATION_NAME:
                 continue
+
             if meta.snapshot_version:
                 delegation_version = meta.snapshot_version
             else:
                 delegation_version = meta.value['signed']['version']
-            delegation_json = self.cjson(meta.value)
+
             signed['meta'][name + '.json'] = {
                 'version': delegation_version,
             }
@@ -462,12 +462,12 @@ class Targets(Metadata):
             targets_keys_idx: list,
             targets: types.FunctionType,
             hardware_id: str,
-            targets_sign_keys_idx: list=None,
-            role_name: str='targets',
-            ecu_identifier: str=None,
-            delegations: types.FunctionType=None,  # -> list
-            is_delegation: bool=False,
-            snapshot_version: int=None,  # only works for delegations
+            targets_sign_keys_idx: list = None,
+            role_name: str = 'targets',
+            ecu_identifier: str = None,
+            delegations: types.FunctionType = None,  # -> list
+            is_delegation: bool = False,
+            snapshot_version: int = None,  # only works for delegations
             **kwargs) -> None:
         # add these back in for Metadata
         kwargs.update(hardware_id=hardware_id, ecu_identifier=ecu_identifier, is_delegation=is_delegation)

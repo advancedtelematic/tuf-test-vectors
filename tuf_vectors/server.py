@@ -145,7 +145,7 @@ def init_app(
             current = counter[repo]
             repo = repos[repo].steps[current - 1][1]
         except (IndexError, KeyError) as e:
-            app.logger.warn(e)
+            app.logger.warning(e)
             abort(400)
 
         # Check top-level targets
