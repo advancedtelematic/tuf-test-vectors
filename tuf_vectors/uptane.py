@@ -745,7 +745,7 @@ class DirectorTargetHashMismatchUptane(Uptane):
             'targets_keys_idx': TARGETS_KEYS_IDX,
         }
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
@@ -783,7 +783,7 @@ class ImageRepoTargetHashMismatchUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
@@ -2013,6 +2013,7 @@ class ImageRepoTimestampBadKeyIdsUptane(Uptane):
         (DirectorStep, ImageStep),
     ]
 
+
 class DirectorTargetOversizedUptane(Uptane):
 
     '''The director's metadata states that a target is smaller than it actually is.
@@ -2057,13 +2058,12 @@ class DirectorTargetOversizedUptane(Uptane):
             'targets_keys_idx': TARGETS_KEYS_IDX,
         }
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
                            ecu_identifier=ecu_identifier,
                            alteration='oversized')]
-
 
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,
@@ -2073,6 +2073,7 @@ class DirectorTargetOversizedUptane(Uptane):
     STEPS = [
         (DirectorStep, ImageStep),
     ]
+
 
 class ImageRepoTargetOversizedUptane(Uptane):
 
@@ -2093,7 +2094,7 @@ class ImageRepoTargetOversizedUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
@@ -2134,6 +2135,7 @@ class ImageRepoTargetOversizedUptane(Uptane):
         (DirectorStep, ImageStep),
     ]
 
+
 class TargetOversizedUptane(Uptane):
 
     '''Both the director's and image repo's metadata states that a target is smaller than it
@@ -2157,7 +2159,7 @@ class TargetOversizedUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
@@ -2190,7 +2192,7 @@ class TargetOversizedUptane(Uptane):
             'targets_keys_idx': TARGETS_KEYS_IDX,
         }
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
@@ -2679,7 +2681,7 @@ class DirectorBadHwIdUptane(Uptane):
             'targets_keys_idx': TARGETS_KEYS_IDX,
         }
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
@@ -2717,7 +2719,7 @@ class ImageRepoBadHwIdUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
@@ -2776,7 +2778,7 @@ class BadHwIdUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
@@ -2809,7 +2811,7 @@ class BadHwIdUptane(Uptane):
             'targets_keys_idx': TARGETS_KEYS_IDX,
         }
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
@@ -2868,7 +2870,7 @@ class DirectorBadEcuIdUptane(Uptane):
             'targets_keys_idx': TARGETS_KEYS_IDX,
         }
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
@@ -3078,7 +3080,7 @@ class DelegationPathMismatchUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __delegations(delegations_keys_idx: list=None, **kwargs) -> list:
+        def __delegations(delegations_keys_idx: list = None, **kwargs) -> list:
             return [
                 Delegation(
                     keys_idx=delegations_keys_idx,
@@ -3157,7 +3159,7 @@ class DelegationKeyMissingUptane(Uptane):
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
 
-        def __delegations(delegations_keys_idx: list=None, **kwargs) -> list:
+        def __delegations(delegations_keys_idx: list = None, **kwargs) -> list:
             return [
                 Delegation(
                     # Note that keys_idx is empty!
@@ -3462,7 +3464,7 @@ class DelegationHashMismatchUptane(Uptane):
         TIMESTAMP_KEYS_IDX = [3]
         DELEGATION_KEYS_IDX = [6]
 
-        def __targets(hardware_id: str, ecu_identifier: str=None) -> list:
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
             return [Target(name=DEFAULT_TARGET_NAME,
                            content=DEFAULT_TARGET_CONTENT,
                            hardware_id=hardware_id,
