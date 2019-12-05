@@ -1,0 +1,35 @@
+stages:
+  - docker
+  - test
+
+variables:
+  UBUNTU_BIONIC_MASTER_IMAGE: ${CI_REGISTRY_IMAGE}:ci-master-UBUNTU_BIONIC
+  UBUNTU_BIONIC_PR_IMAGE: ${CI_REGISTRY_IMAGE}:ci-${CI_COMMIT_REF_SLUG}-UBUNTU_BIONIC
+
+Docker Setup:
+  image: docker:18
+  stage: docker
+  except:
+    - /^20\d\d\.\d\d?-docs$/
+    - /^docs\//
+  services:
+    - docker:18-dind
+  before_script:
+    - docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
+  script:
+    # main images
+    - docker pull "$UBUNTU_BIONIC_PR_IMAGE" || docker pull "$UBUNTU_BIONIC_MASTER_IMAGE" || true
+    - docker build --pull --cache-from "$UBUNTU_BIONIC_MASTER_IMAGE" --cache-from "$UBUNTU_BIONIC_PR_IMAGE" -f "$CI_PROJECT_DIR/ci/gitlab/Dockerfile.tuf-test-vectors" -t "$UBUNTU_BIONIC_PR_IMAGE" .
+    - docker push "$UBUNTU_BIONIC_PR_IMAGE"
+
+# --tuf-test-vector
+
+tuf-test-vector:
+  image: "$UBUNTU_BIONIC_PR_IMAGE"
+  stage: test
+  except:
+    - /^20\d\d\.\d\d?-docs$/
+    - /^docs\//
+  script:
+    - make lint
+    - make test

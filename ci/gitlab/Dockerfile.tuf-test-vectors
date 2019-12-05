@@ -1,0 +1,21 @@
+FROM ubuntu:bionic
+LABEL Description="tuf-test-vector testing dockerfile for Ubuntu Bionic"
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# It is important to run these in the same RUN command, because otherwise
+# Docker layer caching breaks us
+RUN apt-get update && apt-get -y install --no-install-suggests --no-install-recommends \
+  gcc \
+  make \
+  python3-dev \
+  python3-pip \
+  python3-setuptools \
+  python3-wheel \
+  python3-pytest
+
+RUN pip3 install pip-tools virtualenv
+RUN useradd testuser
+
+ADD . /tuf-test-vectors
+WORKDIR /tuf-test-vectors
