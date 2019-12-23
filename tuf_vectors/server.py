@@ -84,27 +84,34 @@ def init_app(
         if uptane not in ['director', 'image_repo']:
             abort(404)
 
-        root_idx = root_version - 1
-        if current >= root_idx:
-            repo = repos.get(repo, None)
-            if repo is None:
-                abort(404)
-
-            if current > len(repo.steps):
-                abort(400)
-
-            # this is a hack
-            jsonify = repo.steps[0][0].root.jsonify
-
-            try:
-                root = repo.steps[root_idx]
-            except IndexError:
-                abort(404)
-
-            return jsonify(root[0 if uptane == 'director' else 1].root.value)
-        else:
+        # Assume root version must be equal to or less than current step.
+        if current < root_version:
             return abort(404)
 
+        repo = repos.get(repo, None)
+        if repo is None:
+            abort(404)
+
+        if current > len(repo.steps):
+            abort(400)
+
+        # this is a hack
+        jsonify = repo.steps[0][0].root.jsonify
+
+        try:
+            step = repo.steps[current - 1]
+        except IndexError:
+            abort(404)
+
+        step_repo = step[0 if uptane == 'director' else 1]
+
+        # Make sure the version we've fetched is matches the version requested.
+        if step_repo.root.version != root_version:
+            return abort(404)
+
+        return jsonify(step_repo.root.value)
+
+    # TODO: prevent fetching unversioned root.json?
     @app.route('/<string:repo>/<string:uptane>/<string:metadata>.json')
     @app.route('/<string:repo>/<string:uptane>/delegations/<string:metadata>.json')
     @json_response
@@ -129,11 +136,11 @@ def init_app(
         except IndexError:
             abort(400)
 
-        repo = step[0 if uptane == 'director' else 1]
+        step_repo = step[0 if uptane == 'director' else 1]
 
-        data = getattr(repo, metadata, None)
+        data = getattr(step_repo, metadata, None)
         if data is None:
-            data = repo.delegations.get(metadata, None)
+            data = step_repo.delegations.get(metadata, None)
             if data is None:
                 abort(400)
 
