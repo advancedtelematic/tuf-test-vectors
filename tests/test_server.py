@@ -82,27 +82,27 @@ def test_simple(app):
 
 @pytest.mark.skip(reason='TODO')
 def test_root_rotation(app):
-    resp = app.post('/image_repo_valid_root_rotation/step')
+    resp = app.post('/image_repo_root_rotation/step')
     assert resp.status_code == 200
 
     for m in ['', '1.']:
         resp = app.get(
-            '/image_repo_valid_root_rotation/image_repo/{}root.json'.format(m))
+            '/image_repo_root_rotation/image_repo/{}root.json'.format(m))
         assert resp.status_code == 200, 'Prefix "{}"'.format(m)
 
         jsn = json.loads(resp.data.decode('utf-8'))
         assert jsn['signed']['version'] == 1, 'Prefix "{}"'.format(m)
 
-    resp = app.post('/image_repo_valid_root_rotation/step')
+    resp = app.post('/image_repo_root_rotation/step')
     assert resp.status_code == 200
 
     for m in ['', '2.']:
         resp = app.get(
-            '/image_repo_valid_root_rotation/image_repo/{}root.json'.format(m))
+            '/image_repo_root_rotation/image_repo/{}root.json'.format(m))
         assert resp.status_code == 200, 'Prefix "{}"'.format(m)
 
         jsn = json.loads(resp.data.decode('utf-8'))
         assert jsn['signed']['version'] == 2, 'Prefix "{}"'.format(m)
 
-    resp = app.post('/image_repo_valid_root_rotation/step')
+    resp = app.post('/image_repo_root_rotation/step')
     assert resp.status_code == 204
