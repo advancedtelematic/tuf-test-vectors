@@ -278,10 +278,13 @@ class Root(Metadata):
             targets_bad_key_ids: list = None,
             snapshot_bad_key_ids: list = None,
             timestamp_bad_key_ids: list = None,
+            stated_version: int = None,
             **kwargs) -> None:
         super().__init__(is_delegation=False, **kwargs)
         self.role_name = 'root'
         self.version = version
+        if stated_version is None:
+            stated_version = version
 
         if root_sign_keys_idx is None:
             root_sign_keys_idx = root_keys_idx
@@ -307,7 +310,7 @@ class Root(Metadata):
 
         signed = {
             '_type': kwargs.get('_type', 'Root'),
-            'version': version,
+            'version': stated_version,
             'expires': '2017-01-01T00:00:00Z' if is_expired else '2038-01-19T03:14:06Z',
             'consistent_snapshot': False,
             'keys': {},
