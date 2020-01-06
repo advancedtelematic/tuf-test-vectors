@@ -9,9 +9,6 @@ variables:
 Docker Setup:
   image: docker:18
   stage: docker
-  except:
-    - /^20\d\d\.\d\d?-docs$/
-    - /^docs\//
   services:
     - docker:18-dind
   before_script:
@@ -27,9 +24,6 @@ Docker Setup:
 tuf-test-vector:
   image: "$UBUNTU_BIONIC_PR_IMAGE"
   stage: test
-  except:
-    - /^20\d\d\.\d\d?-docs$/
-    - /^docs\//
   script:
     - make lint
     - make test

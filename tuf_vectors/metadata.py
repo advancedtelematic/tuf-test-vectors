@@ -250,6 +250,8 @@ class Metadata(Helper):
     def persist(self) -> None:
         if self.is_delegation:
             full_path = path.join(self.output_dir, self.uptane_role, 'delegations', self.role_name + '.json')
+        elif self.role_name == 'root':
+            full_path = path.join(self.output_dir, self.uptane_role, str(self.version) + '.' + self.role_name + '.json')
         else:
             full_path = path.join(self.output_dir, self.uptane_role, self.role_name + '.json')
         os.makedirs(path.dirname(full_path), exist_ok=True)
@@ -276,9 +278,13 @@ class Root(Metadata):
             targets_bad_key_ids: list = None,
             snapshot_bad_key_ids: list = None,
             timestamp_bad_key_ids: list = None,
+            stated_version: int = None,
             **kwargs) -> None:
-        self.role_name = 'root'
         super().__init__(is_delegation=False, **kwargs)
+        self.role_name = 'root'
+        self.version = version
+        if stated_version is None:
+            stated_version = version
 
         if root_sign_keys_idx is None:
             root_sign_keys_idx = root_keys_idx
@@ -304,7 +310,7 @@ class Root(Metadata):
 
         signed = {
             '_type': kwargs.get('_type', 'Root'),
-            'version': version,
+            'version': stated_version,
             'expires': '2017-01-01T00:00:00Z' if is_expired else '2038-01-19T03:14:06Z',
             'consistent_snapshot': False,
             'keys': {},
