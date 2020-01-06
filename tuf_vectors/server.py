@@ -86,7 +86,7 @@ def init_app(
 
         # Assume root version must be equal to or less than current step.
         if current < root_version:
-            return abort(404)
+            abort(404)
 
         repo = repos.get(repo, None)
         if repo is None:
@@ -107,7 +107,7 @@ def init_app(
 
         # Make sure the version we've fetched is matches the version requested.
         if step_repo.root.version != root_version:
-            return abort(404)
+            abort(404)
 
         return jsonify(step_repo.root.value)
 
