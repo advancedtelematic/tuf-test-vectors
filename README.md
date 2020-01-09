@@ -68,6 +68,6 @@ same one vector in parallel.
 
 ## License
 
-This code is licensed under the [MIT license](COPYING.MIT), a copy of which can be found in this repository. All code is copyright HERE Europe B.V., 2017-2019.
+This code is licensed under the [MIT license](COPYING.MIT), a copy of which can be found in this repository. All code is copyright HERE Europe B.V., 2017-2020.
 
 We require that contributors accept the terms of Linux Foundation's [Developer Certificate of Origin](https://developercertificate.org/). Please see the [contribution instructions of aktualizr](https://github.com/advancedtelematic/aktualizr/blob/master/CONTRIBUTING.md) for more information.
