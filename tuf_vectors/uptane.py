@@ -107,7 +107,7 @@ class SimpleUptane(Uptane):
 
 class DirectorRootZeroThresholdUptane(Uptane):
 
-    '''The director has a threshold of zero for the root role.'''
+    '''The Director has a threshold of zero for the Root role.'''
 
     class ImageStep(Step):
 
@@ -156,7 +156,7 @@ class DirectorRootZeroThresholdUptane(Uptane):
 
 class DirectorTargetsZeroThresholdUptane(Uptane):
 
-    '''The director has a threshold of zero for the targets role.'''
+    '''The Director has a threshold of zero for the Targets role.'''
 
     class ImageStep(Step):
 
@@ -205,7 +205,7 @@ class DirectorTargetsZeroThresholdUptane(Uptane):
 
 class ImageRepoRootZeroThresholdUptane(Uptane):
 
-    '''The image repo has a threshold of zero for the root role.'''
+    '''The Image repo has a threshold of zero for the Root role.'''
 
     class ImageStep(Step):
 
@@ -255,7 +255,7 @@ class ImageRepoRootZeroThresholdUptane(Uptane):
 
 class ImageRepoTargetsZeroThresholdUptane(Uptane):
 
-    '''The image repo has a threshold of zero for the targets role.'''
+    '''The Image repo has a threshold of zero for the Targets role.'''
 
     class ImageStep(Step):
 
@@ -305,7 +305,7 @@ class ImageRepoTargetsZeroThresholdUptane(Uptane):
 
 class ImageRepoSnapshotZeroThresholdUptane(Uptane):
 
-    '''The image repo has a threshold of zero for the snapshot role.'''
+    '''The Image repo has a threshold of zero for the Snapshot role.'''
 
     class ImageStep(Step):
 
@@ -355,7 +355,7 @@ class ImageRepoSnapshotZeroThresholdUptane(Uptane):
 
 class ImageRepoTimestampZeroThresholdUptane(Uptane):
 
-    '''The image repo has a threshold of zero for the timestamp role.'''
+    '''The Image repo has a threshold of zero for the Timestamp role.'''
 
     class ImageStep(Step):
 
@@ -405,7 +405,7 @@ class ImageRepoTimestampZeroThresholdUptane(Uptane):
 
 class DirectorRootExpiredUptane(Uptane):
 
-    '''The director has expired root metadata'''
+    '''The Director has expired Root metadata'''
 
     class ImageStep(Step):
 
@@ -455,7 +455,7 @@ class DirectorRootExpiredUptane(Uptane):
 
 class DirectorTargetsExpiredUptane(Uptane):
 
-    '''The director has expired targets metadata'''
+    '''The Director has expired Targets metadata'''
 
     class ImageStep(Step):
 
@@ -505,7 +505,7 @@ class DirectorTargetsExpiredUptane(Uptane):
 
 class ImageRepoRootExpiredUptane(Uptane):
 
-    '''The image repo has expired root metadata'''
+    '''The Image repo has expired Root metadata'''
 
     class ImageStep(Step):
 
@@ -555,7 +555,7 @@ class ImageRepoRootExpiredUptane(Uptane):
 
 class ImageRepoTargetsExpiredUptane(Uptane):
 
-    '''The image repo has expired targets metadata'''
+    '''The Image repo has expired Targets metadata'''
 
     class ImageStep(Step):
 
@@ -605,7 +605,7 @@ class ImageRepoTargetsExpiredUptane(Uptane):
 
 class ImageRepoSnapshotExpiredUptane(Uptane):
 
-    '''The image repo has expired snapshot metadata'''
+    '''The Image repo has expired Snapshot metadata'''
 
     class ImageStep(Step):
 
@@ -655,7 +655,7 @@ class ImageRepoSnapshotExpiredUptane(Uptane):
 
 class ImageRepoTimestampExpiredUptane(Uptane):
 
-    '''The image repo has expired timestamp metadata'''
+    '''The Image repo has expired Timestamp metadata'''
 
     class ImageStep(Step):
 
@@ -705,7 +705,7 @@ class ImageRepoTimestampExpiredUptane(Uptane):
 
 class DirectorTargetHashMismatchUptane(Uptane):
 
-    '''The director has a target with bad hashes'''
+    '''The Director has a target with bad hashes'''
 
     class ImageStep(Step):
 
@@ -764,7 +764,7 @@ class DirectorTargetHashMismatchUptane(Uptane):
 
 class ImageRepoTargetHashMismatchUptane(Uptane):
 
-    '''The image repo has a target with bad hashes'''
+    '''The Image repo has a target with bad hashes'''
 
     class ImageStep(Step):
 
@@ -823,7 +823,7 @@ class ImageRepoTargetHashMismatchUptane(Uptane):
 
 class DirectorRootUnmetThresholdUptane(Uptane):
 
-    '''The director root metadata has an unmet threshold'''
+    '''The Director Root metadata has an unmet threshold'''
 
     class ImageStep(Step):
 
@@ -873,7 +873,7 @@ class DirectorRootUnmetThresholdUptane(Uptane):
 
 class DirectorTargetsUnmetThresholdUptane(Uptane):
 
-    '''The director targets metadata has an unmet threshold'''
+    '''The Director Targets metadata has an unmet threshold'''
 
     class ImageStep(Step):
 
@@ -922,7 +922,7 @@ class DirectorTargetsUnmetThresholdUptane(Uptane):
 
 class ImageRepoRootUnmetThresholdUptane(Uptane):
 
-    '''The image repo targets metadata has an unmet threshold'''
+    '''The Image repo Targets metadata has an unmet threshold'''
 
     class ImageStep(Step):
 
@@ -972,7 +972,7 @@ class ImageRepoRootUnmetThresholdUptane(Uptane):
 
 class ImageRepoTargetsUnmetThresholdUptane(Uptane):
 
-    '''The image repo targets metadata has an unmet threshold'''
+    '''The Image repo Targets metadata has an unmet threshold'''
 
     class ImageStep(Step):
 
@@ -1021,7 +1021,7 @@ class ImageRepoTargetsUnmetThresholdUptane(Uptane):
 
 class ImageRepoSnapshotUnmetThresholdUptane(Uptane):
 
-    '''The image repo snapshot metadata has an unmet threshold'''
+    '''The Image repo Snapshot metadata has an unmet threshold'''
 
     class ImageStep(Step):
 
@@ -1070,7 +1070,7 @@ class ImageRepoSnapshotUnmetThresholdUptane(Uptane):
 
 class ImageRepoTimestampUnmetThresholdUptane(Uptane):
 
-    '''The image repo timestamp metadata has an unmet threshold'''
+    '''The Image repo Timestamp metadata has an unmet threshold'''
 
     class ImageStep(Step):
 
@@ -1119,7 +1119,7 @@ class ImageRepoTimestampUnmetThresholdUptane(Uptane):
 
 class DirectorRootNonUniqueSignaturesUptane(Uptane):
 
-    '''The director root metadata has duplicate signatures'''
+    '''The Director Root metadata has duplicate signatures'''
 
     class ImageStep(Step):
 
@@ -1169,7 +1169,7 @@ class DirectorRootNonUniqueSignaturesUptane(Uptane):
 
 class DirectorTargetsNonUniqueSignaturesUptane(Uptane):
 
-    '''The director targets metadata has duplicate signatures'''
+    '''The Director Targets metadata has duplicate signatures'''
 
     class ImageStep(Step):
 
@@ -1219,7 +1219,7 @@ class DirectorTargetsNonUniqueSignaturesUptane(Uptane):
 
 class ImageRepoRootNonUniqueSignaturesUptane(Uptane):
 
-    '''The image repo root metadata has duplicate signatures'''
+    '''The Image repo Root metadata has duplicate signatures'''
 
     class ImageStep(Step):
 
@@ -1269,7 +1269,7 @@ class ImageRepoRootNonUniqueSignaturesUptane(Uptane):
 
 class ImageRepoTargetsNonUniqueSignaturesUptane(Uptane):
 
-    '''The image repo targets metadata has duplicate signatures'''
+    '''The Image repo Targets metadata has duplicate signatures'''
 
     class ImageStep(Step):
 
@@ -1319,7 +1319,7 @@ class ImageRepoTargetsNonUniqueSignaturesUptane(Uptane):
 
 class ImageRepoSnapshotNonUniqueSignaturesUptane(Uptane):
 
-    '''The image repo snapshot metadata has duplicate signatures'''
+    '''The Image repo Snapshot metadata has duplicate signatures'''
 
     class ImageStep(Step):
 
@@ -1369,7 +1369,7 @@ class ImageRepoSnapshotNonUniqueSignaturesUptane(Uptane):
 
 class ImageRepoTimestampNonUniqueSignaturesUptane(Uptane):
 
-    '''The image repo timestamp metadata has duplicate signatures'''
+    '''The Image repo Timestamp metadata has duplicate signatures'''
 
     class ImageStep(Step):
 
@@ -1420,7 +1420,7 @@ class ImageRepoTimestampNonUniqueSignaturesUptane(Uptane):
 
 class DirectorRootUnsignedUptane(Uptane):
 
-    '''The director root metadata has no signatures'''
+    '''The Director Root metadata has no signatures'''
 
     class ImageStep(Step):
 
@@ -1470,7 +1470,7 @@ class DirectorRootUnsignedUptane(Uptane):
 
 class DirectorTargetsUnsignedUptane(Uptane):
 
-    '''The director targets metadata has no signatures'''
+    '''The Director Targets metadata has no signatures'''
 
     class ImageStep(Step):
 
@@ -1520,7 +1520,7 @@ class DirectorTargetsUnsignedUptane(Uptane):
 
 class ImageRepoRootUnsignedUptane(Uptane):
 
-    '''The image repo root metadata has no signatures'''
+    '''The Image repo Root metadata has no signatures'''
 
     class ImageStep(Step):
 
@@ -1570,7 +1570,7 @@ class ImageRepoRootUnsignedUptane(Uptane):
 
 class ImageRepoTargetsUnsignedUptane(Uptane):
 
-    '''The image repo targets metadata has no signatures'''
+    '''The Image repo Targets metadata has no signatures'''
 
     class ImageStep(Step):
 
@@ -1620,7 +1620,7 @@ class ImageRepoTargetsUnsignedUptane(Uptane):
 
 class ImageRepoSnapshotUnsignedUptane(Uptane):
 
-    '''The image repo snapshot metadata has no signatures'''
+    '''The Image repo Snapshot metadata has no signatures'''
 
     class ImageStep(Step):
 
@@ -1670,7 +1670,7 @@ class ImageRepoSnapshotUnsignedUptane(Uptane):
 
 class ImageRepoTimestampUnsignedUptane(Uptane):
 
-    '''The image repo timestamp metadata has no signatures'''
+    '''The Image repo Timestamp metadata has no signatures'''
 
     class ImageStep(Step):
 
@@ -1720,7 +1720,7 @@ class ImageRepoTimestampUnsignedUptane(Uptane):
 
 class DirectorRootBadKeyIdsUptane(Uptane):
 
-    '''The director root metadata has bad key IDs for the root role'''
+    '''The Director Root metadata has bad key IDs for the Root role'''
 
     class ImageStep(Step):
 
@@ -1770,7 +1770,7 @@ class DirectorRootBadKeyIdsUptane(Uptane):
 
 class DirectorTargetsBadKeyIdsUptane(Uptane):
 
-    '''The director root metadata has bad key IDs for the targets role'''
+    '''The Director Root metadata has bad key IDs for the Targets role'''
 
     class ImageStep(Step):
 
@@ -1819,7 +1819,7 @@ class DirectorTargetsBadKeyIdsUptane(Uptane):
 
 class ImageRepoRootBadKeyIdsUptane(Uptane):
 
-    '''The image repo root metadata has bad key IDs for the root role'''
+    '''The Image repo Root metadata has bad key IDs for the Root role'''
 
     class ImageStep(Step):
 
@@ -1869,7 +1869,7 @@ class ImageRepoRootBadKeyIdsUptane(Uptane):
 
 class ImageRepoTargetsBadKeyIdsUptane(Uptane):
 
-    '''The image repo root metadata has bad key IDs for the targets role'''
+    '''The Image repo Root metadata has bad key IDs for the Targets role'''
 
     class ImageStep(Step):
 
@@ -1918,7 +1918,7 @@ class ImageRepoTargetsBadKeyIdsUptane(Uptane):
 
 class ImageRepoSnapshotBadKeyIdsUptane(Uptane):
 
-    '''The image repo root metadata has bad key IDs for the snapshot role'''
+    '''The Image repo Root metadata has bad key IDs for the Snapshot role'''
 
     class ImageStep(Step):
 
@@ -1967,7 +1967,7 @@ class ImageRepoSnapshotBadKeyIdsUptane(Uptane):
 
 class ImageRepoTimestampBadKeyIdsUptane(Uptane):
 
-    '''The image repo root metadata has bad key IDs for the timestamp role'''
+    '''The Image repo Root metadata has bad key IDs for the Timestamp role'''
 
     class ImageStep(Step):
 
@@ -2016,8 +2016,8 @@ class ImageRepoTimestampBadKeyIdsUptane(Uptane):
 
 class DirectorTargetOversizedUptane(Uptane):
 
-    '''The director's metadata states that a target is smaller than it actually is.
-       The target metadata in image and director do not match.
+    '''The Director's metadata states that a target is smaller than it actually is.
+       The target metadata in the Image and Director repos do not match.
     '''
 
     class ImageStep(Step):
@@ -2077,8 +2077,8 @@ class DirectorTargetOversizedUptane(Uptane):
 
 class ImageRepoTargetOversizedUptane(Uptane):
 
-    '''The image repo's metadata states that a target is smaller than it actually is.
-       The target metadata in image and director do not match.
+    '''The Image repo's metadata states that a target is smaller than it actually is.
+       The target metadata in the Image and Director repos do not match.
     '''
 
     class ImageStep(Step):
@@ -2138,7 +2138,7 @@ class ImageRepoTargetOversizedUptane(Uptane):
 
 class TargetOversizedUptane(Uptane):
 
-    '''Both the director's and image repo's metadata states that a target is smaller than it
+    '''Both the Director's and Image repo's metadata states that a target is smaller than it
        actually is.
     '''
 
@@ -2937,7 +2937,7 @@ class ImageRepoRootRotationVersionSkipUptane(Uptane):
 
 class DirectorBadHwIdUptane(Uptane):
 
-    '''The director targets metadata has a bad hardware ID'''
+    '''The Director Targets metadata has a bad hardware ID'''
 
     class ImageStep(Step):
 
@@ -2996,7 +2996,7 @@ class DirectorBadHwIdUptane(Uptane):
 
 class ImageRepoBadHwIdUptane(Uptane):
 
-    '''The image repo targets metadata has a bad hardware ID'''
+    '''The Image repo Targets metadata has a bad hardware ID'''
 
     class ImageStep(Step):
 
@@ -3055,7 +3055,7 @@ class ImageRepoBadHwIdUptane(Uptane):
 
 class BadHwIdUptane(Uptane):
 
-    '''Both targets metadata have a bad hardware ID'''
+    '''Both Targets metadata have a bad hardware ID'''
 
     class ImageStep(Step):
 
@@ -3126,7 +3126,7 @@ class BadHwIdUptane(Uptane):
 
 class DirectorBadEcuIdUptane(Uptane):
 
-    '''The director targets metadata has a bad ECU ID'''
+    '''The Director Targets metadata has a bad ECU ID'''
 
     class ImageStep(Step):
 
@@ -3185,7 +3185,7 @@ class DirectorBadEcuIdUptane(Uptane):
 
 class ImageRepoSnapshotTargetsVersionMismatchUptane(Uptane):
 
-    '''The images repo snapshot metadata expects a newer version of the targets metadata'''
+    '''The Image repo Snapshot metadata expects a newer version of the Targets metadata'''
 
     class ImageStep(Step):
 
@@ -3235,7 +3235,7 @@ class ImageRepoSnapshotTargetsVersionMismatchUptane(Uptane):
 
 class DelegationSimpleUptane(Uptane):
 
-    '''The most basic delegation happy case where targets points at one delegation'''
+    '''The most basic delegation happy case where Targets points at one delegation'''
 
     class ImageStep(Step):
 
@@ -3292,7 +3292,7 @@ class DelegationSimpleUptane(Uptane):
 
 class DelegationRedundantUptane(Uptane):
 
-    '''A target is listed in both the top-level targets and a delegation'''
+    '''A target is listed in both the top-level Targets and a delegation'''
 
     class ImageStep(Step):
 
@@ -3431,7 +3431,7 @@ class DelegationPathMismatchUptane(Uptane):
 
 class DelegationKeyMissingUptane(Uptane):
 
-    '''The top-level targets metadata is missing a key ID for a delegated role'''
+    '''The top-level Targets metadata is missing a key ID for a delegated role'''
 
     class ImageStep(Step):
 
@@ -3566,7 +3566,7 @@ class DelegationUnsignedUptane(Uptane):
 
 class DelegationBadKeyIdsUptane(Uptane):
 
-    '''The top-level targets metadata has bad key IDs for a delegated role'''
+    '''The top-level Targets metadata has bad key IDs for a delegated role'''
 
     class ImageStep(Step):
 
@@ -3726,7 +3726,7 @@ class DelegationEmptyUptane(Uptane):
 
     class DirectorStep(Step):
 
-        # Should perhaps be a failure in the images repo, since that is where
+        # Should perhaps be a failure in the Image repo, since that is where
         # the target is missing, but that doesn't work. The error could also be
         # more accurate.
         TARGET_ERRORS = {
@@ -3798,7 +3798,7 @@ class DelegationHashMismatchUptane(Uptane):
 
     class DirectorStep(Step):
 
-        # Should be a failure in the images repo, since that is where the
+        # Should be a failure in the Image repo, since that is where the
         # target is missing, but that doesn't work.
         TARGET_ERRORS = {
             DEFAULT_TARGET_NAME: 'TargetMismatch',
@@ -3862,7 +3862,7 @@ class DelegationExpiredUptane(Uptane):
 
     class DirectorStep(Step):
 
-        # Should be a failure in the images repo, since that is where the
+        # Should be a failure in the Image repo, since that is where the
         # target is missing, but that doesn't work. The error could also be
         # more accurate.
         TARGET_ERRORS = {
@@ -3887,7 +3887,7 @@ class DelegationExpiredUptane(Uptane):
 
 class DelegationSnapshotMissingUptane(Uptane):
 
-    '''The snapshot metadata does not list a delegation'''
+    '''The Snapshot metadata does not list a delegation'''
 
     class ImageStep(Step):
 
@@ -3947,7 +3947,7 @@ class DelegationSnapshotMissingUptane(Uptane):
 
 class DelegationSnapshotVersionMismatchUptane(Uptane):
 
-    '''The snapshot metadata expects a newer version of a delegation'''
+    '''The Snapshot metadata expects a newer version of a delegation'''
 
     class ImageStep(Step):
 
