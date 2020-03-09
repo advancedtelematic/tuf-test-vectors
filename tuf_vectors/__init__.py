@@ -111,7 +111,7 @@ def human_message(err: str) -> str:
     elif err == 'BadEcuId':
         return "The target had an ECU ID that did not match the client's configured ECU id."
     elif err == 'TargetMismatch':
-        return "The target metadata in image and director do not match."
+        return "The target metadata in the Image and Director repos do not match."
     else:
         raise Exception('Unavailable err: {}'.format(err))
 

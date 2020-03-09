@@ -148,8 +148,8 @@ class Step:
             meta['update']['err_msg'] = human_message(self.UPDATE_ERROR)
 
         targets = {}
-        # Note this won't work at present for delegated targets in the images
-        # repo! (It will still work if used for the director repo, though.)
+        # Note this won't work at present for delegated targets in the Image
+        # repo! (It will still work if used for the Director repo, though.)
         for target in self.targets.targets:
             target_error = self.TARGET_ERRORS.get(target.name, None)
             if target_error is None:
