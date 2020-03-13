@@ -114,6 +114,8 @@ def human_message(err: str) -> str:
         return "The target metadata in the Image and Director repos do not match."
     elif err == 'DirectorDelegation':
         return "The targets metadata failed to parse:Found unexpected delegation."
+    elif err == 'DirectorRepeatedEcuId':
+        return "The targets metadata failed to parse:Found repeated ECU ID."
     else:
         raise Exception('Unavailable err: {}'.format(err))
 
