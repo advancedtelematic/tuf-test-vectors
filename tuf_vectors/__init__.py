@@ -64,15 +64,9 @@ def human_message(err: str) -> str:
         return "The target's calculated hash did not match the hash in the metadata."
     elif err == 'OversizedTarget':
         return "The target's size was greater than the size in the metadata."
-    # Not used at present:
-    elif err == 'UnavailableTarget':
-        return 'The target either does not exist or was not in the chain of trusted metadata.'
     elif '::' in err:
         err_base, err_sub = err.split('::')
 
-        if err_base == 'MissingRepo':
-            assert err_sub in ['Director', 'Repo'], err_sub
-            return 'The {} repo is missing.'.format(err_sub.lower())
         if err_base == 'DelegationHashMismatch':
             return "The calculated hash of delegated role {} did not match the hash in the metadata.". \
                     format(err_sub.lower())
@@ -88,16 +82,16 @@ def human_message(err: str) -> str:
             return 'The role {} had non-unique signatures.'.format(err_sub.lower())
         elif err_base == 'SecurityException':
             return 'Metadata type invalidrole does not match expected role {}'.format(err_sub.lower())
-        elif err_base == 'InvalidMetadata':
-            return 'The targets metadata failed to parse:invalid {}.json'.format(err_sub.lower())
 
         assert err_sub in ['Root', 'Targets', 'Timestamp', 'Snapshot', 'Delegation'], err_sub
 
         if err_base == 'ExpiredMetadata':
             return "The {} metadata was expired.".format(err_sub.lower())
+        # Unused, but probably should be:
         elif err_base == 'MetadataHashMismatch':
             return "The {} metadata's hash did not match the hash in the metadata." \
                    .format(err_sub.lower())
+        # Unused, but probably should be:
         elif err_base == 'OversizedMetadata':
             return "The {} metadata's size was greater than the size in the metadata." \
                    .format(err_sub.lower())
@@ -107,11 +101,15 @@ def human_message(err: str) -> str:
         return 'A key has an incorrect associated key ID'
     elif err == 'BadHardwareId':
         return "The target had a hardware ID that did not match the client's configured " \
-               "hardware id."
+               "hardware ID."
     elif err == 'BadEcuId':
-        return "The target had an ECU ID that did not match the client's configured ECU id."
+        return "The target had an ECU ID that did not match the client's configured ECU ID."
     elif err == 'TargetMismatch':
         return "The target metadata in the Image and Director repos do not match."
+    elif err == 'DirectorDelegation':
+        return "The targets metadata failed to parse: Found unexpected delegation."
+    elif err == 'DirectorRepeatedEcuId':
+        return "The targets metadata failed to parse: Found repeated ECU ID."
     else:
         raise Exception('Unavailable err: {}'.format(err))
 

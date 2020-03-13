@@ -4547,3 +4547,118 @@ class ImageRepoTimestampRoleTypeMismatchUptane(Uptane):
     STEPS = [
         (DirectorStep, ImageStep),
     ]
+
+
+class DirectorDelegationsUptane(Uptane):
+
+    '''Director Targets metadata should not have delegations.'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+        # There's no need to create the actual delegation, because the mere
+        # presence of the delegation in the top-level Targets metadata should
+        # be enough to cause a problem.
+
+        UPDATE_ERROR = 'DirectorDelegation'
+
+        TARGETS_KEYS_IDX = [5]
+        DELEGATION_KEYS_IDX = [6]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'delegations_keys_idx': DELEGATION_KEYS_IDX,
+            'delegations': Step.default_delegations,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
+
+
+class DirectorTargetsSameEcuUptane(Uptane):
+
+    '''The Director Targets metadata lists two targets with the same ECU ID'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        UPDATE_ERROR = 'DirectorRepeatedEcuId'
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        def __targets(hardware_id: str, ecu_identifier: str = None) -> list:
+            return [Target(name=DEFAULT_TARGET_NAME,
+                           content=DEFAULT_TARGET_CONTENT,
+                           hardware_id=hardware_id,
+                           ecu_identifier=ecu_identifier),
+                    Target(name='alt.txt',
+                           content=b'something else',
+                           hardware_id=hardware_id,
+                           ecu_identifier=ecu_identifier)]
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': __targets,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep),
+    ]
