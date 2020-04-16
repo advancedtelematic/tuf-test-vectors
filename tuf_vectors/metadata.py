@@ -502,6 +502,11 @@ class Targets(Metadata):
         for target in self.targets:
             signed['targets'][target.name] = target.meta
 
+        too_large = kwargs.get('too_large', None)
+        if too_large == 'TRUE':
+            for i in range(1, 1024*30):
+                signed['targets'][target.name + str(i)] = target.meta
+
         if delegations:
             signed['delegations'] = {}
             signed['delegations']['keys'] = {}
