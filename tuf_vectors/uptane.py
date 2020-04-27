@@ -2393,7 +2393,7 @@ class DirectorRootRotationNoOriginalSignatureUptane(Uptane):
 
     class DirectorStep2(Step):
 
-        UPDATE_ERROR = 'UnmetThreshold::Root'
+        UPDATE_ERROR = 'BadKeyId'
 
         TARGETS_KEYS_IDX = [5]
 
@@ -2447,7 +2447,7 @@ class ImageRepoRootRotationNoOriginalSignatureUptane(Uptane):
 
     class ImageStep2(Step):
 
-        UPDATE_ERROR = 'UnmetThreshold::Root'
+        UPDATE_ERROR = 'BadKeyId'
 
         TARGETS_KEYS_IDX = [1]
         SNAPSHOT_KEYS_IDX = [2]
@@ -2539,7 +2539,7 @@ class DirectorRootRotationNoNewSignatureUptane(Uptane):
 
     class DirectorStep2(Step):
 
-        UPDATE_ERROR = 'UnmetThreshold::Root'
+        UPDATE_ERROR = 'BadKeyId'
 
         TARGETS_KEYS_IDX = [5]
 
@@ -2593,7 +2593,7 @@ class ImageRepoRootRotationNoNewSignatureUptane(Uptane):
 
     class ImageStep2(Step):
 
-        UPDATE_ERROR = 'UnmetThreshold::Root'
+        UPDATE_ERROR = 'BadKeyId'
 
         TARGETS_KEYS_IDX = [1]
         SNAPSHOT_KEYS_IDX = [2]
@@ -2685,7 +2685,7 @@ class DirectorRootRotationVersionUnchangedUptane(Uptane):
     class DirectorStep2(Step):
 
         # Note that aktualizr doesn't actually throw an exception; it just fails.
-        UPDATE_ERROR = 'UnmetThreshold::Root'
+        UPDATE_ERROR = 'RootRotationError'
 
         TARGETS_KEYS_IDX = [5]
 
@@ -2740,7 +2740,7 @@ class ImageRepoRootRotationVersionUnchangedUptane(Uptane):
     class ImageStep2(Step):
 
         # Note that aktualizr doesn't actually throw an exception; it just fails.
-        UPDATE_ERROR = 'UnmetThreshold::Root'
+        UPDATE_ERROR = 'RootRotationError'
 
         TARGETS_KEYS_IDX = [1]
         SNAPSHOT_KEYS_IDX = [2]
@@ -2833,7 +2833,7 @@ class DirectorRootRotationVersionSkipUptane(Uptane):
     class DirectorStep2(Step):
 
         # Note that aktualizr doesn't actually throw an exception; it just fails.
-        UPDATE_ERROR = 'UnmetThreshold::Root'
+        UPDATE_ERROR = 'RootRotationError'
 
         TARGETS_KEYS_IDX = [5]
 
@@ -2888,7 +2888,7 @@ class ImageRepoRootRotationVersionSkipUptane(Uptane):
     class ImageStep2(Step):
 
         # Note that aktualizr doesn't actually throw an exception; it just fails.
-        UPDATE_ERROR = 'UnmetThreshold::Root'
+        UPDATE_ERROR = 'RootRotationError'
 
         TARGETS_KEYS_IDX = [1]
         SNAPSHOT_KEYS_IDX = [2]
@@ -4671,7 +4671,7 @@ class ImageRepoTargetsTooLargeUptane(Uptane):
     class ImageStep(Step):
 
         TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'TargetMismatch',
+            DEFAULT_TARGET_NAME: 'MetadataFetchFailure::Targets::Image',
         }
 
         TARGETS_KEYS_IDX = [1]
@@ -4748,7 +4748,7 @@ class DirectorTargetsTooLargeUptane(Uptane):
     class DirectorStep(Step):
 
         TARGET_ERRORS = {
-            DEFAULT_TARGET_NAME: 'TargetMismatch',
+            DEFAULT_TARGET_NAME: 'MetadataFetchFailure::Targets::Director',
         }
 
         TARGETS_KEYS_IDX = [5]

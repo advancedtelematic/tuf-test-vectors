@@ -65,8 +65,10 @@ def human_message(err: str) -> str:
     elif err == 'OversizedTarget':
         return "The target's size was greater than the size in the metadata."
     elif '::' in err:
-        err_base, err_sub = err.split('::')
+        err_base, err_sub, *err_extra = err.split('::')
 
+        if err_base == 'MetadataFetchFailure':
+            return "Failed to fetch role {} in {} repository.".format(err_sub.lower(), err_extra[0].lower())
         if err_base == 'DelegationHashMismatch':
             return "The calculated hash of delegated role {} did not match the hash in the metadata.". \
                     format(err_sub.lower())
@@ -110,6 +112,8 @@ def human_message(err: str) -> str:
         return "The targets metadata failed to parse: Found unexpected delegation."
     elif err == 'DirectorRepeatedEcuId':
         return "The targets metadata failed to parse: Found repeated ECU ID."
+    elif err == 'RootRotationError':
+        return "Version in Root metadata does not match its expected value."
     else:
         raise Exception('Unavailable err: {}'.format(err))
 
