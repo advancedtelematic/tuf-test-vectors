@@ -2272,6 +2272,77 @@ class DirectorRootRotationUptane(Uptane):
     ]
 
 
+class DirectorRootRotationMultipleUptane(Uptane):
+
+    '''Director step 0 has root v1, step 1 has root v3, it is correctly cross signed'''
+
+    class ImageStep(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep1(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    class DirectorStep2(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = [
+            {
+                'version': 2,
+                'root_keys_idx': [6],
+                'root_sign_keys_idx': [4, 6],
+                'targets_keys_idx': TARGETS_KEYS_IDX,
+            },
+            {
+                'version': 3,
+                'root_keys_idx': [7],
+                'root_sign_keys_idx': [4, 6, 7],
+                'targets_keys_idx': TARGETS_KEYS_IDX,
+            },
+        ]
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep1, ImageStep),
+        (DirectorStep2, ImageStep),
+    ]
+
+
 class ImageRepoRootRotationUptane(Uptane):
 
     '''Image repo step 0 has root v1, step 1 has root v2, it is correctly cross signed'''
@@ -2315,6 +2386,91 @@ class ImageRepoRootRotationUptane(Uptane):
             'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
             'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
         }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep(Step):
+
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+    STEPS = [
+        (DirectorStep, ImageStep1),
+        (DirectorStep, ImageStep2),
+    ]
+
+
+class ImageRepoRootRotationMultipleUptane(Uptane):
+
+    '''Image repo step 0 has root v1, step 1 has root v3, it is correctly cross signed'''
+
+    class ImageStep1(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        SNAPSHOT_KWARGS = {
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class ImageStep2(Step):
+
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = [
+            {
+                'version': 2,
+                'root_keys_idx': [6],
+                'root_sign_keys_idx': [0, 6],
+                'targets_keys_idx': TARGETS_KEYS_IDX,
+                'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+                'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+            },
+            {
+                'version': 3,
+                'root_keys_idx': [7],
+                'root_sign_keys_idx': [0, 6, 7],
+                'targets_keys_idx': TARGETS_KEYS_IDX,
+                'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+                'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+            },
+        ]
 
         TARGETS_KWARGS = {
             'targets_keys_idx': TARGETS_KEYS_IDX,

@@ -45,7 +45,7 @@ def init_app(
     @json_response
     def index():
         # hack to get jsonify function
-        jsonify = list(repos.values())[0].steps[0][0].root.jsonify
+        jsonify = list(repos.values())[0].steps[0][0].roots[0].jsonify
         return jsonify(sorted(list(repos.keys())))
 
     @app.route('/<string:repo>/reset', methods=['POST'])
@@ -69,7 +69,7 @@ def init_app(
             return '', 204
 
         # hack to get jsonify function
-        jsonify = repos[repo].steps[0][0].root.jsonify
+        jsonify = repos[repo].steps[0][0].roots[0].jsonify
 
         # TODO if current step == 0, include root keys for pinning
         return jsonify(step_meta)
@@ -84,10 +84,6 @@ def init_app(
         if uptane not in ['director', 'image_repo']:
             abort(404)
 
-        # Assume root version must be equal to or less than current step.
-        if current < root_version:
-            abort(404)
-
         repo = repos.get(repo, None)
         if repo is None:
             abort(404)
@@ -96,7 +92,7 @@ def init_app(
             abort(400)
 
         # this is a hack
-        jsonify = repo.steps[0][0].root.jsonify
+        jsonify = repo.steps[0][0].roots[0].jsonify
 
         try:
             step = repo.steps[current - 1]
@@ -105,11 +101,13 @@ def init_app(
 
         step_repo = step[0 if uptane == 'director' else 1]
 
-        # Make sure the version we've fetched is matches the version requested.
-        if step_repo.root.version != root_version:
+        # Make sure the version we've fetched matches the version requested.
+        try:
+            root, = [r for r in step_repo.roots if r.version == root_version]
+        except Exception:
             abort(404)
 
-        return jsonify(step_repo.root.value)
+        return jsonify(root.value)
 
     # TODO: prevent fetching unversioned root.json?
     @app.route('/<string:repo>/<string:uptane>/<string:metadata>.json')
@@ -129,7 +127,7 @@ def init_app(
             abort(404)
 
         # this is a hack
-        jsonify = repo.steps[0][0].root.jsonify
+        jsonify = repo.steps[0][0].roots[0].jsonify
 
         try:
             step = repo.steps[current - 1]

@@ -86,10 +86,14 @@ class Step:
             raise ValueError('Bad uptane_role: {}'.format(uptane_role))
         self.uptane_role = uptane_role
 
-        root_args = self.__ROOT_DEFAULT.copy()
-        root_args.update(**self.ROOT_KWARGS)
-        root_args.update(**kwargs)
-        self.root = Root(**root_args)
+        self.roots = []
+        if not isinstance(self.ROOT_KWARGS, list):
+            self.ROOT_KWARGS = [self.ROOT_KWARGS]
+        for r in self.ROOT_KWARGS:
+            root_args = self.__ROOT_DEFAULT.copy()
+            root_args.update(**r)
+            root_args.update(**kwargs)
+            self.roots.append(Root(**root_args))
 
         targets_args = self.__TARGETS_DEFAULT.copy()
         targets_args.update(**self.TARGETS_KWARGS)
@@ -124,8 +128,13 @@ class Step:
             if MISSING_DELEGATION_NAME in self.delegations:
                 del self.delegations[MISSING_DELEGATION_NAME]
 
+    @property
+    def root(self):
+        return self.roots[-1]
+
     def persist(self) -> None:
-        self.root.persist()
+        for r in self.roots:
+            r.persist()
         self.targets.persist()
 
         if self.uptane_role == 'image_repo':
