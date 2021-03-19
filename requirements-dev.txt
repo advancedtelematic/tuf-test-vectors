@@ -4,32 +4,23 @@
 #
 #    pip-compile --output-file=requirements-dev.txt requirements-dev.in requirements.in
 #
-attrs==19.3.0             # via pytest
-click==7.0                # via flask
-colorama==0.4.1           # via securesystemslib
-coverage==4.5.4           # via pytest-cov
+click==7.1.2
+    # via flask
 ed25519==1.5
-entrypoints==0.3          # via flake8
-flake8==3.7.9
-flask==1.1.1
-importlib-metadata==0.23  # via pluggy, pytest
-itsdangerous==1.1.0       # via flask
-jinja2==2.10.3            # via flask
-markupsafe==1.1.1         # via jinja2
-mccabe==0.6.1             # via flake8
-more-itertools==7.2.0     # via pytest, zipp
-packaging==19.2           # via pytest
-pluggy==0.13.1            # via pytest
-py==1.8.0                 # via pytest
-pycodestyle==2.5.0        # via flake8
-pycryptodome==3.9.4
-pyflakes==2.1.1           # via flake8
-pyparsing==2.4.5          # via packaging
-pytest-cov==2.8.1
-pytest==5.3.1
-python-dateutil==2.8.1    # via securesystemslib
-securesystemslib==0.12.2
-six==1.13.0               # via packaging, python-dateutil, securesystemslib
-wcwidth==0.1.7            # via pytest
-werkzeug==0.16.0          # via flask
-zipp==0.6.0               # via importlib-metadata
+    # via -r requirements.in
+flask==1.1.2
+    # via -r requirements.in
+itsdangerous==1.1.0
+    # via flask
+jinja2==2.11.3
+    # via flask
+markupsafe==1.1.1
+    # via jinja2
+pycryptodome==3.10.1
+    # via -r requirements.in
+securesystemslib==0.20.0
+    # via -r requirements.in
+six==1.13.0
+    # via securesystemslib
+werkzeug==1.0.1
+    # via flask
