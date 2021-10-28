@@ -2328,7 +2328,7 @@ class DirectorRootRotationMultipleUptane(Uptane):
             {
                 'version': 3,
                 'root_keys_idx': [7],
-                'root_sign_keys_idx': [4, 6, 7],
+                'root_sign_keys_idx': [6, 7],
                 'targets_keys_idx': TARGETS_KEYS_IDX,
             },
         ]
@@ -2465,7 +2465,7 @@ class ImageRepoRootRotationMultipleUptane(Uptane):
             {
                 'version': 3,
                 'root_keys_idx': [7],
-                'root_sign_keys_idx': [0, 6, 7],
+                'root_sign_keys_idx': [6, 7],
                 'targets_keys_idx': TARGETS_KEYS_IDX,
                 'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
                 'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
