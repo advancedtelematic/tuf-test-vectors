@@ -4504,7 +4504,7 @@ class DirectorTargetsRoleTypeMismatchUptane(Uptane):
     ]
 
 
-class ImageRepRootRoleTypeMismatchUptane(Uptane):
+class ImageRepoRootRoleTypeMismatchUptane(Uptane):
     """
     The type of role must have an appropriate name in the metadata file.
     ImageRepo role Root: _type = "Root"
@@ -4555,7 +4555,7 @@ class ImageRepRootRoleTypeMismatchUptane(Uptane):
     ]
 
 
-class ImageRepTargetsRoleTypeMismatchUptane(Uptane):
+class ImageRepoTargetsRoleTypeMismatchUptane(Uptane):
     """
     The type of role must have an appropriate name in the metadata file.
     ImageRepo role Targets: _type = "Targets"
