@@ -1,0 +1,27 @@
+name: tuf-test-vectors CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  selftest:
+    name: tuf-test-vectors selftests
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_TAG: docker.pkg.github.com/advancedtelematics/tuf-test-vectors/tuf-test-vectors-ci:ubuntu-focal-master
+      DOCKERFILE: ci/gitlab/Dockerfile.tuf-test-vectors
+    steps:
+      - uses: actions/checkout@master
+      - run: git fetch --prune --unshallow
+      - name: Docker login
+        if: github.token
+        run: echo ${{ github.token }} | docker login docker.pkg.github.com -u uptane --password-stdin
+      - name: Docker build
+        run: |
+          docker pull "$DOCKER_TAG" || true
+          docker build --cache-from "$DOCKER_TAG" --pull -t "$DOCKER_TAG" -f "$DOCKERFILE" .
+      - name: Test
+        run: |
+          make lint
+          make test
