@@ -3091,6 +3091,124 @@ class ImageRepoRootRotationVersionSkipUptane(Uptane):
     ]
 
 
+class ImageRepoMetadataChangedWhileVersionSameUptane(Uptane):
+
+    '''Image repo step 0 has timestamp, snapshot, and targets v1, step 1 has different metadata than step 0,
+       but, the version is the same. Update should succeed in this case, since the specification does NOT forbid it '''
+
+    class ImageStep1(Step):
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [0],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda hardware_id, ecu_identifier: [
+                Target(name=DEFAULT_TARGET_NAME,
+                       content=DEFAULT_TARGET_CONTENT,
+                       hardware_id=hardware_id,
+                       ecu_identifier=ecu_identifier)
+            ]
+        }
+
+        SNAPSHOT_KWARGS = {
+            'add_targets_hash_and_length': True,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class ImageStep2(Step):
+        TARGETS_KEYS_IDX = [1]
+        SNAPSHOT_KEYS_IDX = [2]
+        TIMESTAMP_KEYS_IDX = [3]
+
+        ROOT_KWARGS = {
+            'version': 1,
+            'root_keys_idx': [6],
+            'root_sign_keys_idx': [0, 6],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda hardware_id, ecu_identifier: [
+                Target(name=DEFAULT_TARGET_NAME,
+                       content=DEFAULT_TARGET_CONTENT,
+                       hardware_id=hardware_id,
+                       ecu_identifier=ecu_identifier),
+                Target(name='file01.txt',
+                       content=b'some foobar content',
+                       hardware_id=hardware_id,
+                       ecu_identifier=ecu_identifier)
+
+            ]
+        }
+
+        SNAPSHOT_KWARGS = {
+            'add_targets_hash_and_length': True,
+            'snapshot_keys_idx': SNAPSHOT_KEYS_IDX,
+        }
+
+        TIMESTAMP_KWARGS = {
+            'timestamp_keys_idx': TIMESTAMP_KEYS_IDX,
+        }
+
+    class DirectorStep1(Step):
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda hardware_id, ecu_identifier: [
+                Target(name=DEFAULT_TARGET_NAME,
+                       content=DEFAULT_TARGET_CONTENT,
+                       hardware_id=hardware_id,
+                       ecu_identifier=ecu_identifier)
+            ]
+        }
+
+    class DirectorStep2(Step):
+        TARGETS_KEYS_IDX = [5]
+
+        ROOT_KWARGS = {
+            'root_keys_idx': [4],
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+        }
+
+        TARGETS_KWARGS = {
+            'version': 2,
+            'targets_keys_idx': TARGETS_KEYS_IDX,
+            'targets': lambda hardware_id, ecu_identifier: [
+                Target(name='file01.txt',
+                       content=b'some foobar content',
+                       hardware_id=hardware_id,
+                       ecu_identifier=ecu_identifier)
+
+                ]
+        }
+
+    STEPS = [
+        (DirectorStep1, ImageStep1),
+        (DirectorStep2, ImageStep2),
+    ]
+
+
 class DirectorBadHwIdUptane(Uptane):
 
     '''The Director Targets metadata has a bad hardware ID'''
