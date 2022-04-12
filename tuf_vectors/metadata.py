@@ -418,6 +418,7 @@ class Snapshot(Metadata):
             delegations: dict,  # role_name -> contents_dict
             snapshot_sign_keys_idx: list = None,
             targets_version: int = None,
+            add_targets_hash_and_length: bool = False,
             **kwargs) -> None:
         super().__init__(is_delegation=False, **kwargs)
         self.role_name = 'snapshot'
@@ -440,6 +441,13 @@ class Snapshot(Metadata):
                 },
             },
         }
+
+        if add_targets_hash_and_length:
+            targets_content = self.cjson(targets).encode('utf-8')
+            signed['meta']['targets.json']['hashes'] = {
+                'sha256': sha256(targets_content, False),
+            }
+            signed['meta']['targets.json']['length'] = len(targets_content)
 
         for (name, meta) in delegations.items():
             if name == SKIPPED_DELEGATION_NAME:
