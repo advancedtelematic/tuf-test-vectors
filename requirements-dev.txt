@@ -4,53 +4,25 @@
 #
 #    pip-compile --output-file=requirements-dev.txt requirements-dev.in requirements.in
 #
-attrs==21.2.0
-    # via pytest
-click==8.0.3
-    # via flask
-coverage[toml]==6.1.1
+coverage[toml]==7.2.5
     # via pytest-cov
-ed25519==1.5
-    # via -r requirements.in
-flake8==4.0.1
+flake8==6.0.0
     # via -r requirements-dev.in
-flask==2.0.2
-    # via -r requirements.in
-iniconfig==1.1.1
+iniconfig==2.0.0
     # via pytest
-itsdangerous==2.0.1
-    # via flask
-jinja2==3.0.2
-    # via flask
-markupsafe==2.0.1
-    # via jinja2
-mccabe==0.6.1
+mccabe==0.7.0
     # via flake8
-packaging==21.2
+packaging==23.1
     # via pytest
 pluggy==1.0.0
     # via pytest
-py==1.10.0
-    # via pytest
-pycodestyle==2.8.0
+pycodestyle==2.10.0
     # via flake8
-pycryptodome==3.11.0
-    # via -r requirements.in
-pyflakes==2.4.0
+pyflakes==3.0.1
     # via flake8
-pyparsing==2.4.7
-    # via packaging
-pytest==6.2.5
+pytest==7.3.1
     # via
     #   -r requirements-dev.in
     #   pytest-cov
-pytest-cov==3.0.0
+pytest-cov==4.0.0
     # via -r requirements-dev.in
-securesystemslib==0.21.0
-    # via -r requirements.in
-toml==0.10.2
-    # via pytest
-tomli==1.2.2
-    # via coverage
-werkzeug==2.0.2
-    # via flask
